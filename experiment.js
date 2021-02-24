@@ -290,7 +290,8 @@ var test_ebbinghaus_procedure = {
 
 /* debriefing feedback */
 var debrief_block = {
-    type: "html-keyboard-response",
+    type: "html-button-response",
+    choices: ["End"],
     stimulus: function () {
 
         var trials = jsPsych.data.get().filter({ screen: 'test' })
@@ -329,7 +330,7 @@ jsPsych.init({
     show_progress_bar: true,
     message_progress_bar: 'Completion',
     preload_images: images,
-    exclusions: { min_width: 800, min_height: 600 }, /* exclude browsers that are not at least 800x600 pix */
+    // exclusions: { min_width: 800, min_height: 600 }, /* exclude browsers that are not at least 800x600 pix */
     on_interaction_data_update: function (data) { console.log(JSON.stringify(data)) }, /* record browser interactions */
     on_finish: function () {
         jsPsych.data.displayData()
