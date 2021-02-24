@@ -38,8 +38,8 @@
 */
 
 
-/* INITIALIZE VARIABLES */
-/* get participant info */
+/* ----------------- Initialize Variables ----------------- */
+// Get participant and session info
 var subject_id = jsPsych.randomization.randomID(15) /* random subject ID with 15 characters */
 var datetime = new Date()
 var timezone = -1 * (datetime.getTimezoneOffset() / 60)
@@ -57,17 +57,14 @@ var session_info = {
     date_timezone: timezone
 }
 
-/* experiment variables */
-var timeline = []  // timeline for containing sets of trials to run in expt
+// Set experiment variables
 var trial_number = 1 // trial indexing variable starts at 1 for convenience
 var block_number = 0 // block indexing variables (should block 0 be there as practice block?)
-var focus = 'focus' // tracks if the current tab/window is the active tab/window, initially the current tab should be focused
-var fullscreen = 'no' // tracks fullscreen activity, initially not activated
 var images = ['stimuli/delboeuf_str0_diff1.png', 'stimuli/delboeuf_str0_diff-1.png', 'stimuli/delboeuf_str1_diff1.png', 'stimuli/delboeuf_str1_diff-1.png',
               'stimuli/delboeuf_str-1_diff1.png', 'stimuli/delboeuf_str-1_diff-1.png', 'stimuli/ebbinghaus_str0_diff1.png', 'stimuli/ebbinghaus_str0_diff-1.png',
               'stimuli/ebbinghaus_str1_diff1.png', 'stimuli/ebbinghaus_str1_diff-1.png', 'stimuli/ebbinghaus_str-1_diff1.png', 'stimuli/ebbinghaus_str-1_diff-1.png'] // preload images
 
-/* define welcome message trial */
+// Welcome + Informed Consent
 var welcome = {
     type: "html-button-response",
     choices: ["I want to participate.", "I don't want to participate."],
@@ -85,7 +82,7 @@ var welcome = {
     datetime: datetime,
 }); */
 
-/* record questionnaire info */
+// Get self-reported participant info
 var participant_info_general = {
     type: 'survey-text',
     questions: [
@@ -95,6 +92,7 @@ var participant_info_general = {
     data: { screen: 'participant_info_general' }
 }
 
+// Get info on repetition
 var participant_info_repetition = {
     type: 'survey-multi-choice',
     questions: [
@@ -109,45 +107,7 @@ var participant_info_repetition = {
     data: { screen: 'participant_info_repetition' }
 }
 
-/* DELBOEUF BLOCK */
-/* define instructions message */
-var delboeuf_instructions = {
-    type: "html-button-response",
-    choices: ["Start"],
-    stimulus: function () {
-        if (systemInfo().screen_touchscreen == false) {
-            return ("<p>In this experiment, two red circles will appear " +
-                "on the screen.</p><p>Your task is to judge which circle is bigger in size. </p><p>If the <strong>left circle</strong> is bigger, " +
-                "press the <strong>left arrow key</strong> on the keyboard as fast as you can.</p>" +
-                "<p>If the <strong>right circle</strong> is bigger, press the <strong>right arrow key</strong> as fast as you can.</p>" +
-                "<div style='float: center'><img src='demo_stimuli/Delboeuf_Demo.png' height='600'></img>" +
-                "<p class='small'>For example, <strong>press the left arrow key</strong> here.</p></div>")
-        } else {
-            return ("<p>In this experiment, two red circles will appear " +
-                "on the screen.</p><p>Your task is to judge which circle is bigger in size. </p><p>If the <strong>left circle</strong> is bigger, " +
-                "<strong>click on the left circle</strong> as fast as you can.</p>" +
-                "<p>If the <strong>right circle</strong> is bigger, <strong>click on the right circle</strong> as fast as you can.</p>" +
-                "<div style='float: center'><img src='demo_stimuli/Delboeuf_Demo.png' height='600'></img>" +
-                "<p class='small'>For example, <strong>click on the left circle</strong> here.</p></div>")
-        }
-    },
-    post_trial_gap: 2000,
-    on_finish: function (data) {
-        block_number += 1
-    }
-}
-
-/* define array of trials */
-var delboeuf_stimuli = [
-    { stimulus: "stimuli/delboeuf_str0_diff1.png", data: { screen: 'test', block: 'delboeuf', correct_response: 'arrowleft' } },
-    { stimulus: "stimuli/delboeuf_str0_diff-1.png", data: { screen: 'test', block: 'delboeuf', correct_response: 'arrowright' } },
-    { stimulus: "stimuli/delboeuf_str1_diff1.png", data: { screen: 'test', block: 'delboeuf', correct_response: 'arrowleft' } },
-    { stimulus: "stimuli/delboeuf_str1_diff-1.png", data: { screen: 'test', block: 'delboeuf', correct_response: 'arrowright' } },
-    { stimulus: "stimuli/delboeuf_str-1_diff1.png", data: { screen: 'test', block: 'delboeuf', correct_response: 'arrowleft' } },
-    { stimulus: "stimuli/delboeuf_str-1_diff-1.png", data: { screen: 'test', block: 'delboeuf', correct_response: 'arrowright' } }
-]
-
-/* define fixation cross to show in between trials */
+// Set fixation cross
 var fixation = {
     type: 'html-keyboard-response',
     stimulus: '<div style="font-size:60px;">+</div>',
@@ -159,11 +119,50 @@ var fixation = {
     data: { screen: 'fixation' }
 }
 
-/* create test trials, substitute the value of the parameter in from the timeline variables. */
+/* ----------------- BLOCK 1: DELBOEUF ILLUSION ----------------- */
+// Instructions
+var delboeuf_instructions = {
+    type: "html-button-response",
+    choices: ["Start"],
+    stimulus: function () {
+        if (systemInfo().screen_touchscreen == false) {
+            return ("<p>In this experiment, two red circles will appear " +
+                "on the screen.</p><p>Your task is to judge which circle is bigger in size. </p><p>If the <strong>left circle</strong> is bigger, " +
+                "press the <strong>left arrow key</strong> on the keyboard as fast as you can.</p>" +
+                "<p>If the <strong>right circle</strong> is bigger, press the <strong>right arrow key</strong> as fast as you can.</p>" +
+                "<div style='float: center'><img src='demo_stimuli/Delboeuf_Demo.png' height='300'></img>" +
+                "<p class='small'>For example, <strong>press the left arrow key</strong> here.</p></div>")
+        } else {
+            return ("<p>In this experiment, two red circles will appear " +
+                "on the screen.</p><p>Your task is to judge which circle is bigger in size. </p><p>If the <strong>left circle</strong> is bigger, " +
+                "<strong>click on the left circle</strong> as fast as you can.</p>" +
+                "<p>If the <strong>right circle</strong> is bigger, <strong>click on the right circle</strong> as fast as you can.</p>" +
+                "<div style='float: center'><img src='demo_stimuli/Delboeuf_Demo.png' height='300'></img>" +
+                "<p class='small'>For example, <strong>click on the left circle</strong> here.</p></div>")
+        }
+    },
+    post_trial_gap: 2000,
+    on_finish: function (data) {
+        block_number += 1
+    }
+}
+
+// Set stimuli
+var delboeuf_stimuli = [
+    { stimulus: "stimuli/delboeuf_str0_diff1.png", data: { screen: 'test', block: 'delboeuf', correct_response: 'arrowleft' } },
+    { stimulus: "stimuli/delboeuf_str0_diff-1.png", data: { screen: 'test', block: 'delboeuf', correct_response: 'arrowright' } },
+    { stimulus: "stimuli/delboeuf_str1_diff1.png", data: { screen: 'test', block: 'delboeuf', correct_response: 'arrowleft' } },
+    { stimulus: "stimuli/delboeuf_str1_diff-1.png", data: { screen: 'test', block: 'delboeuf', correct_response: 'arrowright' } },
+    { stimulus: "stimuli/delboeuf_str-1_diff1.png", data: { screen: 'test', block: 'delboeuf', correct_response: 'arrowleft' } },
+    { stimulus: "stimuli/delboeuf_str-1_diff-1.png", data: { screen: 'test', block: 'delboeuf', correct_response: 'arrowright' } }
+]
+
+
+// Set test trials
 var delboeuf_test = {
     type: "image-keyboardmouse-response",
     stimulus: jsPsych.timelineVariable('stimulus'),
-    choices: ['arrowleft', 'arrowright', 'esc'],
+    choices: ['arrowleft', 'arrowright'],
     data: jsPsych.timelineVariable('data'),
     on_finish: function (data) {
         data.prestimulus_duration = jsPsych.data.get().last(2).values()[0].time_elapsed - jsPsych.data.get().last(3).values()[0].time_elapsed
@@ -191,13 +190,10 @@ var delboeuf_test = {
         data.block_number = block_number
         data.trial_number = trial_number
         trial_number += 1
-        if (data.answer == 'esc') {
-            jsPsych.endExperiment('The experiment has ended.')
-        }
     },
 }
 
-/* link variables in delboeuf_stimuli array with the call to jsPsych.timelineVariable() */
+// link variables in stimuli array with the call to jsPsych.timelineVariable()
 var test_delboeuf_procedure = {
     timeline: [fixation, delboeuf_test],
     timeline_variables: delboeuf_stimuli,
@@ -205,8 +201,8 @@ var test_delboeuf_procedure = {
     repetitions: 1
 }
 
-/* EBBINGHAUS BLOCK */
-/* define instructions message */
+/* ----------------- BLOCK 2: EBBINGHAUS ILLUSION ----------------- */
+// Instructions
 var ebbinghaus_instructions = {
     type: "html-button-response",
     choices: ["Start"],
@@ -216,14 +212,14 @@ var ebbinghaus_instructions = {
                 "on the screen.</p><p>Your task is to judge which circle is bigger in size. </p><p>If the <strong>left circle</strong> is bigger, " +
                 "press the <strong>left arrow key</strong> on the keyboard as fast as you can.</p>" +
                 "<p>If the <strong>right circle</strong> is bigger, press the <strong>right arrow key</strong> as fast as you can.</p>" +
-                "<div style='float: center'><img src='demo_stimuli/Ebbinghaus_Demo.png' height='600'></img>" +
+                "<div style='float: center'><img src='demo_stimuli/Ebbinghaus_Demo.png' height='300'></img>" +
                 "<p class='small'>For example, <strong>press the left arrow key</strong> here.</p></div>")
         } else {
             return ("<p>In this experiment, two red circles will appear " +
                 "on the screen.</p><p>Your task is to judge which circle is bigger in size. </p><p>If the <strong>left circle</strong> is bigger, " +
                 "<strong>click on the left circle</strong> as fast as you can.</p>" +
                 "<p>If the <strong>right circle</strong> is bigger, <strong>click on the right circle</strong> as fast as you can.</p>" +
-                "<div style='float: center'><img src='demo_stimuli/Ebbinghaus_Demo.png' height='600'></img>" +
+                "<div style='float: center'><img src='demo_stimuli/Ebbinghaus_Demo.png' height='300'></img>" +
                 "<p class='small'>For example, <strong>click on the left circle</strong> here.</p></div>")
         }
     },
@@ -234,6 +230,7 @@ var ebbinghaus_instructions = {
     }
 }
 
+// Set stimuli
 var ebbinghaus_stimuli = [
     { stimulus: "stimuli/ebbinghaus_str0_diff1.png", data: { screen: 'test', block: 'ebbinghaus', correct_response: 'arrowleft' } },
     { stimulus: "stimuli/ebbinghaus_str0_diff-1.png", data: { screen: 'test', block: 'ebbinghaus', correct_response: 'arrowright' } },
@@ -243,6 +240,7 @@ var ebbinghaus_stimuli = [
     { stimulus: "stimuli/ebbinghaus_str-1_diff-1.png", data: { screen: 'test', block: 'ebbinghaus', correct_response: 'arrowright' } }
 ]
 
+// Set test trials
 var ebbinghaus_test = {
     type: "image-keyboardmouse-response",
     stimulus: jsPsych.timelineVariable('stimulus'),
@@ -274,12 +272,10 @@ var ebbinghaus_test = {
         data.block_number = block_number
         data.trial_number = trial_number
         trial_number += 1
-        if (data.answer == 'esc') {
-            jsPsych.endExperiment('The experiment has ended.')
-        }
     },
 }
 
+// link variables in stimuli array with the call to jsPsych.timelineVariable()
 var test_ebbinghaus_procedure = {
     timeline: [fixation, ebbinghaus_test],
     timeline_variables: ebbinghaus_stimuli,
@@ -287,8 +283,8 @@ var test_ebbinghaus_procedure = {
     repetitions: 1
 }
 
-
-/* debriefing feedback */
+/* ----------------- END OF EXPERIMENT ----------------- */
+// Debriefing Information
 var debrief_block = {
     type: "html-button-response",
     choices: ["End"],
@@ -323,7 +319,7 @@ var debrief_block = {
 
 
 
-/* start experiment */
+/* ----------------- Initialize experiment ----------------- */
 jsPsych.init({
     timeline: [welcome, participant_info_general, participant_info_repetition, delboeuf_instructions, test_delboeuf_procedure,
         ebbinghaus_instructions, test_ebbinghaus_procedure, debrief_block],
