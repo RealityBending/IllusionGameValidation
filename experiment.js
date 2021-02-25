@@ -70,7 +70,7 @@ const delboeuf_sd = 10
 const ebbinghaus_mean = 660
 const ebbinghaus_sd = 20
 
-const mathjs = require('mathjs')
+mathjs = require('mathjs')
 function cdfNormal (x, mean, standardDeviation) {
   return (1 - mathjs.erf((mean - x ) / (Math.sqrt(2) * standardDeviation))) / 2
 }
