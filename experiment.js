@@ -64,6 +64,14 @@ var images = ['stimuli/delboeuf_str0_diff1.png', 'stimuli/delboeuf_str0_diff-1.p
               'stimuli/delboeuf_str-1_diff1.png', 'stimuli/delboeuf_str-1_diff-1.png', 'stimuli/ebbinghaus_str0_diff1.png', 'stimuli/ebbinghaus_str0_diff-1.png',
               'stimuli/ebbinghaus_str1_diff1.png', 'stimuli/ebbinghaus_str1_diff-1.png', 'stimuli/ebbinghaus_str-1_diff1.png', 'stimuli/ebbinghaus_str-1_diff-1.png'] // preload images
 
+// fixed scores as placeholders, update later
+var population_scores = {
+    delboeuf_accuracy = 90,
+    delboeuf_sd = 10,
+    ebbinghaus_accuracy = 100,
+    ebbinghaus_sd = 20
+}
+
 // Welcome + Informed Consent
 var welcome = {
     type: "html-button-response",
@@ -129,14 +137,14 @@ var delboeuf_instructions = {
             return ("<p>In this experiment, two red circles will appear " +
                 "on the screen.</p><p>Your task is to judge which circle is bigger in size. </p><p>If the <strong>left circle</strong> is bigger, " +
                 "press the <strong>left arrow key</strong> on the keyboard as fast as you can.</p>" +
-                "<p>If the <strong>right circle</strong> is bigger, press the <strong>right arrow key</strong> as fast as you can.</p>" +
+                "<p>If the <strong>right circle</strong> is bigger, press the <strong>right arrow key</strong> as fast as you can.</p><hr>" +
                 "<div style='float: center'><img src='demo_stimuli/Delboeuf_Demo.png' height='300'></img>" +
                 "<p class='small'>For example, <strong>press the left arrow key</strong> here.</p></div>")
         } else {
             return ("<p>In this experiment, two red circles will appear " +
                 "on the screen.</p><p>Your task is to judge which circle is bigger in size. </p><p>If the <strong>left circle</strong> is bigger, " +
                 "<strong>click on the left circle</strong> as fast as you can.</p>" +
-                "<p>If the <strong>right circle</strong> is bigger, <strong>click on the right circle</strong> as fast as you can.</p>" +
+                "<p>If the <strong>right circle</strong> is bigger, <strong>click on the right circle</strong> as fast as you can.</p><hr>" +
                 "<div style='float: center'><img src='demo_stimuli/Delboeuf_Demo.png' height='300'></img>" +
                 "<p class='small'>For example, <strong>click on the left circle</strong> here.</p></div>")
         }
@@ -211,14 +219,14 @@ var ebbinghaus_instructions = {
             return ("<p>In this experiment, two red circles will appear " +
                 "on the screen.</p><p>Your task is to judge which circle is bigger in size. </p><p>If the <strong>left circle</strong> is bigger, " +
                 "press the <strong>left arrow key</strong> on the keyboard as fast as you can.</p>" +
-                "<p>If the <strong>right circle</strong> is bigger, press the <strong>right arrow key</strong> as fast as you can.</p>" +
+                "<p>If the <strong>right circle</strong> is bigger, press the <strong>right arrow key</strong> as fast as you can.</p><hr>" +
                 "<div style='float: center'><img src='demo_stimuli/Ebbinghaus_Demo.png' height='300'></img>" +
                 "<p class='small'>For example, <strong>press the left arrow key</strong> here.</p></div>")
         } else {
             return ("<p>In this experiment, two red circles will appear " +
                 "on the screen.</p><p>Your task is to judge which circle is bigger in size. </p><p>If the <strong>left circle</strong> is bigger, " +
                 "<strong>click on the left circle</strong> as fast as you can.</p>" +
-                "<p>If the <strong>right circle</strong> is bigger, <strong>click on the right circle</strong> as fast as you can.</p>" +
+                "<p>If the <strong>right circle</strong> is bigger, <strong>click on the right circle</strong> as fast as you can.</p><hr>" +
                 "<div style='float: center'><img src='demo_stimuli/Ebbinghaus_Demo.png' height='300'></img>" +
                 "<p class='small'>For example, <strong>click on the left circle</strong> here.</p></div>")
         }
@@ -316,7 +324,6 @@ var debrief_block = {
         jsPsych.endExperiment('The experiment has ended. You can close the window or press refresh it to start again.')
     }
 }
-
 
 
 /* ----------------- Initialize experiment ----------------- */
