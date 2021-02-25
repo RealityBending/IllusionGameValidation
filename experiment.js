@@ -65,11 +65,14 @@ var images = ['stimuli/delboeuf_str0_diff1.png', 'stimuli/delboeuf_str0_diff-1.p
               'stimuli/ebbinghaus_str1_diff1.png', 'stimuli/ebbinghaus_str1_diff-1.png', 'stimuli/ebbinghaus_str-1_diff1.png', 'stimuli/ebbinghaus_str-1_diff-1.png'] // preload images
 
 // fixed scores as placeholders, update later
-var population_scores = {
-    delboeuf_accuracy: 90,
-    delboeuf_sd: 10,
-    ebbinghaus_accuracy: 100,
-    ebbinghaus_sd: 20
+const delboeuf_mean = 550
+const delboeuf_sd = 10
+const ebbinghaus_mean = 660
+const ebbinghaus_sd = 20
+
+const mathjs = require('mathjs')
+function cdfNormal (x, mean, standardDeviation) {
+  return (1 - mathjs.erf((mean - x ) / (Math.sqrt(2) * standardDeviation))) / 2
 }
 
 // Welcome + Informed Consent
@@ -218,16 +221,18 @@ var delboeuf_debrief = {
         var trials = jsPsych.data.get().filter({ screen: 'test', block: 'delboeuf'})
         var correct_trials = trials.filter({ correct: true })
         var proportion_correct = correct_trials.count() / trials.count()
+        var accuracy = "<p style='color:rgb(76,175,80);'>You responded correctly on <b>" +
+            round_digits(correct_trials.count() / trials.count() * 100) + "" +
+            "%</b> of the trials.</p>"
         if (correct_trials.count() > 0) {
             var rt = correct_trials.select('rt').mean()
-            // compute inverse efficiency score
-            var ies = rt / proportion_correct
+            var ies = rt / proportion_correct // compute inverse efficiency score
+            display = "<p style='color:rgb(233,30,99);'>You performed better than <b>" + round_digits(cdfNormal(ies, delboeuf_mean, delboeuf_sd)) + "</b>% of the population.</p>"
         } else {
-            var rt = ""
-            var ies = ""
+            var display = ""
         }
         return "<p>Here are your results:</p><hr>" +
-            ies +
+            display +
             "<hr><p>Can you do better in the next illusion?</p>"
     }
 }
