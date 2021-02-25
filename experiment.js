@@ -66,10 +66,10 @@ var images = ['stimuli/delboeuf_str0_diff1.png', 'stimuli/delboeuf_str0_diff-1.p
 
 // fixed scores as placeholders, update later
 var population_scores = {
-    delboeuf_accuracy = 90,
-    delboeuf_sd = 10,
-    ebbinghaus_accuracy = 100,
-    ebbinghaus_sd = 20
+    delboeuf_accuracy: 90,
+    delboeuf_sd: 10,
+    ebbinghaus_accuracy: 100,
+    ebbinghaus_sd: 20
 }
 
 // Welcome + Informed Consent
