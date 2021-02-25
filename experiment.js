@@ -209,6 +209,29 @@ var test_delboeuf_procedure = {
     repetitions: 1
 }
 
+// Debriefing Information
+var delboeuf_debrief = {
+    type: "html-button-response",
+    choices: ["Next Illusion"],
+    stimulus: function () {
+
+        var trials = jsPsych.data.get().filter({ screen: 'test', block: 'delboeuf'})
+        var correct_trials = trials.filter({ correct: true })
+        var accuracy = "<p style='color:rgb(76,175,80);'>You responded correctly on <b>" +
+            round_digits(correct_trials.count() / trials.count() * 100) + "" +
+            "%</b> of the trials.</p>"
+        if (correct_trials.count() > 0) {
+            var rt = correct_trials.select('rt').mean()
+            rt = "<p style='color:rgb(233,30,99);'>Your average response time was <b>" + round_digits(rt) + "</b> ms.</p>"
+        } else {
+            var rt = ""
+        }
+        return "<p>Here are your results:</p><hr>" +
+            accuracy + rt +
+            "<hr><p>Can you do better in the next illusion?</p>"
+    }
+}
+
 /* ----------------- BLOCK 2: EBBINGHAUS ILLUSION ----------------- */
 // Instructions
 var ebbinghaus_instructions = {
@@ -291,9 +314,32 @@ var test_ebbinghaus_procedure = {
     repetitions: 1
 }
 
+// Debriefing Information
+var ebbinghaus_debrief = {
+    type: "html-button-response",
+    choices: ["Next Illusion"],
+    stimulus: function () {
+
+        var trials = jsPsych.data.get().filter({ screen: 'test', block: 'ebbinghaus'})
+        var correct_trials = trials.filter({ correct: true })
+        var accuracy = "<p style='color:rgb(76,175,80);'>You responded correctly on <b>" +
+            round_digits(correct_trials.count() / trials.count() * 100) + "" +
+            "%</b> of the trials.</p>"
+        if (correct_trials.count() > 0) {
+            var rt = correct_trials.select('rt').mean()
+            rt = "<p style='color:rgb(233,30,99);'>Your average response time was <b>" + round_digits(rt) + "</b> ms.</p>"
+        } else {
+            var rt = ""
+        }
+        return "<p>Here are your results:</p><hr>" +
+            accuracy + rt +
+            "<hr><p>Can you do better in the next illusion?</p>"
+    }
+}
+
 /* ----------------- END OF EXPERIMENT ----------------- */
 // Debriefing Information
-var debrief_block = {
+var end_experiment = {
     type: "html-button-response",
     choices: ["End"],
     stimulus: function () {
@@ -328,8 +374,8 @@ var debrief_block = {
 
 /* ----------------- Initialize experiment ----------------- */
 jsPsych.init({
-    timeline: [welcome, participant_info_general, participant_info_repetition, delboeuf_instructions, test_delboeuf_procedure,
-        ebbinghaus_instructions, test_ebbinghaus_procedure, debrief_block],
+    timeline: [welcome, participant_info_general, participant_info_repetition, delboeuf_instructions, test_delboeuf_procedure, delboeuf_debrief,
+        ebbinghaus_instructions, test_ebbinghaus_procedure, ebbinghaus_debrief, end_experiment],
     show_progress_bar: true,
     message_progress_bar: 'Completion',
     preload_images: images,
