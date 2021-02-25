@@ -217,17 +217,17 @@ var delboeuf_debrief = {
 
         var trials = jsPsych.data.get().filter({ screen: 'test', block: 'delboeuf'})
         var correct_trials = trials.filter({ correct: true })
-        var accuracy = "<p style='color:rgb(76,175,80);'>You responded correctly on <b>" +
-            round_digits(correct_trials.count() / trials.count() * 100) + "" +
-            "%</b> of the trials.</p>"
+        var proportion_correct = correct_trials.count() / trials.count()
         if (correct_trials.count() > 0) {
             var rt = correct_trials.select('rt').mean()
-            rt = "<p style='color:rgb(233,30,99);'>Your average response time was <b>" + round_digits(rt) + "</b> ms.</p>"
+            // compute inverse efficiency score
+            var ies = rt / proportion_correct
         } else {
             var rt = ""
+            var ies = ""
         }
         return "<p>Here are your results:</p><hr>" +
-            accuracy + rt +
+            ies +
             "<hr><p>Can you do better in the next illusion?</p>"
     }
 }
