@@ -327,6 +327,7 @@ var ebbinghaus_debrief = {
 
         var trials = jsPsych.data.get().filter({ screen: 'test', block: 'ebbinghaus'})
         var correct_trials = trials.filter({ correct: true })
+        var proportion_correct = correct_trials.count() / trials.count()
         var accuracy = "<p style='color:rgb(76,175,80);'>You responded correctly on <b>" +
             round_digits(correct_trials.count() / trials.count() * 100) + "" +
             "%</b> of the trials.</p>"
@@ -355,6 +356,7 @@ var end_experiment = {
 
         var trials = jsPsych.data.get().filter({ screen: 'test' })
         var correct_trials = trials.filter({ correct: true })
+        var proportion_correct = correct_trials.count() / trials.count()
         var accuracy = "<p style='color:rgb(76,175,80);'>You responded correctly on <b>" +
             round_digits(correct_trials.count() / trials.count() * 100) + "" +
             "%</b> of the trials.</p>"
