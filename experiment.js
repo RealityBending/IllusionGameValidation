@@ -69,11 +69,8 @@ const delboeuf_mean = 550
 const delboeuf_sd = 10
 const ebbinghaus_mean = 660
 const ebbinghaus_sd = 20
-
-mathjs = require('mathjs')
-function cdfNormal (x, mean, standardDeviation) {
-  return (1 - mathjs.erf((mean - x ) / (Math.sqrt(2) * standardDeviation))) / 2
-}
+const overall_mean = 590
+const overall_sd = 25
 
 // Welcome + Informed Consent
 var welcome = {
@@ -225,14 +222,17 @@ var delboeuf_debrief = {
             round_digits(correct_trials.count() / trials.count() * 100) + "" +
             "%</b> of the trials.</p>"
         if (correct_trials.count() > 0) {
-            var rt = correct_trials.select('rt').mean()
-            var ies = rt / proportion_correct // compute inverse efficiency score
-            display = "<p style='color:rgb(233,30,99);'>You performed better than <b>" + round_digits(cdfNormal(ies, delboeuf_mean, delboeuf_sd)) + "</b>% of the population.</p>"
+            var rt_mean = correct_trials.select('rt').mean()
+            var rt = "<p style='color:rgb(233,30,99);'>Your average response time was <b>" + round_digits(rt_mean) + "</b> ms.</p>"
+            var ies = rt_mean / proportion_correct // compute inverse efficiency score
+            var percentile = round_digits(100 - (cumulative_probability(ies, delboeuf_mean, delboeuf_sd)*100))
+            comparison = "<p style='color:rgb(233,30,99);'>You performed better than <b>" + percentile + "</b>% of the population.</p>"
         } else {
-            var display = ""
+            rt = ""
+            comparison = ""
         }
         return "<p>Here are your results:</p><hr>" +
-            display +
+            accuracy + rt + comparison
             "<hr><p>Can you do better in the next illusion?</p>"
     }
 }
@@ -331,13 +331,17 @@ var ebbinghaus_debrief = {
             round_digits(correct_trials.count() / trials.count() * 100) + "" +
             "%</b> of the trials.</p>"
         if (correct_trials.count() > 0) {
-            var rt = correct_trials.select('rt').mean()
-            rt = "<p style='color:rgb(233,30,99);'>Your average response time was <b>" + round_digits(rt) + "</b> ms.</p>"
+            var rt_mean = correct_trials.select('rt').mean()
+            var rt = "<p style='color:rgb(233,30,99);'>Your average response time was <b>" + round_digits(rt_mean) + "</b> ms.</p>"
+            var ies = rt_mean / proportion_correct // compute inverse efficiency score
+            var percentile = round_digits(100 - (cumulative_probability(ies, ebbinghaus_mean, ebbinghaus_sd)*100))
+            comparison = "<p style='color:rgb(233,30,99);'>You performed better than <b>" + percentile + "</b>% of the population.</p>"
         } else {
-            var rt = ""
+            rt = ""
+            comparison = ""
         }
         return "<p>Here are your results:</p><hr>" +
-            accuracy + rt +
+            accuracy + rt + comparison
             "<hr><p>Can you do better in the next illusion?</p>"
     }
 }
@@ -355,13 +359,17 @@ var end_experiment = {
             round_digits(correct_trials.count() / trials.count() * 100) + "" +
             "%</b> of the trials.</p>"
         if (correct_trials.count() > 0) {
-            var rt = correct_trials.select('rt').mean()
-            rt = "<p style='color:rgb(233,30,99);'>Your average response time was <b>" + round_digits(rt) + "</b> ms.</p>"
+            var rt_mean = correct_trials.select('rt').mean()
+            var rt = "<p style='color:rgb(233,30,99);'>Your average response time was <b>" + round_digits(rt_mean) + "</b> ms.</p>"
+            var ies = rt_mean / proportion_correct // compute inverse efficiency score
+            var percentile = round_digits(100 - (cumulative_probability(ies, overall_mean, overall_sd)*100))
+            comparison = "<p style='color:rgb(233,30,99);'>You performed better than <b>" + percentile + "</b>% of the population.</p>"
         } else {
-            var rt = ""
+            rt = ""
+            comparison = ""
         }
         return "<p><b>Thank you for participating!</b> Here are your results:</p><hr>" +
-            accuracy + rt +
+            accuracy + rt + comparison +
             "<hr><p> Don't hesitate to spread the word and share this experiment, science appreciates :)</p>"
     },
     /* var accuracy = Math.round(correct_trials.count() / trials.count() * 100);
