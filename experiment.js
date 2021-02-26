@@ -37,6 +37,33 @@
 }
 */
 
+/* ----------------- Internal Functions ----------------- */
+function get_results(illusion_type, illusion_mean, illusion_sd, block=true) {
+    if (block === true) {
+        var trials = jsPsych.data.get().filter({ screen: 'test', block: illusion_type }) // results by block
+    } else {
+        var trials = jsPsych.data.get().filter({ screen: 'test'}) // overall results
+    }
+    var correct_trials = trials.filter({ correct: true })
+    var proportion_correct = correct_trials.count() / trials.count()
+    var rt_mean = trials.select('rt').mean()
+    if (correct_trials.count() > 0) {
+        var rt_mean_correct = correct_trials.select('rt').mean()
+        var ies = rt_mean_correct / proportion_correct // compute inverse efficiency score
+        var percentile = 100 - (cumulative_probability(ies, illusion_mean, illusion_sd) * 100)
+    } else {
+        var rt_mean_correct = ""
+        var ies = ""
+        var percentile = ""
+    }
+    return {
+        accuracy: proportion_correct,
+        mean_reaction_time: rt_mean,
+        mean_reaction_time_correct: rt_mean_correct,
+        inverse_efficiency: ies,
+        percentage: percentile,
+    }
+}
 
 /* ----------------- Initialize Variables ----------------- */
 // Get participant and session info
@@ -214,27 +241,29 @@ var delboeuf_debrief = {
     type: "html-button-response",
     choices: ["Next Illusion"],
     stimulus: function () {
+        var results = get_results('delboeuf', delboeuf_mean, delboeuf_sd, block=true)
+        var display_accuracy = "<p style='color:rgb(76,175,80);'>You responded correctly on <b>" +
+            round_digits(results.accuracy * 100) + "" + "%</b> of the trials.</p>"
+        var display_rt = "<p style='color:rgb(233,30,99);'>Your average response time was <b>" + round_digits(results.mean_reaction_time) + "</b> ms.</p>"
+        var display_percentile = round_digits(results.percentage) 
 
-        var trials = jsPsych.data.get().filter({ screen: 'test', block: 'delboeuf'})
-        var correct_trials = trials.filter({ correct: true })
-        var proportion_correct = correct_trials.count() / trials.count()
-        var accuracy = "<p style='color:rgb(76,175,80);'>You responded correctly on <b>" +
-            round_digits(correct_trials.count() / trials.count() * 100) + "" +
-            "%</b> of the trials.</p>"
-        if (correct_trials.count() > 0) {
-            var rt_mean = correct_trials.select('rt').mean()
-            var rt = "<p style='color:rgb(233,30,99);'>Your average response time was <b>" + round_digits(rt_mean) + "</b> ms.</p>"
-            var ies = rt_mean / proportion_correct // compute inverse efficiency score
-            var percentile = round_digits(100 - (cumulative_probability(ies, delboeuf_mean, delboeuf_sd)*100))
-            var comparison = "<p style='color:rgb(233,30,99);'>You performed better than <b>" + percentile + "</b>% of the population.</p>"
+        if (results.percentage != "") {
+            var comparison = "<p style='color:rgb(233,30,99);'>You performed better than <b>" + display_percentile + "</b>% of the population.</p>"
         } else {
-            rt = ""
-            comparison = ""
+            var comparison = ""
         }
         return "<p>Here are your results:</p><hr>" +
-            accuracy + rt + comparison
-            "<hr><p>Can you do better in the next illusion?</p>"
-    }
+            display_accuracy + display_rt + comparison +
+        "<hr><p>Can you do better in the next illusion?</p>"
+    },
+    on_finish: function (data) {
+        var results = get_results('delboeuf', delboeuf_mean, delboeuf_sd, block=true)
+        data.rt_mean = results.mean_reaction_time
+        data.rt_mean_correct = results.mean_reaction_time_correct
+        data.accuracy = results.accuracy
+        data.inverse_efficiency_score = results.inverse_efficiency
+    },
+    data: { screen: 'block_results' }
 }
 
 /* ----------------- BLOCK 2: EBBINGHAUS ILLUSION ----------------- */
@@ -324,27 +353,29 @@ var ebbinghaus_debrief = {
     type: "html-button-response",
     choices: ["Next Illusion"],
     stimulus: function () {
+        var results = get_results('ebbinghaus', ebbinghaus_mean, ebbinghaus_sd, block=true)
+        var display_accuracy = "<p style='color:rgb(76,175,80);'>You responded correctly on <b>" +
+            round_digits(results.accuracy * 100) + "" + "%</b> of the trials.</p>"
+        var display_rt = "<p style='color:rgb(233,30,99);'>Your average response time was <b>" + round_digits(results.mean_reaction_time) + "</b> ms.</p>"
+        var display_percentile = round_digits(results.percentage) 
 
-        var trials = jsPsych.data.get().filter({ screen: 'test', block: 'ebbinghaus'})
-        var correct_trials = trials.filter({ correct: true })
-        var proportion_correct = correct_trials.count() / trials.count()
-        var accuracy = "<p style='color:rgb(76,175,80);'>You responded correctly on <b>" +
-            round_digits(correct_trials.count() / trials.count() * 100) + "" +
-            "%</b> of the trials.</p>"
-        if (correct_trials.count() > 0) {
-            var rt_mean = correct_trials.select('rt').mean()
-            var rt = "<p style='color:rgb(233,30,99);'>Your average response time was <b>" + round_digits(rt_mean) + "</b> ms.</p>"
-            var ies = rt_mean / proportion_correct // compute inverse efficiency score
-            var percentile = round_digits(100 - (cumulative_probability(ies, ebbinghaus_mean, ebbinghaus_sd)*100))
-            var comparison = "<p style='color:rgb(233,30,99);'>You performed better than <b>" + percentile + "</b>% of the population.</p>"
+        if (results.percentage != "") {
+            var comparison = "<p style='color:rgb(233,30,99);'>You performed better than <b>" + display_percentile + "</b>% of the population.</p>"
         } else {
-            rt = ""
-            comparison = ""
+            var comparison = ""
         }
         return "<p>Here are your results:</p><hr>" +
-            accuracy + rt + comparison
-            "<hr><p>Can you do better in the next illusion?</p>"
-    }
+            display_accuracy + display_rt + comparison +
+        "<hr><p>Can you do better in the next illusion?</p>"
+    },
+    on_finish: function (data) {
+        var results = get_results('ebbinghaus', ebbinghaus_mean, ebbinghaus_sd, block=true)
+        data.rt_mean = results.mean_reaction_time
+        data.rt_mean_correct = results.mean_reaction_time_correct
+        data.accuracy = results.accuracy
+        data.inverse_efficiency_score = results.inverse_efficiency
+    },
+    data: { screen: 'block_results' }
 }
 
 /* ----------------- END OF EXPERIMENT ----------------- */
@@ -353,37 +384,30 @@ var end_experiment = {
     type: "html-button-response",
     choices: ["End"],
     stimulus: function () {
+        var results = get_results(illusion_mean=overall_mean, illusion_sd=overall_sd, block=false)
+        var display_accuracy = "<p style='color:rgb(76,175,80);'>You responded correctly on <b>" +
+            round_digits(results.accuracy * 100) + "" + "%</b> of the trials.</p>"
+        var display_rt = "<p style='color:rgb(233,30,99);'>Your average response time was <b>" + round_digits(results.mean_reaction_time) + "</b> ms.</p>"
+        var display_percentile = round_digits(results.percentage) 
 
-        var trials = jsPsych.data.get().filter({ screen: 'test' })
-        var correct_trials = trials.filter({ correct: true })
-        var proportion_correct = correct_trials.count() / trials.count()
-        var accuracy = "<p style='color:rgb(76,175,80);'>You responded correctly on <b>" +
-            round_digits(correct_trials.count() / trials.count() * 100) + "" +
-            "%</b> of the trials.</p>"
-        if (correct_trials.count() > 0) {
-            var rt_mean = correct_trials.select('rt').mean()
-            var rt = "<p style='color:rgb(233,30,99);'>Your average response time was <b>" + round_digits(rt_mean) + "</b> ms.</p>"
-            var ies = rt_mean / proportion_correct // compute inverse efficiency score
-            var percentile = round_digits(100 - (cumulative_probability(ies, overall_mean, overall_sd)*100))
-            var comparison = "<p style='color:rgb(233,30,99);'>You performed better than <b>" + percentile + "</b>% of the population.</p>"
+        if (results.percentage != "") {
+            var comparison = "<p style='color:rgb(233,30,99);'>You performed better than <b>" + display_percentile + "</b>% of the population.</p>"
         } else {
-            rt = ""
-            comparison = ""
+            var comparison = ""
         }
         return "<p><b>Thank you for participating!</b> Here are your results:</p><hr>" +
-            accuracy + rt + comparison +
+            display_accuracy + display_rt + comparison +
             "<hr><p> Don't hesitate to spread the word and share this experiment, science appreciates :)</p>"
     },
-    /* var accuracy = Math.round(correct_trials.count() / trials.count() * 100);
-    var rt = Math.round(correct_trials.select('rt').mean());
-
-    return "<p>You responded correctly on "+accuracy+"% of the trials.</p>"+
-    "<p>Your average response time was "+rt+"ms.</p>"+
-    "<p>Press any key to complete the experiment. Thank you!</p>";
-    },*/
-    on_finish: function () {
+    on_finish: function (data) {
         jsPsych.endExperiment('The experiment has ended. You can close the window or press refresh it to start again.')
-    }
+        var results = get_results(illusion_mean=overall_mean, illusion_sd=overall_sd, block=false)
+        data.rt_mean = results.mean_reaction_time
+        data.rt_mean_correct = results.mean_reaction_time_correct
+        data.accuracy = results.accuracy
+        data.inverse_efficiency_score = results.inverse_efficiency
+    },
+    data: { screen: 'final_results' }
 }
 
 
