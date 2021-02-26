@@ -247,12 +247,7 @@ var delboeuf_debrief = {
             round_digits(results.accuracy * 100) + "" + "%</b> of the trials.</p>"
         var display_rt = "<p style='color:rgb(233,30,99);'>Your average response time was <b>" + round_digits(results.mean_reaction_time) + "</b> ms.</p>"
         var display_percentile = round_digits(results.percentage) 
-
-        if (results.percentage != "") {
-            var comparison = "<p style='color:rgb(233,30,99);'>You performed better than <b>" + display_percentile + "</b>% of the population.</p>"
-        } else {
-            var comparison = ""
-        }
+        var comparison = "<p style='color:rgb(233,30,99);'>You performed better than <b>" + display_percentile + "</b>% of the population.</p>"
         return "<p>Here are your results:</p><hr>" +
             display_accuracy + display_rt + comparison +
         "<hr><p>Can you do better in the next illusion?</p>"
@@ -362,12 +357,7 @@ var ebbinghaus_debrief = {
             round_digits(results.accuracy * 100) + "" + "%</b> of the trials.</p>"
         var display_rt = "<p style='color:rgb(233,30,99);'>Your average response time was <b>" + round_digits(results.mean_reaction_time) + "</b> ms.</p>"
         var display_percentile = round_digits(results.percentage) 
-
-        if (results.percentage != "") {
-            var comparison = "<p style='color:rgb(233,30,99);'>You performed better than <b>" + display_percentile + "</b>% of the population.</p>"
-        } else {
-            var comparison = ""
-        }
+        var comparison = "<p style='color:rgb(233,30,99);'>You performed better than <b>" + display_percentile + "</b>% of the population.</p>"
         return "<p>Here are your results:</p><hr>" +
             display_accuracy + display_rt + comparison +
         "<hr><p>Can you do better in the next illusion?</p>"
@@ -395,12 +385,7 @@ var end_experiment = {
             round_digits(results.accuracy * 100) + "" + "%</b> of the trials.</p>"
         var display_rt = "<p style='color:rgb(233,30,99);'>Your average response time was <b>" + round_digits(results.mean_reaction_time) + "</b> ms.</p>"
         var display_percentile = round_digits(results.percentage) 
-
-        if (results.percentage != "") {
-            var comparison = "<p style='color:rgb(233,30,99);'>You performed better than <b>" + display_percentile + "</b>% of the population.</p>"
-        } else {
-            var comparison = ""
-        }
+        var comparison = "<p style='color:rgb(233,30,99);'>You performed better than <b>" + display_percentile + "</b>% of the population.</p>"
         return "<p><b>Thank you for participating!</b> Here are your results:</p><hr>" +
             display_accuracy + display_rt + comparison +
             "<hr><p> Don't hesitate to spread the word and share this experiment, science appreciates :)</p>"
