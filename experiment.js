@@ -226,7 +226,7 @@ var delboeuf_debrief = {
             var rt = "<p style='color:rgb(233,30,99);'>Your average response time was <b>" + round_digits(rt_mean) + "</b> ms.</p>"
             var ies = rt_mean / proportion_correct // compute inverse efficiency score
             var percentile = round_digits(100 - (cumulative_probability(ies, delboeuf_mean, delboeuf_sd)*100))
-            comparison = "<p style='color:rgb(233,30,99);'>You performed better than <b>" + percentile + "</b>% of the population.</p>"
+            var comparison = "<p style='color:rgb(233,30,99);'>You performed better than <b>" + percentile + "</b>% of the population.</p>"
         } else {
             rt = ""
             comparison = ""
@@ -335,7 +335,7 @@ var ebbinghaus_debrief = {
             var rt = "<p style='color:rgb(233,30,99);'>Your average response time was <b>" + round_digits(rt_mean) + "</b> ms.</p>"
             var ies = rt_mean / proportion_correct // compute inverse efficiency score
             var percentile = round_digits(100 - (cumulative_probability(ies, ebbinghaus_mean, ebbinghaus_sd)*100))
-            comparison = "<p style='color:rgb(233,30,99);'>You performed better than <b>" + percentile + "</b>% of the population.</p>"
+            var comparison = "<p style='color:rgb(233,30,99);'>You performed better than <b>" + percentile + "</b>% of the population.</p>"
         } else {
             rt = ""
             comparison = ""
@@ -363,7 +363,7 @@ var end_experiment = {
             var rt = "<p style='color:rgb(233,30,99);'>Your average response time was <b>" + round_digits(rt_mean) + "</b> ms.</p>"
             var ies = rt_mean / proportion_correct // compute inverse efficiency score
             var percentile = round_digits(100 - (cumulative_probability(ies, overall_mean, overall_sd)*100))
-            comparison = "<p style='color:rgb(233,30,99);'>You performed better than <b>" + percentile + "</b>% of the population.</p>"
+            var comparison = "<p style='color:rgb(233,30,99);'>You performed better than <b>" + percentile + "</b>% of the population.</p>"
         } else {
             rt = ""
             comparison = ""
