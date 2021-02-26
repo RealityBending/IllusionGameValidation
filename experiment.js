@@ -38,8 +38,8 @@
 */
 
 /* ----------------- Internal Functions ----------------- */
-function get_results(illusion_type, illusion_mean, illusion_sd, block=true) {
-    if (block === true) {
+function get_results(illusion_mean, illusion_sd, illusion_type) {
+    if (typeof illusion_type != 'undefined') {
         var trials = jsPsych.data.get().filter({ screen: 'test', block: illusion_type }) // results by block
     } else {
         var trials = jsPsych.data.get().filter({ screen: 'test'}) // overall results
@@ -222,6 +222,7 @@ var delboeuf_test = {
             }
         }
         // track block and trial numbers
+        data.block = 'delboeuf'
         data.block_number = block_number
         data.trial_number = trial_number
         trial_number += 1
@@ -241,7 +242,7 @@ var delboeuf_debrief = {
     type: "html-button-response",
     choices: ["Next Illusion"],
     stimulus: function () {
-        var results = get_results('delboeuf', delboeuf_mean, delboeuf_sd, block=true)
+        var results = get_results(delboeuf_mean, delboeuf_sd, 'delboeuf')
         var display_accuracy = "<p style='color:rgb(76,175,80);'>You responded correctly on <b>" +
             round_digits(results.accuracy * 100) + "" + "%</b> of the trials.</p>"
         var display_rt = "<p style='color:rgb(233,30,99);'>Your average response time was <b>" + round_digits(results.mean_reaction_time) + "</b> ms.</p>"
@@ -257,7 +258,9 @@ var delboeuf_debrief = {
         "<hr><p>Can you do better in the next illusion?</p>"
     },
     on_finish: function (data) {
-        var results = get_results('delboeuf', delboeuf_mean, delboeuf_sd, block=true)
+        var results = get_results(delboeuf_mean, delboeuf_sd, 'delboeuf')
+        data.block = 'delboeuf'
+        data.block_number = block_number
         data.rt_mean = results.mean_reaction_time
         data.rt_mean_correct = results.mean_reaction_time_correct
         data.accuracy = results.accuracy
@@ -334,6 +337,7 @@ var ebbinghaus_test = {
             }
         }
         // track block and trial numbers
+        data.block = 'ebbinghaus'
         data.block_number = block_number
         data.trial_number = trial_number
         trial_number += 1
@@ -353,7 +357,7 @@ var ebbinghaus_debrief = {
     type: "html-button-response",
     choices: ["Next Illusion"],
     stimulus: function () {
-        var results = get_results('ebbinghaus', ebbinghaus_mean, ebbinghaus_sd, block=true)
+        var results = get_results(ebbinghaus_mean, ebbinghaus_sd, 'ebbinghaus')
         var display_accuracy = "<p style='color:rgb(76,175,80);'>You responded correctly on <b>" +
             round_digits(results.accuracy * 100) + "" + "%</b> of the trials.</p>"
         var display_rt = "<p style='color:rgb(233,30,99);'>Your average response time was <b>" + round_digits(results.mean_reaction_time) + "</b> ms.</p>"
@@ -369,7 +373,9 @@ var ebbinghaus_debrief = {
         "<hr><p>Can you do better in the next illusion?</p>"
     },
     on_finish: function (data) {
-        var results = get_results('ebbinghaus', ebbinghaus_mean, ebbinghaus_sd, block=true)
+        var results = get_results(ebbinghaus_mean, ebbinghaus_sd, 'ebbinghaus')
+        data.block = 'ebbinghaus'
+        data.block_number = block_number
         data.rt_mean = results.mean_reaction_time
         data.rt_mean_correct = results.mean_reaction_time_correct
         data.accuracy = results.accuracy
@@ -384,7 +390,7 @@ var end_experiment = {
     type: "html-button-response",
     choices: ["End"],
     stimulus: function () {
-        var results = get_results(illusion_mean=overall_mean, illusion_sd=overall_sd, block=false)
+        var results = get_results(overall_mean, overall_sd)
         var display_accuracy = "<p style='color:rgb(76,175,80);'>You responded correctly on <b>" +
             round_digits(results.accuracy * 100) + "" + "%</b> of the trials.</p>"
         var display_rt = "<p style='color:rgb(233,30,99);'>Your average response time was <b>" + round_digits(results.mean_reaction_time) + "</b> ms.</p>"
@@ -401,7 +407,7 @@ var end_experiment = {
     },
     on_finish: function (data) {
         jsPsych.endExperiment('The experiment has ended. You can close the window or press refresh it to start again.')
-        var results = get_results(illusion_mean=overall_mean, illusion_sd=overall_sd, block=false)
+        var results = get_results(overall_mean, overall_sd)
         data.rt_mean = results.mean_reaction_time
         data.rt_mean_correct = results.mean_reaction_time_correct
         data.accuracy = results.accuracy
