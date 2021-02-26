@@ -8,7 +8,7 @@ A game based on visual illusions.
 - [ ] Include all illusions 
 - [ ] Set up organization oauth 
 - [ ] Have data saved after each block and committed to GH even after experiment is quitted halfway
-- [ ] Compute score and RT for each block of illusions  
-- [ ] Show feedback after each block of illusions 
+- [x] Compute score and RT for each block of illusions  
+- [x] Show feedback after each block of illusions 
   - Feedback to consist of **inverse efficiency score** to show participants that they performed better than x% of the players
-- [ ] Final feedback to show overall score
+- [x] Final feedback to show overall score
