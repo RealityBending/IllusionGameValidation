@@ -42,7 +42,7 @@ function get_results(illusion_mean, illusion_sd, illusion_type) {
     if (typeof illusion_type != 'undefined') {
         var trials = jsPsych.data.get().filter({ screen: 'test', block: illusion_type }) // results by block
     } else {
-        var trials = jsPsych.data.get().filter({ screen: 'test'}) // overall results
+        var trials = jsPsych.data.get().filter({ screen: 'test' }) // overall results
     }
     var correct_trials = trials.filter({ correct: true })
     var proportion_correct = correct_trials.count() / trials.count()
@@ -88,8 +88,8 @@ var session_info = {
 var trial_number = 1 // trial indexing variable starts at 1 for convenience
 var block_number = 0 // block indexing variables (should block 0 be there as practice block?)
 var images = ['stimuli/delboeuf_str0_diff1.png', 'stimuli/delboeuf_str0_diff-1.png', 'stimuli/delboeuf_str1_diff1.png', 'stimuli/delboeuf_str1_diff-1.png',
-              'stimuli/delboeuf_str-1_diff1.png', 'stimuli/delboeuf_str-1_diff-1.png', 'stimuli/ebbinghaus_str0_diff1.png', 'stimuli/ebbinghaus_str0_diff-1.png',
-              'stimuli/ebbinghaus_str1_diff1.png', 'stimuli/ebbinghaus_str1_diff-1.png', 'stimuli/ebbinghaus_str-1_diff1.png', 'stimuli/ebbinghaus_str-1_diff-1.png'] // preload images
+    'stimuli/delboeuf_str-1_diff1.png', 'stimuli/delboeuf_str-1_diff-1.png', 'stimuli/ebbinghaus_str0_diff1.png', 'stimuli/ebbinghaus_str0_diff-1.png',
+    'stimuli/ebbinghaus_str1_diff1.png', 'stimuli/ebbinghaus_str1_diff-1.png', 'stimuli/ebbinghaus_str-1_diff1.png', 'stimuli/ebbinghaus_str-1_diff-1.png'] // preload images
 
 // fixed scores as placeholders, update later
 const delboeuf_mean = 550
@@ -165,14 +165,14 @@ var delboeuf_instructions = {
                 "on the screen.</p><p>Your task is to judge which circle is bigger in size. </p><p>If the <strong>left circle</strong> is bigger, " +
                 "press the <strong>left arrow key</strong> on the keyboard as fast as you can.</p>" +
                 "<p>If the <strong>right circle</strong> is bigger, press the <strong>right arrow key</strong> as fast as you can.</p><hr>" +
-                "<div style='float: center'><img src='demo_stimuli/Delboeuf_Demo.png' height='300'></img>" +
+                "<div style='float: center'><img src='utils/Delboeuf_Demo.png' height='300'></img>" +
                 "<p class='small'>For example, <strong>press the left arrow key</strong> here.</p></div>")
         } else {
             return ("<p>In this experiment, two red circles will appear " +
                 "on the screen.</p><p>Your task is to judge which circle is bigger in size. </p><p>If the <strong>left circle</strong> is bigger, " +
                 "<strong>click on the left circle</strong> as fast as you can.</p>" +
                 "<p>If the <strong>right circle</strong> is bigger, <strong>click on the right circle</strong> as fast as you can.</p><hr>" +
-                "<div style='float: center'><img src='demo_stimuli/Delboeuf_Demo.png' height='300'></img>" +
+                "<div style='float: center'><img src='utils/Delboeuf_Demo.png' height='300'></img>" +
                 "<p class='small'>For example, <strong>click on the left circle</strong> here.</p></div>")
         }
     },
@@ -246,11 +246,11 @@ var delboeuf_debrief = {
         var display_accuracy = "<p style='color:rgb(76,175,80);'>You responded correctly on <b>" +
             round_digits(results.accuracy * 100) + "" + "%</b> of the trials.</p>"
         var display_rt = "<p style='color:rgb(233,30,99);'>Your average response time was <b>" + round_digits(results.mean_reaction_time) + "</b> ms.</p>"
-        var display_percentile = round_digits(results.percentage) 
+        var display_percentile = round_digits(results.percentage)
         var comparison = "<p style='color:rgb(233,30,99);'>You performed better than <b>" + display_percentile + "</b>% of the population.</p>"
         return "<p>Here are your results:</p><hr>" +
             display_accuracy + display_rt + comparison +
-        "<hr><p>Can you do better in the next illusion?</p>"
+            "<hr><p>Can you do better in the next illusion?</p>"
     },
     on_finish: function (data) {
         var results = get_results(delboeuf_mean, delboeuf_sd, 'delboeuf')
@@ -275,14 +275,14 @@ var ebbinghaus_instructions = {
                 "on the screen.</p><p>Your task is to judge which circle is bigger in size. </p><p>If the <strong>left circle</strong> is bigger, " +
                 "press the <strong>left arrow key</strong> on the keyboard as fast as you can.</p>" +
                 "<p>If the <strong>right circle</strong> is bigger, press the <strong>right arrow key</strong> as fast as you can.</p><hr>" +
-                "<div style='float: center'><img src='demo_stimuli/Ebbinghaus_Demo.png' height='300'></img>" +
+                "<div style='float: center'><img src='utils/Ebbinghaus_Demo.png' height='300'></img>" +
                 "<p class='small'>For example, <strong>press the left arrow key</strong> here.</p></div>")
         } else {
             return ("<p>In this experiment, two red circles will appear " +
                 "on the screen.</p><p>Your task is to judge which circle is bigger in size. </p><p>If the <strong>left circle</strong> is bigger, " +
                 "<strong>click on the left circle</strong> as fast as you can.</p>" +
                 "<p>If the <strong>right circle</strong> is bigger, <strong>click on the right circle</strong> as fast as you can.</p><hr>" +
-                "<div style='float: center'><img src='demo_stimuli/Ebbinghaus_Demo.png' height='300'></img>" +
+                "<div style='float: center'><img src='utils/Ebbinghaus_Demo.png' height='300'></img>" +
                 "<p class='small'>For example, <strong>click on the left circle</strong> here.</p></div>")
         }
     },
@@ -356,11 +356,11 @@ var ebbinghaus_debrief = {
         var display_accuracy = "<p style='color:rgb(76,175,80);'>You responded correctly on <b>" +
             round_digits(results.accuracy * 100) + "" + "%</b> of the trials.</p>"
         var display_rt = "<p style='color:rgb(233,30,99);'>Your average response time was <b>" + round_digits(results.mean_reaction_time) + "</b> ms.</p>"
-        var display_percentile = round_digits(results.percentage) 
+        var display_percentile = round_digits(results.percentage)
         var comparison = "<p style='color:rgb(233,30,99);'>You performed better than <b>" + display_percentile + "</b>% of the population.</p>"
         return "<p>Here are your results:</p><hr>" +
             display_accuracy + display_rt + comparison +
-        "<hr><p>Can you do better in the next illusion?</p>"
+            "<hr><p>Can you do better in the next illusion?</p>"
     },
     on_finish: function (data) {
         var results = get_results(ebbinghaus_mean, ebbinghaus_sd, 'ebbinghaus')
@@ -384,7 +384,7 @@ var end_experiment = {
         var display_accuracy = "<p style='color:rgb(76,175,80);'>You responded correctly on <b>" +
             round_digits(results.accuracy * 100) + "" + "%</b> of the trials.</p>"
         var display_rt = "<p style='color:rgb(233,30,99);'>Your average response time was <b>" + round_digits(results.mean_reaction_time) + "</b> ms.</p>"
-        var display_percentile = round_digits(results.percentage) 
+        var display_percentile = round_digits(results.percentage)
         var comparison = "<p style='color:rgb(233,30,99);'>You performed better than <b>" + display_percentile + "</b>% of the population.</p>"
         return "<p><b>Thank you for participating!</b> Here are your results:</p><hr>" +
             display_accuracy + display_rt + comparison +
