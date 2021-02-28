@@ -102,11 +102,16 @@ const overall_sd = 25
 // Welcome + Informed Consent
 var welcome = {
     type: "html-button-response",
-    choices: ["I want to participate.", "I don't want to participate."],
-    stimulus: "Welcome to the experiment. (Some informed consent)",
+    choices: ["I want to play!", "Nah, I hate science."],
+    stimulus: "<p><b>The Illusion Game</b></p>" +
+        "<p>By playing this game, you are also contributing to science, as it was designed by psychologists studying illusions. " +
+        "Therefore, please note that some data from your session will be recorded, such as speed and errors. " +
+        "<b>Don't worry though, it's entirely anonymous!</b></p>" +
+        "<p>By participating, you agree on letting us use this data to study the psychology of illusions.</p>" +
+        "<p><sub>Please contact (dom.makowski@gmail) for any inquiries.</sub></p>",
     on_finish: function (data) {  // end experiment if 'I don't want to participate' was chosen
         if (data.response == 1) {
-            jsPsych.endExperiment('The experiment has ended.')
+            jsPsych.endExperiment("You're free to leave!")
         }
     },
     data: Object.assign({ screen: 'session_info' }, session_info, systemInfo())
