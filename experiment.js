@@ -189,12 +189,10 @@ var delboeuf_instructions = {
 
 // Set stimuli
 var delboeuf_stimuli = [
-    { stimulus: "stimuli/delboeuf_str0_diff1.png", data: { screen: 'test', block: 'delboeuf', correct_response: 'arrowleft' } },
-    { stimulus: "stimuli/delboeuf_str0_diff-1.png", data: { screen: 'test', block: 'delboeuf', correct_response: 'arrowright' } },
-    { stimulus: "stimuli/delboeuf_str1_diff1.png", data: { screen: 'test', block: 'delboeuf', correct_response: 'arrowleft' } },
-    { stimulus: "stimuli/delboeuf_str1_diff-1.png", data: { screen: 'test', block: 'delboeuf', correct_response: 'arrowright' } },
-    { stimulus: "stimuli/delboeuf_str-1_diff1.png", data: { screen: 'test', block: 'delboeuf', correct_response: 'arrowleft' } },
-    { stimulus: "stimuli/delboeuf_str-1_diff-1.png", data: { screen: 'test', block: 'delboeuf', correct_response: 'arrowright' } }
+    { stimulus: "stimuli/Delboeuf_str0.33_diff0.33.png", data: { screen: 'test', block: 'delboeuf', correct_response: 'arrowleft' } },
+    { stimulus: "stimuli/Delboeuf_str0.33_diff-0.33.png", data: { screen: 'test', block: 'delboeuf', correct_response: 'arrowright' } },
+    { stimulus: "stimuli/Delboeuf_str-0.33_diff0.33.png", data: { screen: 'test', block: 'delboeuf', correct_response: 'arrowleft' } },
+    { stimulus: "stimuli/Delboeuf_str-0.33_diff-0.33.png", data: { screen: 'test', block: 'delboeuf', correct_response: 'arrowright' } },
 ]
 
 
@@ -300,12 +298,10 @@ var ebbinghaus_instructions = {
 
 // Set stimuli
 var ebbinghaus_stimuli = [
-    { stimulus: "stimuli/ebbinghaus_str0_diff1.png", data: { screen: 'test', block: 'ebbinghaus', correct_response: 'arrowleft' } },
-    { stimulus: "stimuli/ebbinghaus_str0_diff-1.png", data: { screen: 'test', block: 'ebbinghaus', correct_response: 'arrowright' } },
-    { stimulus: "stimuli/ebbinghaus_str1_diff1.png", data: { screen: 'test', block: 'ebbinghaus', correct_response: 'arrowleft' } },
-    { stimulus: "stimuli/ebbinghaus_str1_diff-1.png", data: { screen: 'test', block: 'ebbinghaus', correct_response: 'arrowright' } },
-    { stimulus: "stimuli/ebbinghaus_str-1_diff1.png", data: { screen: 'test', block: 'ebbinghaus', correct_response: 'arrowleft' } },
-    { stimulus: "stimuli/ebbinghaus_str-1_diff-1.png", data: { screen: 'test', block: 'ebbinghaus', correct_response: 'arrowright' } }
+    { stimulus: "stimuli/Ebbinghaus_str0.33_diff0.33.png", data: { screen: 'test', block: 'ebbinghaus', correct_response: 'arrowleft' } },
+    { stimulus: "stimuli/Ebbinghaus_str0.33_diff-0.33.png", data: { screen: 'test', block: 'ebbinghaus', correct_response: 'arrowright' } },
+    { stimulus: "stimuli/Ebbinghaus_str-0.33_diff0.33.png", data: { screen: 'test', block: 'ebbinghaus', correct_response: 'arrowleft' } },
+    { stimulus: "stimuli/Ebbinghaus_str-0.33_diff-0.33.png", data: { screen: 'test', block: 'ebbinghaus', correct_response: 'arrowright' } },
 ]
 
 // Set test trials
