@@ -159,6 +159,12 @@ var fixation = {
     data: { screen: 'fixation' }
 }
 
+// prepare trigger for fullscreen mode
+var fullscreen = {
+    type: 'fullscreen',
+    fullscreen_mode: true
+}
+
 /* ----------------- BLOCK 1: DELBOEUF ILLUSION ----------------- */
 // Instructions
 var delboeuf_instructions = {
@@ -405,7 +411,7 @@ var end_experiment = {
 
 /* ----------------- Initialize experiment ----------------- */
 jsPsych.init({
-    timeline: [welcome, participant_info_general, participant_info_repetition, delboeuf_instructions, test_delboeuf_procedure, delboeuf_debrief,
+    timeline: [fullscreen, welcome, participant_info_general, participant_info_repetition, delboeuf_instructions, test_delboeuf_procedure, delboeuf_debrief,
         ebbinghaus_instructions, test_ebbinghaus_procedure, ebbinghaus_debrief, end_experiment],
     show_progress_bar: true,
     message_progress_bar: 'Completion',
