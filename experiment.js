@@ -87,9 +87,6 @@ var session_info = {
 // Set experiment variables
 var trial_number = 1 // trial indexing variable starts at 1 for convenience
 var block_number = 0 // block indexing variables (should block 0 be there as practice block?)
-var images = ['stimuli/delboeuf_str0_diff1.png', 'stimuli/delboeuf_str0_diff-1.png', 'stimuli/delboeuf_str1_diff1.png', 'stimuli/delboeuf_str1_diff-1.png',
-    'stimuli/delboeuf_str-1_diff1.png', 'stimuli/delboeuf_str-1_diff-1.png', 'stimuli/ebbinghaus_str0_diff1.png', 'stimuli/ebbinghaus_str0_diff-1.png',
-    'stimuli/ebbinghaus_str1_diff1.png', 'stimuli/ebbinghaus_str1_diff-1.png', 'stimuli/ebbinghaus_str-1_diff1.png', 'stimuli/ebbinghaus_str-1_diff-1.png'] // preload images
 
 // fixed scores as placeholders, update later
 const delboeuf_mean = 550
@@ -203,6 +200,11 @@ var delboeuf_stimuli = [
     { stimulus: "stimuli/Delboeuf_str-0.33_diff-0.33.png", data: { screen: 'test', block: 'delboeuf', correct_response: 'arrowright' } },
 ]
 
+// Preload images
+var delboeuf_preload = {
+    type: 'preload',
+    trials: delboeuf_stimuli // automatically preload just the images from block_1 trials
+}
 
 // Set test trials
 var delboeuf_test = {
@@ -275,6 +277,8 @@ var delboeuf_debrief = {
     data: { screen: 'block_results' }
 }
 
+
+
 /* ----------------- BLOCK 2: EBBINGHAUS ILLUSION ----------------- */
 // Instructions
 var ebbinghaus_instructions = {
@@ -313,6 +317,12 @@ var ebbinghaus_stimuli = [
     { stimulus: "stimuli/Ebbinghaus_str-0.33_diff0.33.png", data: { screen: 'test', block: 'ebbinghaus', correct_response: 'arrowleft' } },
     { stimulus: "stimuli/Ebbinghaus_str-0.33_diff-0.33.png", data: { screen: 'test', block: 'ebbinghaus', correct_response: 'arrowright' } },
 ]
+
+// Preload images
+var ebbinghaus_preload = {
+    type: 'preload',
+    trials: ebbinghaus_stimuli // automatically preload just the images from block_2 trials
+}
 
 // Set test trials
 var ebbinghaus_test = {
@@ -415,11 +425,10 @@ var end_experiment = {
 
 /* ----------------- Initialize experiment ----------------- */
 jsPsych.init({
-    timeline: [fullscreen, welcome, participant_info_general, participant_info_repetition, delboeuf_instructions, test_delboeuf_procedure, delboeuf_debrief,
-        ebbinghaus_instructions, test_ebbinghaus_procedure, ebbinghaus_debrief, end_experiment],
+    timeline: [fullscreen, welcome, participant_info_general, participant_info_repetition, delboeuf_preload, delboeuf_instructions, test_delboeuf_procedure, delboeuf_debrief,
+        ebbinghaus_preload, ebbinghaus_instructions, test_ebbinghaus_procedure, ebbinghaus_debrief, end_experiment],
     show_progress_bar: true,
     message_progress_bar: 'Completion',
-    preload_images: images,
     // exclusions: { min_width: 800, min_height: 600 }, /* exclude browsers that are not at least 800x600 pix */
     on_interaction_data_update: function (data) { console.log(JSON.stringify(data)) }, /* record browser interactions */
     on_finish: function () {
