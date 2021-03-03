@@ -174,7 +174,7 @@ var delboeuf_instructions = {
                 "press the <strong>left arrow key</strong> on the keyboard as fast as you can.</p>" +
                 "<p>If the <strong>right circle</strong> is bigger, press the <strong>right arrow key</strong> as fast as you can.</p><hr>" +
                 "<div style='float: center'><img src='utils/Delboeuf_Demo.png' height='300'></img>" +
-                "<p><img src='utils/answer/answer_leftright_keyboard.PNG' height='200'></img></p>" +                    
+                "<p><img src='utils/answer/answer_leftright_keyboard.PNG' height='150'></img></p>" +                    
                 "<p class='small'>For example, <strong>press the left arrow key</strong> here.</p></div>")
         } else {
             return ("<p>In this experiment, two red circles will appear " +
@@ -182,7 +182,7 @@ var delboeuf_instructions = {
                 "<strong>click on the left circle</strong> as fast as you can.</p>" +
                 "<p>If the <strong>right circle</strong> is bigger, <strong>click on the right circle</strong> as fast as you can.</p><hr>" +
                 "<div style='float: center'><img src='utils/Delboeuf_Demo.png' height='300'></img>" +
-                "<p><img src='utils/answer/answer_leftright_touch.PNG' height='200'></img></p>" +                    
+                "<p><img src='utils/answer/answer_leftright_touch.PNG' height='150'></img></p>" +                    
                 "<p class='small'>For example, <strong>click on the left circle</strong> here.</p></div>")
         }
     },
@@ -262,7 +262,7 @@ var delboeuf_debrief = {
         var display_percentile = round_digits(results.percentage)
         var comparison = "<p style='color:rgb(233,30,99);'>You performed better than <b>" + display_percentile + "</b>% of the population.</p>"
         return "<p>Here are your results:</p><hr>" +
-            display_accuracy + display_rt + comparison +
+            comparison +
             "<hr><p>Can you do better in the next illusion?</p>"
     },
     on_finish: function (data) {
@@ -291,7 +291,7 @@ var ebbinghaus_instructions = {
                 "press the <strong>left arrow key</strong> on the keyboard as fast as you can.</p>" +
                 "<p>If the <strong>right circle</strong> is bigger, press the <strong>right arrow key</strong> as fast as you can.</p><hr>" +
                 "<div style='float: center'><img src='utils/Ebbinghaus_Demo.png' height='300'></img>" +
-                "<p><img src='utils/answer/answer_leftright_keyboard.PNG' height='200'></img></p>" +                    
+                "<p><img src='utils/answer/answer_leftright_keyboard.PNG' height='150'></img></p>" +                    
                 "<p class='small'>For example, <strong>press the left arrow key</strong> here.</p></div>")
         } else {
             return ("<p>In this experiment, two red circles will appear " +
@@ -299,7 +299,7 @@ var ebbinghaus_instructions = {
                 "<strong>click on the left circle</strong> as fast as you can.</p>" +
                 "<p>If the <strong>right circle</strong> is bigger, <strong>click on the right circle</strong> as fast as you can.</p><hr>" +
                 "<div style='float: center'><img src='utils/Ebbinghaus_Demo.png' height='300'></img>" +
-                "<p><img src='utils/answer/answer_leftright_touch.PNG' height='200'></img></p>" +                    
+                "<p><img src='utils/answer/answer_leftright_touch.PNG' height='150'></img></p>" +                    
                 "<p class='small'>For example, <strong>click on the left circle</strong> here.</p></div>")
         }
     },
@@ -380,7 +380,7 @@ var ebbinghaus_debrief = {
         var display_percentile = round_digits(results.percentage)
         var comparison = "<p style='color:rgb(233,30,99);'>You performed better than <b>" + display_percentile + "</b>% of the population.</p>"
         return "<p>Here are your results:</p><hr>" +
-            display_accuracy + display_rt + comparison +
+            comparison +
             "<hr><p>Can you do better in the next illusion?</p>"
     },
     on_finish: function (data) {
@@ -408,7 +408,7 @@ var end_experiment = {
         var display_percentile = round_digits(results.percentage)
         var comparison = "<p style='color:rgb(233,30,99);'>You performed better than <b>" + display_percentile + "</b>% of the population.</p>"
         return "<p><b>Thank you for participating!</b> Here are your results:</p><hr>" +
-            display_accuracy + display_rt + comparison +
+            comparison +
             "<hr><p> Don't hesitate to spread the word and share this experiment, science appreciates :)</p>"
     },
     on_finish: function (data) {
