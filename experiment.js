@@ -177,7 +177,7 @@ var delboeuf_instructions = {
                 "press the <strong>left arrow key</strong> on the keyboard as fast as you can.</p>" +
                 "<p>If the <strong>right circle</strong> is bigger, press the <strong>right arrow key</strong> as fast as you can.</p><hr>" +
                 "<div style='float: center'><img src='utils/Delboeuf_Demo.png' height='300'></img>" +
-                "<p><img src='utils/answer/answer_leftright_keyboard.png' height='200'></img></p>" +                    
+                "<p><img src='utils/answer_leftright_keyboard.png' height='200'></img></p>" +                    
                 "<p class='small'>For example, <strong>press the left arrow key</strong> here.</p></div>")
         } else {
             return ("<p>In this experiment, two red circles will appear " +
@@ -185,7 +185,7 @@ var delboeuf_instructions = {
                 "<strong>click on the left circle</strong> as fast as you can.</p>" +
                 "<p>If the <strong>right circle</strong> is bigger, <strong>click on the right circle</strong> as fast as you can.</p><hr>" +
                 "<div style='float: center'><img src='utils/Delboeuf_Demo.png' height='300'></img>" +
-                "<p><img src='utils/answer/answer_leftright_touch.png' height='200'></img></p>" +                    
+                "<p><img src='utils/answer_leftright_touch.png' height='200'></img></p>" +                    
                 "<p class='small'>For example, <strong>click on the left circle</strong> here.</p></div>")
         }
     },
@@ -287,7 +287,7 @@ var ebbinghaus_instructions = {
                 "press the <strong>left arrow key</strong> on the keyboard as fast as you can.</p>" +
                 "<p>If the <strong>right circle</strong> is bigger, press the <strong>right arrow key</strong> as fast as you can.</p><hr>" +
                 "<div style='float: center'><img src='utils/Ebbinghaus_Demo.png' height='300'></img>" +
-                "<p><img src='utils/answer/answer_leftright_keyboard.png' height='200'></img></p>" +                    
+                "<p><img src='utils/answer_leftright_keyboard.png' height='200'></img></p>" +                    
                 "<p class='small'>For example, <strong>press the left arrow key</strong> here.</p></div>")
         } else {
             return ("<p>In this experiment, two red circles will appear " +
@@ -295,7 +295,7 @@ var ebbinghaus_instructions = {
                 "<strong>click on the left circle</strong> as fast as you can.</p>" +
                 "<p>If the <strong>right circle</strong> is bigger, <strong>click on the right circle</strong> as fast as you can.</p><hr>" +
                 "<div style='float: center'><img src='utils/Ebbinghaus_Demo.png' height='300'></img>" +
-                "<p><img src='utils/answer/answer_leftright_touch.png' height='200'></img></p>" +                    
+                "<p><img src='utils/answer_leftright_touch.png' height='200'></img></p>" +                    
                 "<p class='small'>For example, <strong>click on the left circle</strong> here.</p></div>")
         }
     },
