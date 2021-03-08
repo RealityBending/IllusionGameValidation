@@ -93,6 +93,10 @@ const delboeuf_mean = 550
 const delboeuf_sd = 10
 const ebbinghaus_mean = 660
 const ebbinghaus_sd = 20
+const mullerlyer_mean = 660
+const mullerlyer_sd = 20
+const ponzo_mean = 660
+const ponzo_sd = 20
 const overall_mean = 590
 const overall_sd = 25
 
@@ -197,7 +201,7 @@ var delboeuf_instructions = {
                 "press the <strong>left arrow key</strong> on the keyboard as fast as you can.</p>" +
                 "<p>If the <strong>right circle</strong> is bigger, press the <strong>right arrow key</strong> as fast as you can.</p><hr>" +
                 "<div style='float: center'><img src='utils/Delboeuf_Demo.png' height='300'></img>" +
-                "<p><img src='utils/answer/answer_leftright_keyboard.PNG' height='150'></img></p>" +                    
+                "<p><img src='utils/answer/answer_leftright_keyboard.PNG' height='150'></img></p>" +
                 "<p class='small'>For example, <strong>press the left arrow key</strong> here.</p></div>")
         } else {
             return ("<p>In this experiment, two red circles will appear " +
@@ -205,7 +209,7 @@ var delboeuf_instructions = {
                 "<strong>click on the left circle</strong> as fast as you can.</p>" +
                 "<p>If the <strong>right circle</strong> is bigger, <strong>click on the right circle</strong> as fast as you can.</p><hr>" +
                 "<div style='float: center'><img src='utils/Delboeuf_Demo.png' height='300'></img>" +
-                "<p><img src='utils/answer/answer_leftright_touch.PNG' height='150'></img></p>" +                    
+                "<p><img src='utils/answer/answer_leftright_touch.PNG' height='150'></img></p>" +
                 "<p class='small'>For example, <strong>click on the left circle</strong> here.</p></div>")
         }
     },
@@ -314,7 +318,7 @@ var ebbinghaus_instructions = {
                 "press the <strong>left arrow key</strong> on the keyboard as fast as you can.</p>" +
                 "<p>If the <strong>right circle</strong> is bigger, press the <strong>right arrow key</strong> as fast as you can.</p><hr>" +
                 "<div style='float: center'><img src='utils/Ebbinghaus_Demo.png' height='300'></img>" +
-                "<p><img src='utils/answer/answer_leftright_keyboard.PNG' height='150'></img></p>" +                    
+                "<p><img src='utils/answer/answer_leftright_keyboard.PNG' height='150'></img></p>" +
                 "<p class='small'>For example, <strong>press the left arrow key</strong> here.</p></div>")
         } else {
             return ("<p>In this experiment, two red circles will appear " +
@@ -322,7 +326,7 @@ var ebbinghaus_instructions = {
                 "<strong>click on the left circle</strong> as fast as you can.</p>" +
                 "<p>If the <strong>right circle</strong> is bigger, <strong>click on the right circle</strong> as fast as you can.</p><hr>" +
                 "<div style='float: center'><img src='utils/Ebbinghaus_Demo.png' height='300'></img>" +
-                "<p><img src='utils/answer/answer_leftright_touch.PNG' height='150'></img></p>" +                    
+                "<p><img src='utils/answer/answer_leftright_touch.PNG' height='150'></img></p>" +
                 "<p class='small'>For example, <strong>click on the left circle</strong> here.</p></div>")
         }
     },
@@ -418,6 +422,241 @@ var ebbinghaus_debrief = {
     data: { screen: 'block_results' }
 }
 
+
+/* ----------------- BLOCK 3: MULLERLYER ILLUSION ----------------- */
+// Instructions
+var mullerlyer_instructions = {
+    type: "html-button-response",
+    choices: ["Start"],
+    stimulus: function () {
+        if (systemInfo().screen_touchscreen == false) {
+            return ("<p>In this experiment, two red lines will appear " +
+                "on the screen.</p><p>Your task is to judge which line is longer. </p><p>If the <strong>upper horizontal line</strong> is longer, " +
+                "press the <strong>up arrow key</strong> on the keyboard as fast as you can.</p>" +
+                "<p>If the <strong>lower horizontal line</strong> is longer, press the <strong>down arrow key</strong> as fast as you can.</p><hr>" +
+                "<div style='float: center'><img src='utils/MullerLyer_Demo.png' height='300'></img>" +
+                "<p><img src='utils/answer/answer_leftright_keyboard.PNG' height='150'></img></p>" +
+                "<p class='small'>For example, <strong>press the up arrow key</strong> here.</p></div>")
+        } else {
+            return ("<p>In this experiment, two red lines will appear " +
+                "on the screen.</p><p>Your task is to judge which line is longer. </p><p>If the <strong>upper horizontal line</strong> is longer, " +
+                "<strong>click on the upper line</strong> as fast as you can.</p>" +
+                "<p>If the <strong>lower horizontal line</strong> is longer, <strong>click on the lower line</strong> as fast as you can.</p><hr>" +
+                "<div style='float: center'><img src='utils/MullerLyer_Demo.png' height='300'></img>" +
+                "<p><img src='utils/answer/answer_leftright_touch.PNG' height='150'></img></p>" +
+                "<p class='small'>For example, <strong>click on the upper line</strong> here.</p></div>")
+        }
+    },
+    post_trial_gap: 2000,
+    on_finish: function (data) {
+        trial_number = 1  // reset trial number for next block
+        block_number += 1
+    }
+}
+
+// Set stimuli
+var mullerlyer_stimuli = [
+    { stimulus: "stimuli/MullerLyer_str16.67_diff0.1.png", data: { screen: 'test', block: 'mullerlyer', correct_response: 'arrowup' } },
+    { stimulus: "stimuli/MullerLyer_str16.67_diff-0.1.png", data: { screen: 'test', block: 'mullerlyer', correct_response: 'arrowdown' } },
+    { stimulus: "stimuli/MullerLyer_str50.0_diff0.1.png", data: { screen: 'test', block: 'mullerlyer', correct_response: 'arrowup' } },
+    { stimulus: "stimuli/MullerLyer_str50.0_diff-0.1.png", data: { screen: 'test', block: 'mullerlyer', correct_response: 'arrowdown' } },
+]
+
+// Preload images
+var mullerlyer_preload = {
+    type: 'preload',
+    trials: mullerlyer_stimuli // automatically preload just the images from block_3 trials
+}
+
+// Set test trials
+var mullerlyer_test = {
+    type: "image-keyboardmouse-response",
+    stimulus: jsPsych.timelineVariable('stimulus'),
+    choices: ['arrowup', 'arrowdown'],
+    data: jsPsych.timelineVariable('data'),
+    on_finish: function (data) {
+        data.prestimulus_duration = jsPsych.data.get().last(2).values()[0].time_elapsed - jsPsych.data.get().last(3).values()[0].time_elapsed
+        // Score the response as correct or incorrect.
+        if (data.response != -1) {
+            if (jsPsych.pluginAPI.compareKeys(data.response, data.correct_response)) {
+                data.correct = true
+            } else {
+                data.correct = false
+            }
+        } else {
+            // code mouse clicks as correct or wrong
+            if (data.click_x < window.innerHeight / 2) { // use window.innerHeight for up vs down presses
+                data.response = 'arrowdown'
+            } else {
+                data.response = 'arrowup'
+            }
+            if (jsPsych.pluginAPI.compareKeys(data.response, data.correct_response)) {
+                data.correct = true
+            } else {
+                data.correct = false
+            }
+        }
+        // track block and trial numbers
+        data.block = 'mullerlyer'
+        data.block_number = block_number
+        data.trial_number = trial_number
+        trial_number += 1
+    },
+}
+
+// link variables in stimuli array with the call to jsPsych.timelineVariable()
+var test_mullerlyer_procedure = {
+    timeline: [fixation, mullerlyer_test],
+    timeline_variables: mullerlyer_stimuli,
+    randomize_order: true,
+    repetitions: 1
+}
+
+// Debriefing Information
+var mullerlyer_debrief = {
+    type: "html-button-response",
+    choices: ["Next Illusion"],
+    stimulus: function () {
+        var results = get_results(mullerlyer_mean, mullerlyer_sd, 'mullerlyer')
+        var display_accuracy = "<p style='color:rgb(76,175,80);'>You responded correctly on <b>" +
+            round_digits(results.accuracy * 100) + "" + "%</b> of the trials.</p>"
+        var display_rt = "<p style='color:rgb(233,30,99);'>Your average response time was <b>" + round_digits(results.mean_reaction_time) + "</b> ms.</p>"
+        var display_percentile = round_digits(results.percentage)
+        var comparison = "<p style='color:rgb(233,30,99);'>You performed better than <b>" + display_percentile + "</b>% of the population.</p>"
+        return "<p>Here are your results:</p><hr>" +
+            comparison +
+            "<hr><p>Can you do better in the next illusion?</p>"
+    },
+    on_finish: function (data) {
+        var results = get_results(mullerlyer_mean, mullerlyer_sd, 'mullerlyer')
+        data.block = 'mullerlyer'
+        data.block_number = block_number
+        data.rt_mean = results.mean_reaction_time
+        data.rt_mean_correct = results.mean_reaction_time_correct
+        data.accuracy = results.accuracy
+        data.inverse_efficiency_score = results.inverse_efficiency
+    },
+    data: { screen: 'block_results' }
+}
+
+
+/* ----------------- BLOCK 4: PONZO ILLUSION ----------------- */
+// Instructions
+var ponzo_instructions = {
+    type: "html-button-response",
+    choices: ["Start"],
+    stimulus: function () {
+        if (systemInfo().screen_touchscreen == false) {
+            return ("<p>In this experiment, two red lines will appear " +
+                "on the screen.</p><p>Your task is to judge which line is longer. </p><p>If the <strong>upper horizontal line</strong> is longer, " +
+                "press the <strong>up arrow key</strong> on the keyboard as fast as you can.</p>" +
+                "<p>If the <strong>lower horizontal line</strong> is longer, press the <strong>down arrow key</strong> as fast as you can.</p><hr>" +
+                "<div style='float: center'><img src='utils/Ponzo_Demo.png' height='300'></img>" +
+                "<p><img src='utils/answer/answer_leftright_keyboard.PNG' height='150'></img></p>" +
+                "<p class='small'>For example, <strong>press the up arrow key</strong> here.</p></div>")
+        } else {
+            return ("<p>In this experiment, two red lines will appear " +
+                "on the screen.</p><p>Your task is to judge which line is longer. </p><p>If the <strong>upper horizontal line</strong> is longer, " +
+                "<strong>click on the upper line</strong> as fast as you can.</p>" +
+                "<p>If the <strong>lower horizontal line</strong> is longer, <strong>click on the lower line</strong> as fast as you can.</p><hr>" +
+                "<div style='float: center'><img src='utils/Ponzo_Demo.png' height='300'></img>" +
+                "<p><img src='utils/answer/answer_leftright_touch.PNG' height='150'></img></p>" +
+                "<p class='small'>For example, <strong>click on the upper line</strong> here.</p></div>")
+        }
+    },
+    post_trial_gap: 2000,
+    on_finish: function (data) {
+        trial_number = 1  // reset trial number for next block
+        block_number += 1
+    }
+}
+
+// Set stimuli
+var ponzo_stimuli = [
+    { stimulus: "stimuli/Ponzo_str-6.67_diff0.3.png", data: { screen: 'test', block: 'ponzo', correct_response: 'arrowup' } },
+    { stimulus: "stimuli/Ponzo_str-6.67_diff-0.3.png", data: { screen: 'test', block: 'ponzo', correct_response: 'arrowdown' } },
+    { stimulus: "stimuli/Ponzo_str-20.0_diff0.3.png", data: { screen: 'test', block: 'ponzo', correct_response: 'arrowup' } },
+    { stimulus: "stimuli/Ponzo_str-20.0_diff-0.3.png", data: { screen: 'test', block: 'ponzo', correct_response: 'arrowdown' } },
+]
+
+// Preload images
+var ponzo_preload = {
+    type: 'preload',
+    trials: ponzo_stimuli // automatically preload just the images from block_3 trials
+}
+
+// Set test trials
+var ponzo_test = {
+    type: "image-keyboardmouse-response",
+    stimulus: jsPsych.timelineVariable('stimulus'),
+    choices: ['arrowup', 'arrowdown'],
+    data: jsPsych.timelineVariable('data'),
+    on_finish: function (data) {
+        data.prestimulus_duration = jsPsych.data.get().last(2).values()[0].time_elapsed - jsPsych.data.get().last(3).values()[0].time_elapsed
+        // Score the response as correct or incorrect.
+        if (data.response != -1) {
+            if (jsPsych.pluginAPI.compareKeys(data.response, data.correct_response)) {
+                data.correct = true
+            } else {
+                data.correct = false
+            }
+        } else {
+            // code mouse clicks as correct or wrong
+            if (data.click_x < window.innerHeight / 2) { // use window.innerHeight for up vs down presses
+                data.response = 'arrowdown'
+            } else {
+                data.response = 'arrowup'
+            }
+            if (jsPsych.pluginAPI.compareKeys(data.response, data.correct_response)) {
+                data.correct = true
+            } else {
+                data.correct = false
+            }
+        }
+        // track block and trial numbers
+        data.block = 'ponzo'
+        data.block_number = block_number
+        data.trial_number = trial_number
+        trial_number += 1
+    },
+}
+
+// link variables in stimuli array with the call to jsPsych.timelineVariable()
+var test_ponzo_procedure = {
+    timeline: [fixation, ponzo_test],
+    timeline_variables: ponzo_stimuli,
+    randomize_order: true,
+    repetitions: 1
+}
+
+// Debriefing Information
+var ponzo_debrief = {
+    type: "html-button-response",
+    choices: ["Next Illusion"],
+    stimulus: function () {
+        var results = get_results(ponzo_mean, ponzo_sd, 'ponzo')
+        var display_accuracy = "<p style='color:rgb(76,175,80);'>You responded correctly on <b>" +
+            round_digits(results.accuracy * 100) + "" + "%</b> of the trials.</p>"
+        var display_rt = "<p style='color:rgb(233,30,99);'>Your average response time was <b>" + round_digits(results.mean_reaction_time) + "</b> ms.</p>"
+        var display_percentile = round_digits(results.percentage)
+        var comparison = "<p style='color:rgb(233,30,99);'>You performed better than <b>" + display_percentile + "</b>% of the population.</p>"
+        return "<p>Here are your results:</p><hr>" +
+            comparison +
+            "<hr><p>Can you do better in the next illusion?</p>"
+    },
+    on_finish: function (data) {
+        var results = get_results(ponzo_mean, ponzo_sd, 'ponzo')
+        data.block = 'ponzo'
+        data.block_number = block_number
+        data.rt_mean = results.mean_reaction_time
+        data.rt_mean_correct = results.mean_reaction_time_correct
+        data.accuracy = results.accuracy
+        data.inverse_efficiency_score = results.inverse_efficiency
+    },
+    data: { screen: 'block_results' }
+}
+
+
 /* ----------------- END OF EXPERIMENT ----------------- */
 // Debriefing Information
 var end_experiment = {
@@ -448,8 +687,12 @@ var end_experiment = {
 
 /* ----------------- Initialize experiment ----------------- */
 jsPsych.init({
-    timeline: [fullscreen, welcome, participant_info_general, participant_info_repetition, if_not_repeated, delboeuf_preload, delboeuf_instructions, test_delboeuf_procedure, delboeuf_debrief,
-        ebbinghaus_preload, ebbinghaus_instructions, test_ebbinghaus_procedure, ebbinghaus_debrief, end_experiment],
+    timeline: [fullscreen, welcome, participant_info_general, participant_info_repetition, if_not_repeated,
+        delboeuf_preload, delboeuf_instructions, test_delboeuf_procedure, delboeuf_debrief,
+        ebbinghaus_preload, ebbinghaus_instructions, test_ebbinghaus_procedure, ebbinghaus_debrief,
+        mullerlyer_preload, mullerlyer_instructions, test_mullerlyer_procedure, mullerlyer_debrief,
+        ponzo_preload, ponzo_instructions, test_ponzo_procedure, ponzo_debrief,
+        end_experiment],
     show_progress_bar: true,
     message_progress_bar: 'Completion',
     // exclusions: { min_width: 800, min_height: 600 }, /* exclude browsers that are not at least 800x600 pix */
