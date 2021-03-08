@@ -23,3 +23,17 @@ A game based on visual illusions.
 ![](utils/Delboeuf_Mosaic.png)
 
 ![](utils/Ebbinghaus_Mosaic.png)
+
+![](utils/MullerLyer_Mosaic.png)
+
+![](utils/Ponzo_Mosaic.png)
+
+![](utils/RodFrame_Mosaic.png)
+
+![](utils/VerticalHorizontal_Mosaic.png)
+
+![](utils/Poggendorff.png)
+
+![](utils/Zollner_Mosaic.png)
+
+![](utils/Contrast_Mosaic.png)
