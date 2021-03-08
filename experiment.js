@@ -134,9 +134,7 @@ var participant_info_repetition = {
     type: 'survey-multi-choice',
     questions: [
         {
-            prompt: "<p><b>Have you played this before?</b></p>" +
-                "<p><i>This is important for us to know to study the effect of repetition!</i></p>",
-            name: 'AlreadyPlayed',
+            prompt: "<p><b>Are you familiar with this game?</b></p>",
             options: ["Yes, let me play!", "No, what do I need to do?"],
             required: true
         }
