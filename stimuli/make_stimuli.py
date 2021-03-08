@@ -13,8 +13,11 @@ data = []
 # Convenience functions
 def save_mosaic(strengths, differences, function, name = "Delboeuf"):
     imgs = []
-    for strength in [min(strengths, key=abs), max(strengths)]:
-        for difference in [min(differences, key=abs), max(differences)]:
+    for strength in [abs(min(strengths, key=abs)), max(strengths)]:
+        if name == "Ponzo":
+            strength = -strength # negative value for facilitating illusion
+        for difference in [abs(min(differences, key=abs)), max(differences)]:            
+            
             img = function(illusion_strength=strength, difference=difference, width=width, height=height)
             img = ill.image_text("Difference: " + str(np.round(difference, 2)) + ", Strength: " + str(np.round(strength, 2)), y=0.88, size=40, image=img)
             imgs.append(img)
@@ -73,6 +76,59 @@ data = generate_images(data,
                        differences = np.linspace(-1, 1, num = n),
                        function = ill.ebbinghaus_image,
                        name = "Ebbinghaus")
+
+# -------------------------- MullerLyer Illusion --------------------------
+data = generate_images(data,
+                       strengths = np.linspace(-50, 50, num = n),
+                       differences = np.linspace(-0.3, 0.3, num = n),
+                       function = ill.mullerlyer_image,
+                       name = "MullerLyer")
+
+# -------------------------- Ponzo Illusion --------------------------
+data = generate_images(data,
+                       strengths = np.linspace(-20, 20, num = n),
+                       differences = np.linspace(-0.3, 0.3, num = n),
+                       function = ill.ponzo_image,
+                       name = "Ponzo")
+
+# -------------------------- Rod Frame Illusion -------------------------- (revise again?)
+data = generate_images(data,
+                       strengths = np.linspace(-30, 30, num = n),
+                       differences = np.linspace(-30, 30, num = n),
+                       function = ill.rodframe_image,
+                       name = "RodFrame")
+
+# -------------------------- Zollner Illusion --------------------------
+data = generate_images(data,
+                       strengths = np.linspace(-70, 70, num = n),
+                       differences = np.linspace(-10, 10, num = n),
+                       function = ill.zollner_image,
+                       name = "Zollner")
+
+# -------------------------- Vertical Horizontal Illusion --------------------------
+data = generate_images(data,
+                       strengths = np.linspace(-90, 90, num = n),
+                       differences = np.linspace(-0.3, 0.3, num = n),
+                       function = ill.verticalhorizontal_image,
+                       name = "VerticalHorizontal")
+
+# -------------------------- Poggendorff Illusion --------------------------
+data = generate_images(data,
+                       strengths = np.linspace(25, 55, num = n), # sign does not change feature
+                       differences = np.linspace(-0.3, 0.3, num = n),
+                       function = ill.poggendorff_image,
+                       name = "Poggendorff")
+
+# -------------------------- Contrast Illusion --------------------------
+data = generate_images(data,
+                       strengths = np.linspace(-50, 50, num = n),
+                       differences = np.linspace(-40, 40, num = n),
+                       function = ill.contrast_image,
+                       name = "Contrast")
+
+
+
+
 
 
 # -------------------------- Save data --------------------------
