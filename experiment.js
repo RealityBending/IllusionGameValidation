@@ -129,7 +129,7 @@ var participant_info_general = {
     data: { screen: 'participant_info_general' }
 }
 
-// Get info on repetition
+// Get info on repetition (and show general instructions if not familiar)
 var participant_info_repetition = {
     type: 'survey-multi-choice',
     questions: [
@@ -142,6 +142,31 @@ var participant_info_repetition = {
         }
     ],
     data: { screen: 'participant_info_repetition' }
+}
+
+var general_instructions = {
+    type: "html-button-response",
+    choices: ["Let's play!"],
+    stimulus: "<p><b>The Illusion Game</b></p>" +
+        "<p>In this game, you will see several visual illusions.</p>" +
+        "<p>Visual illusions are visually perceived images that are deceptive or misleading because of their context. </p>" +
+        "<p>For example, one circle may appear large than another because of its surrounding context. </p>" +
+        "<p>In each block of illusions, you will have to make judgements of <b>size/length/colour contrast</b>.</p>" +
+        "<p>Your goal is to be as <b>accurate</b> and as <b>fast</b> as possible!</p>",
+        data: { screen: 'participant_info_newsubject' }
+}
+
+var if_not_repeated = {
+    timeline: [general_instructions],
+    conditional_function: function () {
+        var data = jsPsych.data.getLastTrialData().values()[0]
+        if (data.response.Q0 == "No, what do I need to do?") {
+            return true
+        } else {
+            return false
+        }
+    },
+    data: { screen: 'participant_info_newsubject' }
 }
 
 // Set fixation cross
@@ -425,7 +450,7 @@ var end_experiment = {
 
 /* ----------------- Initialize experiment ----------------- */
 jsPsych.init({
-    timeline: [fullscreen, welcome, participant_info_general, participant_info_repetition, delboeuf_preload, delboeuf_instructions, test_delboeuf_procedure, delboeuf_debrief,
+    timeline: [fullscreen, welcome, participant_info_general, participant_info_repetition, if_not_repeated, delboeuf_preload, delboeuf_instructions, test_delboeuf_procedure, delboeuf_debrief,
         ebbinghaus_preload, ebbinghaus_instructions, test_ebbinghaus_procedure, ebbinghaus_debrief, end_experiment],
     show_progress_bar: true,
     message_progress_bar: 'Completion',
