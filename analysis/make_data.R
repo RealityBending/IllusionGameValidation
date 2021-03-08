@@ -12,6 +12,17 @@ clean_object <- function(screen) {
   screen
 }
 
+preprocess_fullscreen <- function(df){
+  if(df$trial_type == "fullscreen"){
+    df$trial_type <- "Yes"
+  } else {
+    df$trial_type <- "No"
+  }
+  out <- as.data.frame(as.factor(df$trial_type))
+  colnames(out) <- c("Fullscreen")
+  out
+}
+
 preprocess_session_info <- function(df) {
   names(df) <- tools::toTitleCase(names(df))
   df$Duration_Consent <- df$Rt
@@ -28,7 +39,13 @@ preprocess_participant_info_general <- function(df) {
 }
 
 preprocess_participant_info_repetition <- function(df) {
-  out <- as.data.frame(df$response[1])
+  if(df$response$Q0 == "No, what do I need to do?"){
+    df$response$Q0 <- "No"
+  } else {
+    df$response$Q0 <- "Yes"
+  }
+  out <- as.data.frame(as.factor(df$response$Q0))
+  colnames(out) <- c("PlayedBefore")
   out$Duration_InfoSession <- df$rt
   out
 }
@@ -42,24 +59,26 @@ preprocess_trial <- function(df) {
 }
 
 preprocess_results <- function(df, per_block = TRUE) {
-  col_names <- c()
+  scores_cols <- c("accuracy", "rt_mean", "rt_mean_correct", "inverse_efficiency_score")
   if(per_block) {
-    block_name <- tools::toTitleCase(df[["block"]])
+    df <- df[c(scores_cols, "block")] # keep only these values
+    names(df)[names(df) == "block"] <- "Block"
   } else {
-    block_name <- "Final"  # across all blocks
+    df <- df[scores_cols]
   }
-  df <- df[c("accuracy", "rt_mean", "rt_mean_correct", "inverse_efficiency_score")]  # keep only these values
   names(df)[names(df) == "inverse_efficiency_score"] <- "IES" # shorten names
   names(df)[names(df) == "rt_mean"] <- "RT_Mean"
   names(df)[names(df) == "rt_mean_correct"] <- "RT_Mean_Corr"
   names(df)[names(df) == "accuracy"] <- "Accuracy"
   
-  for (i in names(df)){
-    variable = paste(block_name, "_", i, sep="")
-    col_names <- append(col_names, variable)
+  df <- as.data.frame(df)
+  if(!per_block) {
+    colnames(df) <- paste0('Grand_', colnames(df))
+    df
+  } else {
+    colnames(df)[colnames(df) != "Block"] <- paste0('Block_', colnames(df[ ,!(colnames(df) %in% "Block")]))
+    df
   }
-  names(df) <- col_names
-  as.data.frame(df)
 }
 
 preprocess_question <- function(df, index = NULL, label = NULL){
@@ -106,6 +125,7 @@ for(file in list.files(data_path)) {
   # }
 
   trials <- data.frame()
+  block_results <- data.frame()
   info <- data.frame(Temp = 1)
 
   # Loop through all the "screens" (each screen is recorded as a separate list)
@@ -113,6 +133,9 @@ for(file in list.files(data_path)) {
     
     screen <- clean_object(screen)
 
+    if(screen$trial_index == 0) {
+      info <- cbind(info, preprocess_fullscreen(screen))
+    }
     if(!is.null(screen$screen) && screen$screen == "session_info") {
       info <- cbind(info, preprocess_session_info(as.data.frame(screen)))
     }
@@ -120,25 +143,29 @@ for(file in list.files(data_path)) {
       info <- cbind(info, preprocess_participant_info_general(screen))
     }
     if(!is.null(screen$screen) && screen$screen == "participant_info_repetition") {
-      info <- cbind(info, preprocess_participant_info_session(screen))
-    }
-    if(!is.null(screen$screen) && screen$screen == "block_results") {
-      info <- cbind(info, preprocess_results(screen, per_block=TRUE))
-    }
-    if(!is.null(screen$screen) && screen$screen == "final_results") {
-      info <- cbind(info, preprocess_results(screen, per_block=FALSE))
+      info <- cbind(info, preprocess_participant_info_repetition(screen))
     }
     if(!is.null(screen$screen) && screen$screen == "test") {
       trials <- rbind(trials, preprocess_trial(as.data.frame(screen)))
     }
-  
+    
+    if(!is.null(screen$screen) && screen$screen == "final_results") {
+      info <- cbind(info, preprocess_results(screen, per_block=FALSE))
+    }
+    if(!is.null(screen$screen) && screen$screen == "block_results") {
+      block_results <- rbind(block_results, preprocess_results(screen, per_block=TRUE))
+    }
+
     # if(!is.null(screen$screen) && screen$screen == "question_difficulty") {
     #   screen$interactions <- NULL
     #   info <- cbind(info, preprocess_question(as.data.frame(screen), index="Q_Difficulty"))
     # }
   }
+  
   info$Temp <- NULL
+  trials <- dplyr::left_join(trials, block_results)
   data <- rbind(data, cbind(trials, info))
-}
+  }
 
 write.csv(data, "data.csv", row.names = FALSE)
+
