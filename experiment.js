@@ -153,7 +153,7 @@ var general_instructions = {
         "<p>For example, one circle may appear large than another because of its surrounding context. </p>" +
         "<p>In each block of illusions, you will have to make judgements of <b>size/length/colour contrast</b>.</p>" +
         "<p>Your goal is to be as <b>accurate</b> and as <b>fast</b> as possible!</p>",
-        data: { screen: 'participant_info_newsubject' }
+    data: { screen: 'participant_info_newsubject' }
 }
 
 var if_not_repeated = {
