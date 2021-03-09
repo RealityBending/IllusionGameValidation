@@ -168,9 +168,17 @@ for(file in list.files(data_path)) {
   
   }
 
-# Rearrange columns
+# Rearrange and tidy columns
+data$Illusion_Strength <- sapply(strsplit(data$Stimulus, "_"), function(x) x[2])
+data$Illusion_Strength  <- as.numeric(str_remove(data$Illusion_Strength , paste(remove, collapse = "|")))
+
+data$Illusion_Difference <- sapply(strsplit(data$Stimulus, "_"), function(x) x[3])
+data$Illusion_Difference <-  str_remove(data$Illusion_Difference, paste(remove, collapse = "|"))
+data$Illusion_Difference <- as.numeric(tools::file_path_sans_ext(data$Illusion_Difference))
+
 data <- data %>% 
-  select(Participant_ID, Age, Initials, PlayedBefore, everything())
+  select(Participant_ID, Age, Initials, PlayedBefore, Stimulus, Illusion_Strength, Illusion_Difference, everything())
+
 
 write.csv(data, "data.csv", row.names = FALSE)
 
