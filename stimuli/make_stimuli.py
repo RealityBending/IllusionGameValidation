@@ -10,7 +10,6 @@ n = 4
 data = []
 
 
-
 # Convenience functions
 def save_mosaic(strengths, differences, function, name = "Delboeuf"):
     imgs = []
@@ -29,10 +28,6 @@ def save_mosaic(strengths, differences, function, name = "Delboeuf"):
 
 
 def generate_images(data, strengths, differences, function, name = "Delboeuf"):
-
-    illusion_leftright = ["Delboeuf", "Ebbinghaus"]
-    illusion_updown = ["MullerLyer", "Ponzo"]
-
     for strength in strengths:
         for difference in differences:
 
@@ -40,35 +35,15 @@ def generate_images(data, strengths, differences, function, name = "Delboeuf"):
             path = name + "_str" + str(np.round(strength, 2)) + "_diff" + str(np.round(difference, 2)) + ".png"
             img.save(path)
 
-            # Compute expected response            
-            if difference > 0:
-                if name in illusion_leftright:
-                    correct = 'arrowleft'
-                elif name in illusion_updown:
-                    correct = 'arrowup'
-                else:
-                    correct = 'tbc'
-            elif difference < 0:
-                if name in illusion_leftright:
-                    correct = 'arrowright'
-                elif name in illusion_updown:
-                    correct = 'arrowdown'
-                else:
-                    correct = 'tbc'
-            
             # Save parameters for Delboeuf Illusion
             data.append({'Illusion_Type': name,
                          'Illusion_Strength': strength,
                          'Difference': difference,
-                         'Stimulus': 'stimuli/' + path,
-                         'data': { 'screen': 'test', 'block': name, 'correct_response': correct }})
-
-            # data.append({'Illusion_Type': name,
-            #              'Illusion_Strength': strength,
-            #              'Difference': difference,
-            #              'File': path})
+                         'File': path})
     save_mosaic(strengths, differences, function, name = name)
     return data
+
+
 
 
 
