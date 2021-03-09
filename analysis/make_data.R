@@ -26,7 +26,7 @@ preprocess_fullscreen <- function(df){
 preprocess_session_info <- function(df) {
   names(df) <- tools::toTitleCase(names(df))
   df$Duration_Consent <- df$Rt
-  df[c("Button_pressed", "Stimulus", "Screen" ,"Rt", "Internal_node_id", "Time_elapsed", "Trial_index", "Trial_type")] <- NULL
+  df[c("Button_pressed", "Stimulus", "Screen" ,"Rt", "Internal_node_id", "Time_elapsed", "Trial_index", "Trial_type", "Response")] <- NULL
   names(df)[names(df) == "Participant_id"] <- "Participant_ID"
   df
 }
@@ -165,7 +165,12 @@ for(file in list.files(data_path)) {
   info$Temp <- NULL
   trials <- dplyr::left_join(trials, block_results)
   data <- rbind(data, cbind(trials, info))
+  
   }
+
+# Rearrange columns
+data <- data %>% 
+  select(Participant_ID, Age, Initials, PlayedBefore, everything())
 
 write.csv(data, "data.csv", row.names = FALSE)
 
