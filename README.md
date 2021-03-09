@@ -9,6 +9,7 @@ A game based on visual illusions.
 - [ ] Include all illusions
 - [ ] Set up organization oauth
 - [ ] Have data saved after each block and committed to GH even after experiment is quitted halfway
+- [ ] Read stimuli from json file automatically (https://csvjson.com/csv2json)
 - [x] Pop up to go full screen (start of experiment)
 - [x] Finalize instructions to clarify on key / screen press
 - [x] Would be more efficient to preload the stimuli before each block (rather than everything at the start)
