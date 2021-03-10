@@ -68,6 +68,18 @@ function get_results(illusion_mean, illusion_sd, illusion_type) {
     }
 }
 
+function get_debrief_display(results) {
+
+    return {
+        display_score: "<p>Your score for this illusion is <b>" + round_digits(results.score) + "</b>.</p>",
+        display_accuracy: "<p style='color:rgb(76,175,80);'>You responded correctly on <b>" + round_digits(results.accuracy * 100) + "" + "%</b> of the trials.</p>",
+        display_rt: "<p style='color:rgb(233,30,99);'>Your average response time was <b>" + round_digits(results.mean_reaction_time) + "</b> ms.</p>",
+        display_percentile: round_digits(results.percentage),
+        display_comparison: "<p style='color:rgb(76,175,80);'>You performed better than <b>" + display_percentile + "</b>% of the population.</p>"
+    }    
+}
+
+
 /* ----------------- Initialize Variables ----------------- */
 // Get participant and session info
 var subject_id = jsPsych.randomization.randomID(15) /* random subject ID with 15 characters */
@@ -304,14 +316,15 @@ var delboeuf_debrief = {
     choices: ["Next Illusion"],
     stimulus: function () {
         var results = get_results(delboeuf_mean, delboeuf_sd, 'delboeuf')
-        var display_score = "<p>Your score for this illusion is <b>" + round_digits(results.score) + "</b>.</p>"
+        var show_screen = get_debrief_display(results)
+        /* var display_score = "<p>Your score for this illusion is <b>" + round_digits(results.score) + "</b>.</p>"
         var display_accuracy = "<p style='color:rgb(76,175,80);'>You responded correctly on <b>" +
             round_digits(results.accuracy * 100) + "" + "%</b> of the trials.</p>"
         var display_rt = "<p style='color:rgb(233,30,99);'>Your average response time was <b>" + round_digits(results.mean_reaction_time) + "</b> ms.</p>"
         var display_percentile = round_digits(results.percentage)
-        var comparison = "<p style='color:rgb(76,175,80);'>You performed better than <b>" + display_percentile + "</b>% of the population.</p>"
+        var comparison = "<p style='color:rgb(76,175,80);'>You performed better than <b>" + display_percentile + "</b>% of the population.</p>" */
         return "<p>Here are your results:</p><hr>" +
-            display_score + comparison +
+            show_screen.display_score + show_screen.display_comparison +
             "<hr><p>Can you do better in the next illusion?</p>"
     },
     on_finish: function (data) {
