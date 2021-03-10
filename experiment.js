@@ -72,7 +72,7 @@ function get_debrief_display(results, type="Block") {
 
     if (type == "Block") { // Debrief at end of each block
         var score = "<p>Your score for this illusion is " + '<p style="color: black; font-size: 48px; font-weight: bold;">' + Math.round(results.score) + '</p>'
-    } else { // Final debriefing at end of game
+    } else if (type == "Final") { // Final debriefing at end of game
         var score = "<p>Your final score is " + '<p style="color: black; font-size: 48px; font-weight: bold;">' + Math.round(results.score) + '</p>'
     }
 
@@ -671,7 +671,7 @@ var end_experiment = {
     choices: ["End"],
     stimulus: function () {
         var results = get_results(overall_mean, overall_sd)
-        var show_screen = get_debrief_display(results)
+        var show_screen = get_debrief_display(results, type="Final")
         return "<p><b>Thank you for participating!</b></p>" +
             show_screen.display_score + "<hr>" + 
             show_screen.display_comparison +

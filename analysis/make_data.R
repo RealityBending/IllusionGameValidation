@@ -168,6 +168,8 @@ for(file in list.files(data_path)) {
   
   }
 
+remove <- c("str", "diff")
+
 # Rearrange and tidy columns
 data$Illusion_Strength <- sapply(strsplit(data$Stimulus, "_"), function(x) x[2])
 data$Illusion_Strength  <- as.numeric(str_remove(data$Illusion_Strength , paste(remove, collapse = "|")))
