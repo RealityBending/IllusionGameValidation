@@ -67,10 +67,16 @@ function get_results(illusion_mean, illusion_sd, illusion_type) {
         score: score_to_display
     }
 }
+function get_debrief_display(results, type="Block") {
 
-function get_debrief_display(results) {
+    if (type == "Block") { // Debrief at end of each block
+        var score = "<p>Your score for this illusion is " + '<p style="color: red; font-size: 48px; font-weight: bold;">' + round_digits(results.score) + '.</p>'
+    } else { // Final debriefing at end of game
+        var score = "<p>Your final score is " + '<p style="color: red; font-size: 48px; font-weight: bold;">' + round_digits(results.score) + '.</p>'
+    }
+
     return {
-        display_score: "<p>Your score for this illusion is <b>" + <p style = "font-size:20px">round_digits(results.score)</p> + "</b>.</p>",
+        display_score: score,
         display_accuracy: "<p style='color:rgb(76,175,80);'>You responded correctly on <b>" + round_digits(results.accuracy * 100) + "" + "%</b> of the trials.</p>",
         display_rt: "<p style='color:rgb(233,30,99);'>Your average response time was <b>" + round_digits(results.mean_reaction_time) + "</b> ms.</p>",
         display_comparison: "<p style='color:rgb(76,175,80);'>You performed better than <b>" + round_digits(results.percentage) + "</b>% of the population.</p>"
@@ -100,18 +106,6 @@ var session_info = {
 // Set experiment variables
 var trial_number = 1 // trial indexing variable starts at 1 for convenience
 var block_number = 0 // block indexing variables (should block 0 be there as practice block?)
-
-// fixed scores as placeholders, update later
-/*const delboeuf_mean = 550
-const delboeuf_sd = 10
-const ebbinghaus_mean = 660
-const ebbinghaus_sd = 20
-const mullerlyer_mean = 660
-const mullerlyer_sd = 20
-const ponzo_mean = 660
-const ponzo_sd = 20
-const overall_mean = 590
-const overall_sd = 25*/
 
 // update distribution scores
 var delb_scores = scores_byillusion.filter((scores_byillusion) => scores_byillusion.Illusion_Type === 'Delboeuf')
@@ -309,12 +303,6 @@ var delboeuf_debrief = {
     stimulus: function () {
         var results = get_results(delboeuf_mean, delboeuf_sd, 'delboeuf')
         var show_screen = get_debrief_display(results)
-        /* var display_score = "<p>Your score for this illusion is <b>" + round_digits(results.score) + "</b>.</p>"
-        var display_accuracy = "<p style='color:rgb(76,175,80);'>You responded correctly on <b>" +
-            round_digits(results.accuracy * 100) + "" + "%</b> of the trials.</p>"
-        var display_rt = "<p style='color:rgb(233,30,99);'>Your average response time was <b>" + round_digits(results.mean_reaction_time) + "</b> ms.</p>"
-        var display_percentile = round_digits(results.percentage)
-        var comparison = "<p style='color:rgb(76,175,80);'>You performed better than <b>" + display_percentile + "</b>% of the population.</p>" */
         return show_screen.display_score + "<hr>" + 
             show_screen.display_comparison +
             "<hr><p>Can you do better in the next illusion?</p>"
@@ -423,14 +411,9 @@ var ebbinghaus_debrief = {
     choices: ["Next Illusion"],
     stimulus: function () {
         var results = get_results(ebbinghaus_mean, ebbinghaus_sd, 'ebbinghaus')
-        var display_score = "<p>Your score for this illusion is <b>" + round_digits(results.score) + "</b>.</p>"
-        var display_accuracy = "<p style='color:rgb(76,175,80);'>You responded correctly on <b>" +
-            round_digits(results.accuracy * 100) + "" + "%</b> of the trials.</p>"
-        var display_rt = "<p style='color:rgb(233,30,99);'>Your average response time was <b>" + round_digits(results.mean_reaction_time) + "</b> ms.</p>"
-        var display_percentile = round_digits(results.percentage)
-        var comparison = "<p style='color:rgb(76,175,80);'>You performed better than <b>" + display_percentile + "</b>% of the population.</p>"
-        return "<p>Here are your results:</p><hr>" +
-            display_score + comparison +
+        var show_screen = get_debrief_display(results)
+        return show_screen.display_score + "<hr>" + 
+            show_screen.display_comparison +
             "<hr><p>Can you do better in the next illusion?</p>"
     },
     on_finish: function (data) {
@@ -536,14 +519,11 @@ var mullerlyer_debrief = {
     choices: ["Next Illusion"],
     stimulus: function () {
         var results = get_results(mullerlyer_mean, mullerlyer_sd, 'mullerlyer')
-        var display_accuracy = "<p style='color:rgb(76,175,80);'>You responded correctly on <b>" +
-            round_digits(results.accuracy * 100) + "" + "%</b> of the trials.</p>"
-        var display_rt = "<p style='color:rgb(233,30,99);'>Your average response time was <b>" + round_digits(results.mean_reaction_time) + "</b> ms.</p>"
-        var display_percentile = round_digits(results.percentage)
-        var comparison = "<p style='color:rgb(76,175,80);'>You performed better than <b>" + display_percentile + "</b>% of the population.</p>"
-        return "<p>Here are your results:</p><hr>" +
-            comparison +
+        var show_screen = get_debrief_display(results)
+        return show_screen.display_score + "<hr>" + 
+            show_screen.display_comparison +
             "<hr><p>Can you do better in the next illusion?</p>"
+
     },
     on_finish: function (data) {
         var results = get_results(mullerlyer_mean, mullerlyer_sd, 'mullerlyer')
@@ -648,14 +628,11 @@ var ponzo_debrief = {
     choices: ["Next Illusion"],
     stimulus: function () {
         var results = get_results(ponzo_mean, ponzo_sd, 'ponzo')
-        var display_accuracy = "<p style='color:rgb(76,175,80);'>You responded correctly on <b>" +
-            round_digits(results.accuracy * 100) + "" + "%</b> of the trials.</p>"
-        var display_rt = "<p style='color:rgb(233,30,99);'>Your average response time was <b>" + round_digits(results.mean_reaction_time) + "</b> ms.</p>"
-        var display_percentile = round_digits(results.percentage)
-        var comparison = "<p style='color:rgb(76,175,80);'>You performed better than <b>" + display_percentile + "</b>% of the population.</p>"
-        return "<p>Here are your results:</p><hr>" +
-            comparison +
+        var show_screen = get_debrief_display(results)
+        return show_screen.display_score + "<hr>" + 
+            show_screen.display_comparison +
             "<hr><p>Can you do better in the next illusion?</p>"
+
     },
     on_finish: function (data) {
         var results = get_results(ponzo_mean, ponzo_sd, 'ponzo')
@@ -676,15 +653,11 @@ var end_experiment = {
     type: "html-button-response",
     choices: ["End"],
     stimulus: function () {
-        var results = get_results(overall_mean, overall_sd)
-        var display_accuracy = "<p style='color:rgb(76,175,80);'>You responded correctly on <b>" +
-            round_digits(results.accuracy * 100) + "" + "%</b> of the trials.</p>"
-        var display_rt = "<p style='color:rgb(233,30,99);'>Your average response time was <b>" + round_digits(results.mean_reaction_time) + "</b> ms.</p>"
-        var display_percentile = round_digits(results.percentage)
-        var comparison = "<p style='color:rgb(233,30,99);'>You performed better than <b>" + display_percentile + "</b>% of the population.</p>"
-        return "<p><b>Thank you for participating!</b> Here are your results:</p><hr>" +
-            comparison +
-            "<hr><p> Don't hesitate to spread the word and share this experiment, science appreciates :)</p>"
+        var show_screen = get_debrief_display(results)
+        return "<p><b>Thank you for participating!</b></p>" +
+            show_screen.display_score + "<hr>" + 
+            show_screen.display_comparison +
+            "<hr><p>Challenge your friends to this game!</p>"
     },
     on_finish: function (data) {
         jsPsych.endExperiment('The experiment has ended. You can close the window or press refresh it to start again.')
