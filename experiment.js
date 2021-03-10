@@ -67,6 +67,7 @@ function get_results(illusion_mean, illusion_sd, illusion_type) {
         score: score_to_display
     }
 }
+
 function get_debrief_display(results, type="Block") {
 
     if (type == "Block") { // Debrief at end of each block
@@ -220,16 +221,20 @@ var delboeuf_instructions = {
     choices: ["Start"],
     stimulus: function () {
         if (systemInfo().screen_touchscreen == false) {
-            return ("<p>In this experiment, two red circles will appear " +
-                "on the screen.</p><p>Your task is to judge which circle is bigger in size. </p><p>If the <strong>left circle</strong> is bigger, " +
+            return ("<p>In this experiment, two red circles will appear side by side each other " +
+                "on the screen.</p><p>Your task is to select which <strong>red</strong> circle is bigger in size as fast as you can without making any errors. </p>" +
+                "<p>Don't let yourself be distracted by the black outlines around the red circles!</p>" +
+                "<p>If the <strong>left circle</strong> is bigger, " +
                 "press the <strong>left arrow key</strong> on the keyboard as fast as you can.</p>" +
                 "<p>If the <strong>right circle</strong> is bigger, press the <strong>right arrow key</strong> as fast as you can.</p><hr>" +
                 "<div style='float: center'><img src='utils/Delboeuf_Demo.png' height='300'></img>" +
                 "<p><img src='utils/answer/answer_leftright_keyboard.PNG' height='150'></img></p>" +
                 "<p class='small'>For example, <strong>press the left arrow key</strong> here.</p></div>")
         } else {
-            return ("<p>In this experiment, two red circles will appear " +
-                "on the screen.</p><p>Your task is to judge which circle is bigger in size. </p><p>If the <strong>left circle</strong> is bigger, " +
+            return ("<p>In this experiment, two red circles will appear side by side each other " +
+                "on the screen.</p><p>Your task is to select which <strong>red</strong> circle is bigger in size as fast as you can without making any errors. </p>" +
+                "<p>Don't let yourself be distracted by the black outlines around the red circles!</p>" +
+                "<p>If the <strong>left circle</strong> is bigger, " +
                 "<strong>click on the left circle</strong> as fast as you can.</p>" +
                 "<p>If the <strong>right circle</strong> is bigger, <strong>click on the right circle</strong> as fast as you can.</p><hr>" +
                 "<div style='float: center'><img src='utils/Delboeuf_Demo.png' height='300'></img>" +
@@ -328,16 +333,20 @@ var ebbinghaus_instructions = {
     choices: ["Start"],
     stimulus: function () {
         if (systemInfo().screen_touchscreen == false) {
-            return ("<p>In this experiment, two red circles will appear " +
-                "on the screen.</p><p>Your task is to judge which circle is bigger in size. </p><p>If the <strong>left circle</strong> is bigger, " +
+            return ("<p>In this experiment, two red circles will appear side by side each other " +
+                "on the screen.</p><p>Your task is to judge which <strong>red</strong> circle is bigger in size. </p>" +
+                "<p>Don't let yourself be distracted by the small black circles around the red circles!</p>" +
+                "<p>If the <strong>left circle</strong> is bigger, " +
                 "press the <strong>left arrow key</strong> on the keyboard as fast as you can.</p>" +
                 "<p>If the <strong>right circle</strong> is bigger, press the <strong>right arrow key</strong> as fast as you can.</p><hr>" +
                 "<div style='float: center'><img src='utils/Ebbinghaus_Demo.png' height='300'></img>" +
                 "<p><img src='utils/answer/answer_leftright_keyboard.PNG' height='150'></img></p>" +
                 "<p class='small'>For example, <strong>press the left arrow key</strong> here.</p></div>")
         } else {
-            return ("<p>In this experiment, two red circles will appear " +
-                "on the screen.</p><p>Your task is to judge which circle is bigger in size. </p><p>If the <strong>left circle</strong> is bigger, " +
+            return ("<p>In this experiment, two red circles will appear side by side each other " +
+                "on the screen.</p><p>Your task is to judge which <strong>red</strong> circle is bigger in size. </p>" +
+                "<p>Don't let yourself be distracted by the small black circles around the red circles!</p>" +
+                "<p>If the <strong>left circle</strong> is bigger, " +
                 "<strong>click on the left circle</strong> as fast as you can.</p>" +
                 "<p>If the <strong>right circle</strong> is bigger, <strong>click on the right circle</strong> as fast as you can.</p><hr>" +
                 "<div style='float: center'><img src='utils/Ebbinghaus_Demo.png' height='300'></img>" +
@@ -437,7 +446,9 @@ var mullerlyer_instructions = {
     stimulus: function () {
         if (systemInfo().screen_touchscreen == false) {
             return ("<p>In this experiment, two red lines will appear " +
-                "on the screen.</p><p>Your task is to judge which line is longer. </p><p>If the <strong>upper horizontal line</strong> is longer, " +
+                "on the screen, one on top and one below.</p><p>Your task is to judge which <strong>red</strong> line is longer. </p>" +
+                "<p>Don't let yourself be distracted by the black arrows at the ends of the red lines!</p>" +
+                "<p>If the <strong>upper horizontal line</strong> is longer, " +
                 "press the <strong>up arrow key</strong> on the keyboard as fast as you can.</p>" +
                 "<p>If the <strong>lower horizontal line</strong> is longer, press the <strong>down arrow key</strong> as fast as you can.</p><hr>" +
                 "<div style='float: center'><img src='utils/MullerLyer_Demo.png' height='300'></img>" +
@@ -445,7 +456,9 @@ var mullerlyer_instructions = {
                 "<p class='small'>For example, <strong>press the up arrow key</strong> here.</p></div>")
         } else {
             return ("<p>In this experiment, two red lines will appear " +
-                "on the screen.</p><p>Your task is to judge which line is longer. </p><p>If the <strong>upper horizontal line</strong> is longer, " +
+                "on the screen, one on top and one below.</p><p>Your task is to judge which <strong>red</strong> line is longer. </p>" +
+                "<p>Don't let yourself be distracted by the black arrows at the ends of the red lines!</p>" +
+                "<p>If the <strong>upper horizontal line</strong> is longer, " +
                 "<strong>click on the upper line</strong> as fast as you can.</p>" +
                 "<p>If the <strong>lower horizontal line</strong> is longer, <strong>click on the lower line</strong> as fast as you can.</p><hr>" +
                 "<div style='float: center'><img src='utils/MullerLyer_Demo.png' height='300'></img>" +
@@ -546,7 +559,9 @@ var ponzo_instructions = {
     stimulus: function () {
         if (systemInfo().screen_touchscreen == false) {
             return ("<p>In this experiment, two red lines will appear " +
-                "on the screen.</p><p>Your task is to judge which line is longer. </p><p>If the <strong>upper horizontal line</strong> is longer, " +
+                "on the screen, one on top and one below.</p><p>Your task is to judge which <strong>red</strong>line is longer.</p>" +
+                "<p>Don't let yourself be distracted by the black vertical lines on the sides of the red lines!</p>" +
+                "If the <strong>upper horizontal line</strong> is longer, " +
                 "press the <strong>up arrow key</strong> on the keyboard as fast as you can.</p>" +
                 "<p>If the <strong>lower horizontal line</strong> is longer, press the <strong>down arrow key</strong> as fast as you can.</p><hr>" +
                 "<div style='float: center'><img src='utils/Ponzo_Demo.png' height='300'></img>" +
@@ -554,7 +569,9 @@ var ponzo_instructions = {
                 "<p class='small'>For example, <strong>press the up arrow key</strong> here.</p></div>")
         } else {
             return ("<p>In this experiment, two red lines will appear " +
-                "on the screen.</p><p>Your task is to judge which line is longer. </p><p>If the <strong>upper horizontal line</strong> is longer, " +
+                "on the screen, one on top and one below.</p><p>Your task is to judge which <strong>red</strong> line is longer. </p>" +
+                "<p>Don't let yourself be distracted by the black vertical lines on the sides of the red lines!</p>" +
+                "If the <strong>upper horizontal line</strong> is longer, " +
                 "<strong>click on the upper line</strong> as fast as you can.</p>" +
                 "<p>If the <strong>lower horizontal line</strong> is longer, <strong>click on the lower line</strong> as fast as you can.</p><hr>" +
                 "<div style='float: center'><img src='utils/Ponzo_Demo.png' height='300'></img>" +

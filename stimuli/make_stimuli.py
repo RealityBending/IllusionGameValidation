@@ -78,9 +78,9 @@ def generate_images(data, strengths, differences, function, name = "Delboeuf"):
 
 ill.delboeuf_image(illusion_strength=0, difference=5, width=width, height=height).save("../utils/" + "Delboeuf_Demo.png")
 ill.ebbinghaus_image(illusion_strength=0, difference=5, width=width, height=height).save("../utils/" + "Ebbinghaus_Demo.png")
-ill.mullerlyer_image(illusion_strength=0, difference=0.5, width=width, height=height).save("../utils/" + "MullerLyer_Demo.png")
+ill.mullerlyer_image(illusion_strength=-20, difference=1, width=width, height=height).save("../utils/" + "MullerLyer_Demo.png")
 ill.poggendorff_image(illusion_strength=0, difference=0.3, width=width, height=height).save("../utils/" + "Poggendorff_Demo.png")
-ill.ponzo_image(illusion_strength=0, difference=0.5, width=width, height=height).save("../utils/" + "Ponzo_Demo.png")
+ill.ponzo_image(illusion_strength=20, difference=1.0, width=width, height=height).save("../utils/" + "Ponzo_Demo.png")
 ill.rodframe_image(illusion_strength=0, difference=30, width=width, height=height).save("../utils/" + "RodFrame_Demo.png")
 ill.verticalhorizontal_image(illusion_strength=0, difference=0.5, width=width, height=height).save("../utils/" + "VerticalHorizontal_Demo.png")
 ill.zollner_image(illusion_strength=0, difference=15, width=width, height=height).save("../utils/" + "Zollner_Demo.png")
