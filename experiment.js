@@ -89,7 +89,7 @@ var trial_number = 1 // trial indexing variable starts at 1 for convenience
 var block_number = 0 // block indexing variables (should block 0 be there as practice block?)
 
 // fixed scores as placeholders, update later
-const delboeuf_mean = 550
+/*const delboeuf_mean = 550
 const delboeuf_sd = 10
 const ebbinghaus_mean = 660
 const ebbinghaus_sd = 20
@@ -98,7 +98,24 @@ const mullerlyer_sd = 20
 const ponzo_mean = 660
 const ponzo_sd = 20
 const overall_mean = 590
-const overall_sd = 25
+const overall_sd = 25*/
+
+// update distribution scores
+var delb_scores = scores_byillusion.filter((scores_byillusion) => scores_byillusion.Illusion_Type === 'Delboeuf')
+var ebbing_scores =  scores_byillusion.filter((scores_byillusion) => scores_byillusion.Illusion_Type === 'Ebbinghaus')
+var muller_scores = scores_byillusion.filter((scores_byillusion) => scores_byillusion.Illusion_Type === 'MullerLyer')
+var ponzo_scores = scores_byillusion.filter((scores_byillusion) => scores_byillusion.Illusion_Type === 'Ponzo')
+
+const delboeuf_mean = delb_scores.map(o => o.IES_Mean)[0]
+const delboeuf_sd = delb_scores.map(o => o.IES_SD)[0]
+const ebbinghaus_mean = ebbing_scores.map(o => o.IES_Mean)[0]
+const ebbinghaus_sd = ebbing_scores.map(o => o.IES_SD)[0]
+const mullerlyer_mean = muller_scores.map(o => o.IES_Mean)[0]
+const mullerlyer_sd = muller_scores.map(o => o.IES_SD)[0]
+const ponzo_mean = ponzo_scores.map(o => o.IES_Mean)[0]
+const ponzo_sd = ponzo_scores.map(o => o.IES_SD)[0]
+const overall_mean = scores_grand.map(o => o.IES_Mean)[0]
+const overall_sd = scores_grand.map(o => o.IES_SD)[0]
 
 // Welcome + Informed Consent
 var welcome = {

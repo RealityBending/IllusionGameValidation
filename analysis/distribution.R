@@ -39,13 +39,23 @@ plot_correlation(data, "Ponzo")
 
 
 # Get scores by illusions
-scores <- data %>% 
+scores_byillusion <- data %>% 
   group_by(Illusion_Type) %>% 
   summarize(IES_Mean = mean(Block_IES, na.rm=TRUE),
             IES_SD = sd(Block_IES, na.rm=TRUE),
             RT_Mean = mean(RT, na.rm=TRUE),
             RT_SD = sd(RT, na.rm=TRUE),
             Accuracy_Mean = mean(Correct, na.rm=TRUE),
-            Accuracy_SD = sd(Correct, na.rm=TRUE)
-  )
+            Accuracy_SD = sd(Correct, na.rm=TRUE))
 
+Grand_IES_Mean <- mean(data$Grand_IES, na.rm=TRUE)
+Grand_IES_SD <- sd(data$Grand_IES, na.rm=TRUE)
+scores_grand <- as.data.frame(t(c(Grand_IES_Mean, Grand_IES_SD))) 
+rownames(scores_grand) <- NULL
+colnames(scores_grand) <- c("IES_Mean", "IES_SD")
+
+# Save as js
+library(jsonlite)
+
+write_json(scores_byillusion, "scores_byillusion.js")
+write_json(scores_grand, "scores_grand.js")
