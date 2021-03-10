@@ -222,17 +222,17 @@ var delboeuf_instructions = {
     stimulus: function () {
         if (systemInfo().screen_touchscreen == false) {
             return ("<p>In this experiment, two red circles will appear side by side each other " +
-                "on the screen. Your task is to select which <strong>red</strong> circle is bigger in size as fast as you can without making any errors. </p>" +
+                "on the screen. <p></p>Your task is to select which <strong>red</strong> circle is bigger in size as fast as you can without making any errors. </p>" +
                 "<p>Don't let yourself be distracted by the black outlines around the red circles!</p>" +
                 "<p>If the <strong>left circle</strong> is bigger, " +
                 "press the <strong>left arrow key</strong> on the keyboard as fast as you can.</p>" +
                 "<p>If the <strong>right circle</strong> is bigger, press the <strong>right arrow key</strong> as fast as you can.</p><hr>" +
                 "<div style='float: center'><img src='utils/Delboeuf_Demo.png' height='300'></img>" +
-                "<p><img src='utils/answer/answer_leftright_keyboard.PNG' height='150'></img></p>" +
+                "<img src='utils/answer/answer_leftright_keyboard.PNG' height='150'></img>" +
                 "<p class='small'>For example, <strong>press the left arrow key</strong> here.</p></div>")
         } else {
             return ("<p>In this experiment, two red circles will appear side by side each other " +
-                "on the screen. Your task is to select which <strong>red</strong> circle is bigger in size as fast as you can without making any errors. </p>" +
+                "on the screen. <p></p>Your task is to select which <strong>red</strong> circle is bigger in size as fast as you can without making any errors. </p>" +
                 "<p>Don't let yourself be distracted by the black outlines around the red circles!</p>" +
                 "<p>If the <strong>left circle</strong> is bigger, " +
                 "<strong>click on the left circle</strong> as fast as you can.</p>" +
