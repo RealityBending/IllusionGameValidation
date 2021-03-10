@@ -10,6 +10,7 @@ n = 4
 data = []
 
 
+
 # Convenience functions
 def save_mosaic(strengths, differences, function, name = "Delboeuf"):
     imgs = []
@@ -28,6 +29,10 @@ def save_mosaic(strengths, differences, function, name = "Delboeuf"):
 
 
 def generate_images(data, strengths, differences, function, name = "Delboeuf"):
+
+    illusion_leftright = ["Delboeuf", "Ebbinghaus"]
+    illusion_updown = ["MullerLyer", "Ponzo"]
+
     for strength in strengths:
         for difference in differences:
 
@@ -35,15 +40,35 @@ def generate_images(data, strengths, differences, function, name = "Delboeuf"):
             path = name + "_str" + str(np.round(strength, 2)) + "_diff" + str(np.round(difference, 2)) + ".png"
             img.save(path)
 
+            # Compute expected response            
+            if difference > 0:
+                if name in illusion_leftright:
+                    correct = 'arrowleft'
+                elif name in illusion_updown:
+                    correct = 'arrowup'
+                else:
+                    correct = 'tbc'
+            elif difference < 0:
+                if name in illusion_leftright:
+                    correct = 'arrowright'
+                elif name in illusion_updown:
+                    correct = 'arrowdown'
+                else:
+                    correct = 'tbc'
+            
             # Save parameters for Delboeuf Illusion
             data.append({'Illusion_Type': name,
                          'Illusion_Strength': strength,
                          'Difference': difference,
-                         'File': path})
+                         'stimulus': 'stimuli/' + path,
+                         'data': { 'screen': 'test', 'block': name, 'correct_response': correct }})
+
+            # data.append({'Illusion_Type': name,
+            #              'Illusion_Strength': strength,
+            #              'Difference': difference,
+            #              'File': path})
     save_mosaic(strengths, differences, function, name = name)
     return data
-
-
 
 
 
@@ -132,10 +157,12 @@ data = generate_images(data,
 
 
 # -------------------------- Save data --------------------------
-df = pd.DataFrame(data).sort_values('Illusion_Type')
-df.to_csv('stimuli.csv', index=False)
+# df = pd.DataFrame(data).sort_values('Illusion_Type')
+# df.to_csv('stimuli.csv', index=False)
+import json
 
-
+with open('stimuli.js', 'w') as fp:
+    json.dump(data, fp)
 
 
 

@@ -435,7 +435,7 @@ var mullerlyer_instructions = {
                 "press the <strong>up arrow key</strong> on the keyboard as fast as you can.</p>" +
                 "<p>If the <strong>lower horizontal line</strong> is longer, press the <strong>down arrow key</strong> as fast as you can.</p><hr>" +
                 "<div style='float: center'><img src='utils/MullerLyer_Demo.png' height='300'></img>" +
-                "<p><img src='utils/answer/answer_leftright_keyboard.PNG' height='150'></img></p>" +
+                "<p><img src='utils/answer/answer_updown_keyboard.PNG' height='150'></img></p>" +
                 "<p class='small'>For example, <strong>press the up arrow key</strong> here.</p></div>")
         } else {
             return ("<p>In this experiment, two red lines will appear " +
@@ -443,7 +443,7 @@ var mullerlyer_instructions = {
                 "<strong>click on the upper line</strong> as fast as you can.</p>" +
                 "<p>If the <strong>lower horizontal line</strong> is longer, <strong>click on the lower line</strong> as fast as you can.</p><hr>" +
                 "<div style='float: center'><img src='utils/MullerLyer_Demo.png' height='300'></img>" +
-                "<p><img src='utils/answer/answer_leftright_touch.PNG' height='150'></img></p>" +
+                "<p><img src='utils/answer/answer_updown_touch.PNG' height='150'></img></p>" +
                 "<p class='small'>For example, <strong>click on the upper line</strong> here.</p></div>")
         }
     },
@@ -552,7 +552,7 @@ var ponzo_instructions = {
                 "press the <strong>up arrow key</strong> on the keyboard as fast as you can.</p>" +
                 "<p>If the <strong>lower horizontal line</strong> is longer, press the <strong>down arrow key</strong> as fast as you can.</p><hr>" +
                 "<div style='float: center'><img src='utils/Ponzo_Demo.png' height='300'></img>" +
-                "<p><img src='utils/answer/answer_leftright_keyboard.PNG' height='150'></img></p>" +
+                "<p><img src='utils/answer/answer_updown_keyboard.PNG' height='150'></img></p>" +
                 "<p class='small'>For example, <strong>press the up arrow key</strong> here.</p></div>")
         } else {
             return ("<p>In this experiment, two red lines will appear " +
@@ -560,7 +560,7 @@ var ponzo_instructions = {
                 "<strong>click on the upper line</strong> as fast as you can.</p>" +
                 "<p>If the <strong>lower horizontal line</strong> is longer, <strong>click on the lower line</strong> as fast as you can.</p><hr>" +
                 "<div style='float: center'><img src='utils/Ponzo_Demo.png' height='300'></img>" +
-                "<p><img src='utils/answer/answer_leftright_touch.PNG' height='150'></img></p>" +
+                "<p><img src='utils/answer/answer_updown_touch.PNG' height='150'></img></p>" +
                 "<p class='small'>For example, <strong>click on the upper line</strong> here.</p></div>")
         }
     },
