@@ -59,3 +59,17 @@ library(jsonlite)
 
 write_json(scores_byillusion, "scores_byillusion.js")
 write_json(scores_grand, "scores_grand.js")
+
+txt_byillusion <-  read_file("scores_byillusion.js") %>%
+  paste("var scores_byillusion =", .)
+txt_grand <-  read_file("scores_grand.js") %>%
+  paste("var scores_grand =", .)
+
+
+file_byillusion <- file("scores_byillusion.js")
+writeLines(txt_byillusion, file_byillusion)
+close(file_byillusion)
+
+file_grand <- file("scores_grand.js")
+writeLines(txt_grand, file_grand)
+close(file_grand)
