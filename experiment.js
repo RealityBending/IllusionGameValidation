@@ -71,9 +71,9 @@ function get_results(illusion_mean, illusion_sd, illusion_type) {
 function get_debrief_display(results, type="Block") {
 
     if (type == "Block") { // Debrief at end of each block
-        var score = "<p>Your score for this illusion is " + '<p style="color: black; font-size: 48px; font-weight: bold;">' + round_digits(results.score, digits=0) + '</p>'
+        var score = "<p>Your score for this illusion is " + '<p style="color: black; font-size: 48px; font-weight: bold;">' + round_digits(results.score, 0) + '</p>'
     } else { // Final debriefing at end of game
-        var score = "<p>Your final score is " + '<p style="color: black; font-size: 48px; font-weight: bold;">' + round_digits(results.score, digits=0) + '</p>'
+        var score = "<p>Your final score is " + '<p style="color: black; font-size: 48px; font-weight: bold;">' + round_digits(results.score, 0) + '</p>'
     }
 
     return {
