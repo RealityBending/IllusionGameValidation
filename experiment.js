@@ -74,8 +74,7 @@ function get_debrief_display(results) {
         display_score: "<p>Your score for this illusion is <b>" + round_digits(results.score) + "</b>.</p>",
         display_accuracy: "<p style='color:rgb(76,175,80);'>You responded correctly on <b>" + round_digits(results.accuracy * 100) + "" + "%</b> of the trials.</p>",
         display_rt: "<p style='color:rgb(233,30,99);'>Your average response time was <b>" + round_digits(results.mean_reaction_time) + "</b> ms.</p>",
-        display_percentile: round_digits(results.percentage),
-        display_comparison: "<p style='color:rgb(76,175,80);'>You performed better than <b>" + display_percentile + "</b>% of the population.</p>"
+        display_comparison: "<p style='color:rgb(76,175,80);'>You performed better than <b>" + round_digits(results.percentage) + "</b>% of the population.</p>"
     }    
 }
 
@@ -323,8 +322,8 @@ var delboeuf_debrief = {
         var display_rt = "<p style='color:rgb(233,30,99);'>Your average response time was <b>" + round_digits(results.mean_reaction_time) + "</b> ms.</p>"
         var display_percentile = round_digits(results.percentage)
         var comparison = "<p style='color:rgb(76,175,80);'>You performed better than <b>" + display_percentile + "</b>% of the population.</p>" */
-        return "<p>Here are your results:</p><hr>" +
-            show_screen.display_score + show_screen.display_comparison +
+        return show_screen.display_score + "<hr>" +
+            + show_screen.display_comparison +
             "<hr><p>Can you do better in the next illusion?</p>"
     },
     on_finish: function (data) {
