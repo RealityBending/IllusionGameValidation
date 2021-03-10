@@ -164,6 +164,11 @@ import json
 with open('stimuli.js', 'w') as fp:
     json.dump(data, fp)
 
+# adding "var test_stimuli ="
+with open('stimuli.js') as f: 
+	updatedfile = 'var test_stimuli = ' + f.read() 
+with open('stimuli.js','w') as f: 
+	f.write(updatedfile) 
 
 
 # # -------------------------- Line Length Illusions --------------------------
