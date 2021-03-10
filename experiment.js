@@ -69,9 +69,8 @@ function get_results(illusion_mean, illusion_sd, illusion_type) {
 }
 
 function get_debrief_display(results) {
-
     return {
-        display_score: "<p>Your score for this illusion is <b>" + round_digits(results.score) + "</b>.</p>",
+        display_score: "<p>Your score for this illusion is <b>" + <p style = "font-size:20px">round_digits(results.score)</p> + "</b>.</p>",
         display_accuracy: "<p style='color:rgb(76,175,80);'>You responded correctly on <b>" + round_digits(results.accuracy * 100) + "" + "%</b> of the trials.</p>",
         display_rt: "<p style='color:rgb(233,30,99);'>Your average response time was <b>" + round_digits(results.mean_reaction_time) + "</b> ms.</p>",
         display_comparison: "<p style='color:rgb(76,175,80);'>You performed better than <b>" + round_digits(results.percentage) + "</b>% of the population.</p>"
@@ -252,12 +251,6 @@ var delboeuf_instructions = {
 
 // Set stimuli
 var delboeuf_stimuli = test_stimuli.filter((test_stimuli) => test_stimuli.Illusion_Type === 'Delboeuf')
-/* var delboeuf_stimuli = [
-    { stimulus: "stimuli/Delboeuf_str0.33_diff0.33.png", data: { screen: 'test', block: 'delboeuf', correct_response: 'arrowleft' } },
-    { stimulus: "stimuli/Delboeuf_str0.33_diff-0.33.png", data: { screen: 'test', block: 'delboeuf', correct_response: 'arrowright' } },
-    { stimulus: "stimuli/Delboeuf_str-0.33_diff0.33.png", data: { screen: 'test', block: 'delboeuf', correct_response: 'arrowleft' } },
-    { stimulus: "stimuli/Delboeuf_str-0.33_diff-0.33.png", data: { screen: 'test', block: 'delboeuf', correct_response: 'arrowright' } },
-]*/
 
 // Preload images
 var delboeuf_preload = {
@@ -322,8 +315,8 @@ var delboeuf_debrief = {
         var display_rt = "<p style='color:rgb(233,30,99);'>Your average response time was <b>" + round_digits(results.mean_reaction_time) + "</b> ms.</p>"
         var display_percentile = round_digits(results.percentage)
         var comparison = "<p style='color:rgb(76,175,80);'>You performed better than <b>" + display_percentile + "</b>% of the population.</p>" */
-        return show_screen.display_score + "<hr>" +
-            + show_screen.display_comparison +
+        return show_screen.display_score + "<hr>" + 
+            show_screen.display_comparison +
             "<hr><p>Can you do better in the next illusion?</p>"
     },
     on_finish: function (data) {
@@ -373,12 +366,6 @@ var ebbinghaus_instructions = {
 
 // Set stimuli
 var ebbinghaus_stimuli = test_stimuli.filter((test_stimuli) => test_stimuli.Illusion_Type === 'Ebbinghaus')
-/* var ebbinghaus_stimuli = [
-    { stimulus: "stimuli/Ebbinghaus_str0.33_diff0.33.png", data: { screen: 'test', block: 'ebbinghaus', correct_response: 'arrowleft' } },
-    { stimulus: "stimuli/Ebbinghaus_str0.33_diff-0.33.png", data: { screen: 'test', block: 'ebbinghaus', correct_response: 'arrowright' } },
-    { stimulus: "stimuli/Ebbinghaus_str-0.33_diff0.33.png", data: { screen: 'test', block: 'ebbinghaus', correct_response: 'arrowleft' } },
-    { stimulus: "stimuli/Ebbinghaus_str-0.33_diff-0.33.png", data: { screen: 'test', block: 'ebbinghaus', correct_response: 'arrowright' } },
-]*/
 
 // Preload images
 var ebbinghaus_preload = {
@@ -492,12 +479,6 @@ var mullerlyer_instructions = {
 
 // Set stimuli
 var mullerlyer_stimuli = test_stimuli.filter((test_stimuli) => test_stimuli.Illusion_Type === 'MullerLyer')
-/* var mullerlyer_stimuli = [
-    { stimulus: "stimuli/MullerLyer_str16.67_diff0.1.png", data: { screen: 'test', block: 'mullerlyer', correct_response: 'arrowup' } },
-    { stimulus: "stimuli/MullerLyer_str16.67_diff-0.1.png", data: { screen: 'test', block: 'mullerlyer', correct_response: 'arrowdown' } },
-    { stimulus: "stimuli/MullerLyer_str50.0_diff0.1.png", data: { screen: 'test', block: 'mullerlyer', correct_response: 'arrowup' } },
-    { stimulus: "stimuli/MullerLyer_str50.0_diff-0.1.png", data: { screen: 'test', block: 'mullerlyer', correct_response: 'arrowdown' } },
-]*/
 
 // Preload images
 var mullerlyer_preload = {
@@ -610,12 +591,6 @@ var ponzo_instructions = {
 
 // Set stimuli
 var ponzo_stimuli = test_stimuli.filter((test_stimuli) => test_stimuli.Illusion_Type === 'Ponzo')
-/* var ponzo_stimuli = [
-    { stimulus: "stimuli/Ponzo_str-6.67_diff0.3.png", data: { screen: 'test', block: 'ponzo', correct_response: 'arrowup' } },
-    { stimulus: "stimuli/Ponzo_str-6.67_diff-0.3.png", data: { screen: 'test', block: 'ponzo', correct_response: 'arrowdown' } },
-    { stimulus: "stimuli/Ponzo_str-20.0_diff0.3.png", data: { screen: 'test', block: 'ponzo', correct_response: 'arrowup' } },
-    { stimulus: "stimuli/Ponzo_str-20.0_diff-0.3.png", data: { screen: 'test', block: 'ponzo', correct_response: 'arrowdown' } },
-]*/
 
 // Preload images
 var ponzo_preload = {
