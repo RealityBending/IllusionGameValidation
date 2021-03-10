@@ -222,7 +222,7 @@ var delboeuf_instructions = {
     stimulus: function () {
         if (systemInfo().screen_touchscreen == false) {
             return ("<p>In this experiment, two red circles will appear side by side each other " +
-                "on the screen.</p><p>Your task is to select which <strong>red</strong> circle is bigger in size as fast as you can without making any errors. </p>" +
+                "on the screen. Your task is to select which <strong>red</strong> circle is bigger in size as fast as you can without making any errors. </p>" +
                 "<p>Don't let yourself be distracted by the black outlines around the red circles!</p>" +
                 "<p>If the <strong>left circle</strong> is bigger, " +
                 "press the <strong>left arrow key</strong> on the keyboard as fast as you can.</p>" +
@@ -232,7 +232,7 @@ var delboeuf_instructions = {
                 "<p class='small'>For example, <strong>press the left arrow key</strong> here.</p></div>")
         } else {
             return ("<p>In this experiment, two red circles will appear side by side each other " +
-                "on the screen.</p><p>Your task is to select which <strong>red</strong> circle is bigger in size as fast as you can without making any errors. </p>" +
+                "on the screen. Your task is to select which <strong>red</strong> circle is bigger in size as fast as you can without making any errors. </p>" +
                 "<p>Don't let yourself be distracted by the black outlines around the red circles!</p>" +
                 "<p>If the <strong>left circle</strong> is bigger, " +
                 "<strong>click on the left circle</strong> as fast as you can.</p>" +
@@ -334,7 +334,7 @@ var ebbinghaus_instructions = {
     stimulus: function () {
         if (systemInfo().screen_touchscreen == false) {
             return ("<p>In this experiment, two red circles will appear side by side each other " +
-                "on the screen.</p><p>Your task is to judge which <strong>red</strong> circle is bigger in size. </p>" +
+                "on the screen. Your task is to select which <strong>red</strong> circle is bigger in size as fast as you can without making any errors. </p>" +
                 "<p>Don't let yourself be distracted by the small black circles around the red circles!</p>" +
                 "<p>If the <strong>left circle</strong> is bigger, " +
                 "press the <strong>left arrow key</strong> on the keyboard as fast as you can.</p>" +
@@ -344,7 +344,7 @@ var ebbinghaus_instructions = {
                 "<p class='small'>For example, <strong>press the left arrow key</strong> here.</p></div>")
         } else {
             return ("<p>In this experiment, two red circles will appear side by side each other " +
-                "on the screen.</p><p>Your task is to judge which <strong>red</strong> circle is bigger in size. </p>" +
+                "on the screen. Your task is to judge which <strong>red</strong> circle is bigger in size as fast as you can without making any errors. </p>" +
                 "<p>Don't let yourself be distracted by the small black circles around the red circles!</p>" +
                 "<p>If the <strong>left circle</strong> is bigger, " +
                 "<strong>click on the left circle</strong> as fast as you can.</p>" +
@@ -446,7 +446,7 @@ var mullerlyer_instructions = {
     stimulus: function () {
         if (systemInfo().screen_touchscreen == false) {
             return ("<p>In this experiment, two red lines will appear " +
-                "on the screen, one on top and one below.</p><p>Your task is to judge which <strong>red</strong> line is longer. </p>" +
+                "on the screen, one on top and one below. Your task is to judge which <strong>red</strong> line is longer as fast as you can without making any errors. </p>" +
                 "<p>Don't let yourself be distracted by the black arrows at the ends of the red lines!</p>" +
                 "<p>If the <strong>upper horizontal line</strong> is longer, " +
                 "press the <strong>up arrow key</strong> on the keyboard as fast as you can.</p>" +
@@ -456,7 +456,7 @@ var mullerlyer_instructions = {
                 "<p class='small'>For example, <strong>press the up arrow key</strong> here.</p></div>")
         } else {
             return ("<p>In this experiment, two red lines will appear " +
-                "on the screen, one on top and one below.</p><p>Your task is to judge which <strong>red</strong> line is longer. </p>" +
+                "on the screen, one on top and one below. Your task is to judge which <strong>red</strong> line is longer as fast as you can without making any errors. </p>" +
                 "<p>Don't let yourself be distracted by the black arrows at the ends of the red lines!</p>" +
                 "<p>If the <strong>upper horizontal line</strong> is longer, " +
                 "<strong>click on the upper line</strong> as fast as you can.</p>" +
@@ -559,7 +559,7 @@ var ponzo_instructions = {
     stimulus: function () {
         if (systemInfo().screen_touchscreen == false) {
             return ("<p>In this experiment, two red lines will appear " +
-                "on the screen, one on top and one below.</p><p>Your task is to judge which <strong>red</strong>line is longer.</p>" +
+                "on the screen, one on top and one below. Your task is to judge which <strong>red</strong> line is longer as fast as you can without making any errors.</p>" +
                 "<p>Don't let yourself be distracted by the black vertical lines on the sides of the red lines!</p>" +
                 "If the <strong>upper horizontal line</strong> is longer, " +
                 "press the <strong>up arrow key</strong> on the keyboard as fast as you can.</p>" +
@@ -569,7 +569,7 @@ var ponzo_instructions = {
                 "<p class='small'>For example, <strong>press the up arrow key</strong> here.</p></div>")
         } else {
             return ("<p>In this experiment, two red lines will appear " +
-                "on the screen, one on top and one below.</p><p>Your task is to judge which <strong>red</strong> line is longer. </p>" +
+                "on the screen, one on top and one below. Your task is to judge which <strong>red</strong> line is longer as fast as you can without making any errors. </p>" +
                 "<p>Don't let yourself be distracted by the black vertical lines on the sides of the red lines!</p>" +
                 "If the <strong>upper horizontal line</strong> is longer, " +
                 "<strong>click on the upper line</strong> as fast as you can.</p>" +
