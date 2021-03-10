@@ -103,7 +103,7 @@ const overall_sd = 25*/
 // update distribution scores
 var delb_scores = scores_byillusion.filter((scores_byillusion) => scores_byillusion.Illusion_Type === 'Delboeuf')
 var ebbing_scores =  scores_byillusion.filter((scores_byillusion) => scores_byillusion.Illusion_Type === 'Ebbinghaus')
-var muller_scores = scores_byillusion.filter((scores_byillusion) => scores_byillusion.Illusion_Type === 'MullerLyer')
+var muller_scores = scores_byillusion.filter((scores_byillusion) => scores_byillusion.Illusion_Type === 'Mullerlyer')
 var ponzo_scores = scores_byillusion.filter((scores_byillusion) => scores_byillusion.Illusion_Type === 'Ponzo')
 
 const delboeuf_mean = delb_scores.map(o => o.IES_Mean)[0]
