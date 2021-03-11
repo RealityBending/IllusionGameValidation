@@ -70,7 +70,7 @@ function get_results(illusion_mean, illusion_sd, illusion_type) {
 
 function get_debrief_display(results, type="Block") {
 
-    if (typeof type === "Block") { // Debrief at end of each block
+    if (type === "Block") { // Debrief at end of each block
         var score = "<p>Your score for this illusion is " + '<p style="color: black; font-size: 48px; font-weight: bold;">' + Math.round(results.score) + '</p>'
     } else if (type === "Final") { // Final debriefing at end of game
         var score = "<p>Your final score is " + '<p style="color: black; font-size: 48px; font-weight: bold;">' + Math.round(results.score) + '</p>'
