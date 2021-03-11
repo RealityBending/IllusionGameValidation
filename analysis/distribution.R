@@ -8,7 +8,7 @@ data <- read.csv("data.csv") %>%
          Correct = ifelse(Correct == "TRUE", 1, 0)) 
 
 # Convenience functions
-plot_correlation <- function(data, Illusion_Block){
+plot_correlation_IS <- function(data, Illusion_Block){
   data %>%
     filter(Illusion_Type == Illusion_Block) %>% 
     mutate(Illusion_Strength = standardize(Illusion_Strength)) %>% 
@@ -18,6 +18,20 @@ plot_correlation <- function(data, Illusion_Block){
     ggtitle(paste("r =", insight::format_value(cor.test(data$Illusion_Strength, data$RT)$estimate), ", p =", insight::format_value(cor.test(data$Illusion_Strength, data$RT)$p.value))) +
     ylab("Reaction Time (ms)") +
     xlab("Illusion Strength") +
+    ggtitle(paste0(Illusion_Block, " Illusion")) +
+    theme_modern()
+}
+
+plot_correlation_ID <- function(data, Illusion_Block){
+  data %>%
+    filter(Illusion_Type == Illusion_Block) %>% 
+    mutate(Illusion_Difference = standardize(Illusion_Difference)) %>% 
+    ggplot(aes(x=Illusion_Difference, y=RT)) +
+    geom_point() +
+    geom_smooth(method = "lm", alpha = 0.2) +
+    ggtitle(paste("r =", insight::format_value(cor.test(data$Illusion_Difference, data$RT)$estimate), ", p =", insight::format_value(cor.test(data$Illusion_Difference, data$RT)$p.value))) +
+    ylab("Reaction Time (ms)") +
+    xlab("Objective Feature Difference") +
     ggtitle(paste0(Illusion_Block, " Illusion")) +
     theme_modern()
 }
@@ -32,11 +46,15 @@ data %>%
   ggtitle("Distribution of IES across Illusion Type") +
   scale_fill_brewer(palette="Dark2")
 
-plot_correlation(data, "Delboeuf")
-plot_correlation(data, "Ebbinghaus")
-plot_correlation(data, "Mullerlyer")
-plot_correlation(data, "Ponzo")
+plot_correlation_IS(data, "Delboeuf")
+plot_correlation_IS(data, "Ebbinghaus")
+plot_correlation_IS(data, "Mullerlyer")
+plot_correlation_IS(data, "Ponzo")
 
+plot_correlation_ID(data, "Delboeuf")
+plot_correlation_ID(data, "Ebbinghaus")
+plot_correlation_ID(data, "Mullerlyer")
+plot_correlation_ID(data, "Ponzo")
 
 # Get scores by illusions
 scores_byillusion <- data %>% 

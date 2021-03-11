@@ -289,7 +289,7 @@ var delboeuf_test = {
         // track block and trial numbers
         data.block = 'delboeuf'
         data.illusion_strength = jsPsych.timelineVariable('Illusion_Strength')
-        data.illusion_difference = jsPsych.timelineVariable('Illusion_Difference')
+        data.illusion_difference = jsPsych.timelineVariable('Difference')
         data.block_number = block_number
         data.trial_number = trial_number
         trial_number += 1
@@ -404,7 +404,7 @@ var ebbinghaus_test = {
         // track block and trial numbers
         data.block = 'ebbinghaus'
         data.illusion_strength = jsPsych.timelineVariable('Illusion_Strength')
-        data.illusion_difference = jsPsych.timelineVariable('Illusion_Difference')
+        data.illusion_difference = jsPsych.timelineVariable('Difference')
         data.block_number = block_number
         data.trial_number = trial_number
         trial_number += 1
@@ -518,7 +518,7 @@ var mullerlyer_test = {
         // track block and trial numbers
         data.block = 'mullerlyer'
         data.illusion_strength = jsPsych.timelineVariable('Illusion_Strength')
-        data.illusion_difference = jsPsych.timelineVariable('Illusion_Difference')
+        data.illusion_difference = jsPsych.timelineVariable('Difference')
         data.block_number = block_number
         data.trial_number = trial_number
         trial_number += 1
@@ -633,7 +633,7 @@ var ponzo_test = {
         // track block and trial numbers
         data.block = 'ponzo'
         data.illusion_strength = jsPsych.timelineVariable('Illusion_Strength')
-        data.illusion_difference = jsPsych.timelineVariable('Illusion_Difference')
+        data.illusion_difference = jsPsych.timelineVariable('Difference')
         data.block_number = block_number
         data.trial_number = trial_number
         trial_number += 1

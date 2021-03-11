@@ -54,6 +54,8 @@ preprocess_trial <- function(df) {
   df <- df[!stringr::str_detect(names(df), pattern="click_")]  # remove click_x and click_y
   names(df) <- tools::toTitleCase(names(df))
   df[c("Screen" ,"Internal_node_id", "Time_elapsed", "Trial_type")] <- NULL
+  names(df)[names(df) == "Illusion_strength"] = "Illusion_Strength"
+  names(df)[names(df) == "Illusion_difference"] = "Illusion_Difference"
   names(df)[names(df) == "Rt"] <- "RT"
   df
 }
@@ -168,15 +170,15 @@ for(file in list.files(data_path)) {
   
   }
 
-remove <- c("str", "diff")
-
-# Rearrange and tidy columns
-data$Illusion_Strength <- sapply(strsplit(data$Stimulus, "_"), function(x) x[2])
-data$Illusion_Strength  <- as.numeric(str_remove(data$Illusion_Strength , paste(remove, collapse = "|")))
-
-data$Illusion_Difference <- sapply(strsplit(data$Stimulus, "_"), function(x) x[3])
-data$Illusion_Difference <-  str_remove(data$Illusion_Difference, paste(remove, collapse = "|"))
-data$Illusion_Difference <- as.numeric(tools::file_path_sans_ext(data$Illusion_Difference))
+# remove <- c("str", "diff")
+# 
+# # Rearrange and tidy columns
+# data$Illusion_Strength <- sapply(strsplit(data$Stimulus, "_"), function(x) x[2])
+# data$Illusion_Strength  <- as.numeric(str_remove(data$Illusion_Strength , paste(remove, collapse = "|")))
+# 
+# data$Illusion_Difference <- sapply(strsplit(data$Stimulus, "_"), function(x) x[3])
+# data$Illusion_Difference <-  str_remove(data$Illusion_Difference, paste(remove, collapse = "|"))
+# data$Illusion_Difference <- as.numeric(tools::file_path_sans_ext(data$Illusion_Difference))
 
 data <- data %>% 
   select(Participant_ID, Age, Initials, PlayedBefore, Stimulus, Illusion_Strength, Illusion_Difference, everything())
