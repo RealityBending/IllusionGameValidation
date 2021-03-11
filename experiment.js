@@ -672,7 +672,7 @@ var end_experiment = {
     choices: ["End"],
     stimulus: function () {
         var results = get_results(overall_mean, overall_sd)
-        var show_screen = get_debrief_display(results, type="Final")
+        var show_screen = get_debrief_display(results, "Final")
         return "<p><b>Thank you for participating!</b></p>" +
             show_screen.display_score + "<hr>" + 
             show_screen.display_comparison +
