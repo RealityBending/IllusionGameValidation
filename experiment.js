@@ -715,6 +715,7 @@ var end_experiment = {
         data.rt_mean_correct = results.mean_reaction_time_correct
         data.accuracy = results.accuracy
         data.inverse_efficiency_score = results.inverse_efficiency
+        commitToRepo(jsPsych.data.get().json(true), "data/" + participant_id + ".json")  // Send data to Netlify function
     },
     data: { screen: 'final_results' }
 }
