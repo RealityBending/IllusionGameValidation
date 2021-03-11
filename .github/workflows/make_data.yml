@@ -13,7 +13,7 @@ jobs:
         run: |
             install.packages(c("remotes", "rjson", "jsonlite"))
             remotes::install_deps(dependencies = TRUE)
-            remotes::install_github(c("tidyverse/dplyr", "easystats/see")
+            remotes::install_github(c("tidyverse/dplyr", "easystats/see"))
         shell: Rscript {0}
       - name: Run script
         run: |
