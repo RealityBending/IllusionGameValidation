@@ -201,8 +201,8 @@ var fixation = {
     type: 'html-keyboard-response',
     stimulus: '<div style="font-size:60px;">+</div>',
     choices: jsPsych.NO_KEYS, /* no responses will be accepted as a valid response */
-    trial_duration: 0,
-    // trial_duration: function () { return randomInteger(250, 750) },
+    // trial_duration: 0, (for testing)
+    trial_duration: function () { return randomInteger(250, 500, 750) },
     /* trial_duration: function(){
     return jsPsych.randomization.sampleWithoutReplacement([250, 500, 750, 1000], 1)[0];
     }, */
@@ -692,17 +692,17 @@ var end_experiment = {
 /* ----------------- Initialize experiment ----------------- */
 jsPsych.init({
     timeline: [fullscreen, welcome, participant_info_general, participant_info_repetition, if_not_repeated,
-        // delboeuf_preload, delboeuf_instructions, test_delboeuf_procedure, delboeuf_debrief,
-        // ebbinghaus_preload, ebbinghaus_instructions, test_ebbinghaus_procedure, ebbinghaus_debrief,
+        delboeuf_preload, delboeuf_instructions, test_delboeuf_procedure, delboeuf_debrief,
+        ebbinghaus_preload, ebbinghaus_instructions, test_ebbinghaus_procedure, ebbinghaus_debrief,
         mullerlyer_preload, mullerlyer_instructions, test_mullerlyer_procedure, mullerlyer_debrief,
         ponzo_preload, ponzo_instructions, test_ponzo_procedure, ponzo_debrief,
         end_experiment],
     show_progress_bar: true,
     message_progress_bar: 'Completion',
     // exclusions: { min_width: 800, min_height: 600 }, /* exclude browsers that are not at least 800x600 pix */
-    on_interaction_data_update: function (data) { console.log(JSON.stringify(data)) }, /* record browser interactions */
-    on_finish: function () {
-        jsPsych.data.displayData()
-    }
+    on_interaction_data_update: function (data) { console.log(JSON.stringify(data)) } /* record browser interactions */
+    // on_finish: function () {
+    //     jsPsych.data.displayData()
+    // }
 })
 
