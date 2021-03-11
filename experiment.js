@@ -53,7 +53,7 @@ function commitToRepo(jsonData, path) {
         referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
         body: JSON.stringify({
             path: path,
-            data: JSON.stringify(jsonData)
+            data: btoa(jsonData)
         }) // body data type must match "Content-Type" header
     }).then((response) => {
         console.log(response)

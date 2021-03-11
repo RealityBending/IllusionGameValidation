@@ -1,5 +1,5 @@
 library(rjson)
-library(tidyverse)
+library(dplyr)
 
 data_path <- "../data/"
 data <- data.frame()  # Initialize empty dataframe
@@ -185,4 +185,5 @@ data <- data %>%
 
 
 write.csv(data, "data.csv", row.names = FALSE)
+
 
