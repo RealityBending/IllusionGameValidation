@@ -1,0 +1,22 @@
+on: push
+
+name: Compile data
+
+jobs:
+  render:
+    name: Compile data
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: r-lib/actions/setup-r@v1
+      - name: Install Dependencies
+        run: |
+            Rscript -e 'install.packages(c("rjson"))'
+      - name: Run script
+        run: |
+            Rscript -e 'source("analysis/make_data.R")'
+            Rscript -e 'source("analysis/distribution.R")'
+      - name: Commit results
+        run: |
+          git commit analysis/data.csv -m 'Make data.csv' || echo "No changes to commit"
+          git push origin || echo "No changes to commit"
