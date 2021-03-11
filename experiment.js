@@ -73,7 +73,7 @@ function get_debrief_display(results, type="Block") {
     if (type === "Block") { // Debrief at end of each block
         var score = "<p>Your score for this illusion is " + '<p style="color: black; font-size: 48px; font-weight: bold;">' + Math.round(results.score) + '</p>'
     } else if (type === "Final") { // Final debriefing at end of game
-        var score = "<p>Your final score is " + '<p style="color: black; font-size: 48px; font-weight: bold;">' + Math.round(results.score) + '</p>'
+        var score = "<p><strong>Your final score is</strong> " + '<p style="color: black; font-size: 48px; font-weight: bold;">&#127881;' + Math.round(results.score) +  + '&#127881;</p>'
     }
 
     return {
@@ -673,8 +673,7 @@ var end_experiment = {
     stimulus: function () {
         var results = get_results(overall_mean, overall_sd)
         var show_screen = get_debrief_display(results, "Final")
-        return "<p><b>Thank you for participating!</b></p>" +
-            show_screen.display_score + "<hr>" + 
+        return show_screen.display_score + "<hr>" + 
             show_screen.display_comparison +
             "<hr><p>Challenge your friends to this game!</p>"
     },
@@ -693,8 +692,8 @@ var end_experiment = {
 /* ----------------- Initialize experiment ----------------- */
 jsPsych.init({
     timeline: [fullscreen, welcome, participant_info_general, participant_info_repetition, if_not_repeated,
-        delboeuf_preload, delboeuf_instructions, test_delboeuf_procedure, delboeuf_debrief,
-        ebbinghaus_preload, ebbinghaus_instructions, test_ebbinghaus_procedure, ebbinghaus_debrief,
+        // delboeuf_preload, delboeuf_instructions, test_delboeuf_procedure, delboeuf_debrief,
+        // ebbinghaus_preload, ebbinghaus_instructions, test_ebbinghaus_procedure, ebbinghaus_debrief,
         mullerlyer_preload, mullerlyer_instructions, test_mullerlyer_procedure, mullerlyer_debrief,
         ponzo_preload, ponzo_instructions, test_ponzo_procedure, ponzo_debrief,
         end_experiment],
