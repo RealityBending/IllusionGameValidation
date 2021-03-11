@@ -117,7 +117,8 @@ for(file in list.files(data_path)) {
   # 5th data file marks start of new exp template
 
   # Read JSON
-  rawdata <- rjson::fromJSON(file=paste0(data_path, file))
+  data_json <- rjson::fromJSON(file=paste0(data_path, file))
+  rawdata <- rjson::fromJSON(data_json)
 
   # Find interactions (not sure hat to do with them for now)
   # for(screen in rawdata){
