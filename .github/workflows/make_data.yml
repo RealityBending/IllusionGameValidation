@@ -11,7 +11,7 @@ jobs:
       - uses: r-lib/actions/setup-r@v1
       - name: Install Dependencies
         run: |
-            Rscript -e 'install.packages(c("remotes", "rjson", "easystats", "jsonlite"))'
+            Rscript -e 'install.packages(c("remotes", "rjson", "jsonlite"))'
             Rscript -e 'remotes::install_deps(dependencies = TRUE)'
             Rscript -e 'remotes::install_github(c("tidyverse/dplyr", "easystats/see")'
       - name: Run script
