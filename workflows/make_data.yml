@@ -11,9 +11,9 @@ jobs:
       - uses: r-lib/actions/setup-r@v1
       - name: Install Dependencies
         run: |
-            install.packages(c("remotes", "rjson", "easystats", "jsonlite"))
-            remotes::install_deps(dependencies = TRUE)
-            remotes::install_github("tidyverse/dplyr")
+            Rscript -e 'install.packages(c("remotes", "rjson", "easystats", "jsonlite"))'
+            Rscript -e 'remotes::install_deps(dependencies = TRUE)'
+            Rscript -e 'remotes::install_github("tidyverse/dplyr")'
       - name: Run script
         run: |
             Rscript -e 'source("analysis/make_data.R")'
