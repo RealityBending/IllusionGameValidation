@@ -23,11 +23,11 @@ exports.handler = async (event, context) => {
         message: `Saving ${content.path}`,
         path: content.path,
         committer: {
-            name: "RebelityBender",
+            name: "RealityBender",
             email: "realitybendinglab@gmail.com",
         },
         author: {
-            name: "RebelityBender",
+            name: "RealityBender",
             email: "realitybendinglab@gmail.com",
         }
     })
