@@ -68,7 +68,7 @@ function get_results(illusion_mean, illusion_sd, illusion_type) {
     }
 }
 
-function get_debrief_display(results, type) {
+function get_debrief_display(results, type="Block") {
 
     if (typeof type === "Block") { // Debrief at end of each block
         var score = "<p>Your score for this illusion is " + '<p style="color: black; font-size: 48px; font-weight: bold;">' + Math.round(results.score) + '</p>'
@@ -201,7 +201,8 @@ var fixation = {
     type: 'html-keyboard-response',
     stimulus: '<div style="font-size:60px;">+</div>',
     choices: jsPsych.NO_KEYS, /* no responses will be accepted as a valid response */
-    trial_duration: function () { return randomInteger(250, 750) },
+    trial_duration: 0,
+    // trial_duration: function () { return randomInteger(250, 750) },
     /* trial_duration: function(){
     return jsPsych.randomization.sampleWithoutReplacement([250, 500, 750, 1000], 1)[0];
     }, */
