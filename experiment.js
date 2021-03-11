@@ -73,7 +73,7 @@ function get_debrief_display(results, type="Block") {
     if (type === "Block") { // Debrief at end of each block
         var score = "<p>Your score for this illusion is " + '<p style="color: black; font-size: 48px; font-weight: bold;">' + Math.round(results.score) + '</p>'
     } else if (type === "Final") { // Final debriefing at end of game
-        var score = "<p><strong>Your final score is</strong> " + '<p style="color: black; font-size: 48px; font-weight: bold;">&#127881;' + Math.round(results.score) +  + '&#127881;</p>'
+        var score = "<p><strong>Your final score is</strong> " + '<p style="color: black; font-size: 48px; font-weight: bold;">&#127881; ' + Math.round(results.score) + ' &#127881;</p>'
     }
 
     return {
