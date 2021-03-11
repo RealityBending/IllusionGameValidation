@@ -1,5 +1,6 @@
 library(tidyverse)
 library(easystats)
+library(jsonlite)
 
 data <- read.csv("data.csv") %>% 
   rename(Illusion_Type = Block) %>% 
@@ -73,8 +74,6 @@ rownames(scores_grand) <- NULL
 colnames(scores_grand) <- c("IES_Mean", "IES_SD")
 
 # Save as js
-library(jsonlite)
-
 write_json(scores_byillusion, "scores_byillusion.js")
 write_json(scores_grand, "scores_grand.js")
 
