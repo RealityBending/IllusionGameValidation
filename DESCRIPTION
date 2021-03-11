@@ -1,0 +1,5 @@
+Package: IllusionGame
+Title: A game of visual illusions
+Version: 1.0.0
+Authors@R: person("RealityBender", email = "realitybendinglab@gmail.com")
+Description: An online web experiment of visual illusions.
