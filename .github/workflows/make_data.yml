@@ -26,5 +26,6 @@ jobs:
         shell: Rscript {0}
       - name: Commit results
         run: |
+          git add --all
           git commit analysis/data.csv -m 'Make data.csv' || echo "No changes to commit"
           git push origin || echo "No changes to commit"
