@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 library(dplyr)
 
-data_path <- "../data/"
+data_path <- "data/"
 data <- data.frame()  # Initialize empty dataframe
 
 
