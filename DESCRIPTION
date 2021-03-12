@@ -3,6 +3,8 @@ Title: A game of visual illusions
 Version: 1.0.0
 Authors@R: person("RealityBender", email = "realitybendinglab@gmail.com")
 Description: An online web experiment of visual illusions.
+Depends:
+    R (>= 2.10)
 Imports:
     rjson,
     jsonlite,
@@ -17,4 +19,5 @@ Remotes:
     easystats/effectsize,
     easystats/insight,
     easystats/see
+Encoding: UTF-8
 
