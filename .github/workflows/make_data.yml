@@ -23,7 +23,6 @@ jobs:
       - name: Run script
         run: |
             source("analysis/make_data.R")
-            source("analysis/distribution.R")
         shell: Rscript {0}
       - name: Commit results
         run: |
