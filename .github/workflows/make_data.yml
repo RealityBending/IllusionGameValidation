@@ -11,13 +11,6 @@ jobs:
 
       - uses: r-lib/actions/setup-r@v1
 
-      - name: Install Dependencies
-        run: |
-            install.packages(c("remotes", "rjson", "jsonlite"))
-            remotes::install_deps(dependencies = TRUE)
-            remotes::install_github(c("tidyverse/dplyr", "easystats/see", "easystats/effectsize", ""easystats/insight""))
-        shell: Rscript {0}
-
       - name: Restore packages
         run: |
             if (!requireNamespace("renv", quietly = TRUE)) install.packages("renv")
