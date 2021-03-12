@@ -28,11 +28,6 @@ jobs:
             source("analysis/make_data.R")
         shell: Rscript {0}
 
-      - name: Run script to aggregate data
-        run: |
-            source("analysis/distribution.R")
-        shell: Rscript {0}
-
       - name: Commit results
         run: |
           git config --local user.email "actions@github.com"
