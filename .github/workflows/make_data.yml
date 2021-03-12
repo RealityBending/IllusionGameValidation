@@ -34,6 +34,4 @@ jobs:
           git config --local user.name "GitHub Actions"
           git add --all
           git commit analysis/data.csv -m 'Make data.csv'
-          git commit analysis/scores_byillusion.js -m 'Make scores_byillusion.js'
-          git commit analysis/scores_grand.js -m 'Make scores_grand.js'
           git push origin
