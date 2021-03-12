@@ -1,5 +1,5 @@
-# library(rjson)
-# library(dplyr)
+library(rjson)
+library(dplyr)
 
 data_path <- "../data/"
 data <- data.frame()  # Initialize empty dataframe
@@ -181,8 +181,8 @@ for(file in list.files(data_path)) {
 # data$Illusion_Difference <-  str_remove(data$Illusion_Difference, paste(remove, collapse = "|"))
 # data$Illusion_Difference <- as.numeric(tools::file_path_sans_ext(data$Illusion_Difference))
 
-# data <- data %>% 
-#   dplyr::select(Participant_ID, Age, Initials, PlayedBefore, Stimulus, Illusion_Strength, Illusion_Difference, everything())
+data <- data %>%
+  dplyr::select(Participant_ID, Age, Initials, PlayedBefore, Stimulus, Illusion_Strength, Illusion_Difference, everything())
 
 
 write.csv(data, "data.csv", row.names = FALSE)
