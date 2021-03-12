@@ -1,5 +1,5 @@
-library(rjson)
-library(dplyr)
+# library(rjson)
+# library(dplyr)
 
 data_path <- "../data/"
 data <- data.frame()  # Initialize empty dataframe
@@ -187,4 +187,6 @@ for(file in list.files(data_path)) {
 
 write.csv(data, "data.csv", row.names = FALSE)
 
-
+# Fix versions of required packages
+# if (!requireNamespace("renv", quietly = TRUE)) install.packages("renv")
+# renv::snapshot()

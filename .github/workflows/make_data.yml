@@ -13,12 +13,18 @@ jobs:
         run: |
             install.packages(c("remotes", "rjson", "jsonlite"))
             remotes::install_deps(dependencies = TRUE)
-            remotes::install_github(c("tidyverse/dplyr", "easystats/see"))
+            remotes::install_github(c("tidyverse/dplyr", "easystats/see", "easystats/effectsize"))
+        shell: Rscript {0}
+      - name: Restore packages
+        run: |
+            if (!requireNamespace("renv", quietly = TRUE)) install.packages("renv")
+            renv::restore()
         shell: Rscript {0}
       - name: Run script
         run: |
-            Rscript -e 'source("analysis/make_data.R")'
-            Rscript -e 'source("analysis/distribution.R")'
+            source("analysis/make_data.R")
+            source("analysis/distribution.R")
+        shell: Rscript {0}
       - name: Commit results
         run: |
           git commit analysis/data.csv -m 'Make data.csv' || echo "No changes to commit"
