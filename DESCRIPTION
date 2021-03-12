@@ -11,7 +11,8 @@ Imports:
     insight,
     see,
     tools,
-    ggplot2
+    ggplot2,
+    readr
 Remotes: 
     easystats/effectsize,
     easystats/insight,

@@ -13,9 +13,8 @@ jobs:
 
       - name: Install Dependencies
         run: |
-            install.packages(c("remotes", "rjson", "jsonlite"))
+            install.packages(c("remotes"))
             remotes::install_deps(dependencies = TRUE)
-            remotes::install_github(c("tidyverse/dplyr", "easystats/see", "easystats/effectsize", "easystats/insight"))
         shell: Rscript {0}
 
       - name: Restore packages
