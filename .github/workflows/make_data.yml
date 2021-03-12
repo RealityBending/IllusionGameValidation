@@ -25,13 +25,14 @@ jobs:
 
       - name: Run script to process data
         run: |
-            source("analysis/make_data.R")
+            cd analysis
+            source("make_data.R")
         shell: Rscript {0}
 
       - name: Commit results
         run: |
           git config --local user.email "actions@github.com"
           git config --local user.name "GitHub Actions"
-          git add data.csv
-          git commit data.csv -m 'Make data.csv'
+          git add --all
+          git commit --all
           git push origin

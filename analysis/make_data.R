@@ -1,3 +1,4 @@
+#!/usr/bin/env Rscript
 library(dplyr)
 
 data_path <- "../data/"
