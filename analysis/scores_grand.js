@@ -1,2 +1,2 @@
-var scores_grand = [{"IES_Mean":955.065,"IES_SD":18.1091}]
+var scores_grand = [{"IES_Mean":775.8759,"IES_SD":273.3109}]
 

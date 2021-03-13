@@ -8,24 +8,35 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
       - uses: r-lib/actions/setup-r@v1
+
       - name: Install Dependencies
         run: |
-            install.packages(c("remotes", "rjson", "jsonlite"))
+            install.packages(c("remotes"))
             remotes::install_deps(dependencies = TRUE)
-            remotes::install_github(c("tidyverse/dplyr", "easystats/see", "easystats/effectsize"))
         shell: Rscript {0}
+
       - name: Restore packages
         run: |
             if (!requireNamespace("renv", quietly = TRUE)) install.packages("renv")
             renv::restore()
         shell: Rscript {0}
-      - name: Run script
+
+      - name: Run script to process data
         run: |
             source("analysis/make_data.R")
         shell: Rscript {0}
+
+      - name: Run script to aggregate data
+        run: |
+            source("analysis/distribution.R")
+        shell: Rscript {0}
+
       - name: Commit results
         run: |
-          git add --all
-          git commit analysis/data.csv -m 'Make data.csv' || echo "No changes to commit"
-          git push origin || echo "No changes to commit"
+          git config --local user.email "actions@github.com"
+          git config --local user.name "GitHub Actions"
+          git add analysis/data.csv analysis/scores_byillusion.js analysis/scores_grand.js
+          git commit analysis/data.csv analysis/scores_byillusion.js analysis/scores_grand.js -m 'Make data and Compute scores'
+          git push origin

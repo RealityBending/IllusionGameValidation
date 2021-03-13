@@ -1,11 +1,12 @@
+#!/usr/bin/env Rscript
+
 library(dplyr)
 # library(see)
 # library(effectsize)
 # library(jsonlite)
 library(ggplot2)
 
-
-data <- read.csv("data.csv") %>% 
+data <- read.csv("analysis/data.csv") %>% 
   dplyr::rename(Illusion_Type = Block) %>% 
   dplyr::mutate(Illusion_Type = as.factor(tools::toTitleCase(Illusion_Type)),
          PlayedBefore = as.factor(PlayedBefore),
@@ -76,20 +77,20 @@ scores_grand <- as.data.frame(t(c(Grand_IES_Mean, Grand_IES_SD)))
 rownames(scores_grand) <- NULL
 colnames(scores_grand) <- c("IES_Mean", "IES_SD")
 
-# Save as js
-jsonlite::write_json(scores_byillusion, "scores_byillusion.js")
-jsonlite::write_json(scores_grand, "scores_grand.js")
+# # Save as js
+jsonlite::write_json(scores_byillusion, "analysis/scores_byillusion.js")
+jsonlite::write_json(scores_grand, "analysis/scores_grand.js")
 
-txt_byillusion <-  readr::read_file("scores_byillusion.js") %>%
+txt_byillusion <-  readr::read_file("analysis/scores_byillusion.js") %>%
   paste("var scores_byillusion =", .)
-txt_grand <-  readr::read_file("scores_grand.js") %>%
+txt_grand <-  readr::read_file("analysis/scores_grand.js") %>%
   paste("var scores_grand =", .)
 
 
-file_byillusion <- file("scores_byillusion.js")
+file_byillusion <- file("analysis/scores_byillusion.js")
 writeLines(txt_byillusion, file_byillusion)
 close(file_byillusion)
 
-file_grand <- file("scores_grand.js")
+file_grand <- file("analysis/scores_grand.js")
 writeLines(txt_grand, file_grand)
 close(file_grand)
