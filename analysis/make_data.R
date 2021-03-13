@@ -185,7 +185,7 @@ for(file in list.files(data_path)) {
 #   dplyr::select(Participant_ID, Age, Initials, PlayedBefore, Stimulus, Illusion_Strength, Illusion_Difference, everything())
 
 
-write.csv(data, "data.csv", row.names = FALSE)
+write.csv(data, "analysis/data.csv", row.names = FALSE)
 
 # Fix versions of required packages
 # if (!requireNamespace("renv", quietly = TRUE)) install.packages("renv")

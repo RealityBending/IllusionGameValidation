@@ -28,10 +28,15 @@ jobs:
             source("analysis/make_data.R")
         shell: Rscript {0}
 
+      - name: Run script to aggregate data
+        run: |
+            source("analysis/distribution.R")
+        shell: Rscript {0}
+
       - name: Commit results
         run: |
           git config --local user.email "actions@github.com"
           git config --local user.name "GitHub Actions"
-          git add data.csv
-          git commit data.csv -m 'Make data.csv'
+          git add data.csv scores_byillusion.js scores_grand.js
+          git commit data.csv scores_byillusion.js scores_grand.js -m 'Make data and Compute scores'
           git push origin
