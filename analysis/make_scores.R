@@ -32,10 +32,10 @@ for(type in df_scores$Illusion_Type){
 
 
 # Save as js
-jsonlite::write_json(scores, "variables_scores.js")
-text <-  paste("var scores =", readr::read_file("variables_scores.js"))
+jsonlite::write_json(scores, "../variables_scores.js")
+text <-  paste("var scores =", readr::read_file("../variables_scores.js"))
 
 
-file <- file("variables_scores.js")
+file <- file("../variables_scores.js")
 writeLines(text, file)
 close(file)
