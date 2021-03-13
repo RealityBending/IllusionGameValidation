@@ -94,6 +94,16 @@ var session_info = {
 var trial_number = 1 // trial indexing variable starts at 1 for convenience
 var block_number = 0 // block indexing variables (should block 0 be there as practice block?)
 
+// Set demo images and preload them
+var instructions_stimuli = ['utils/Delboeuf_Demo.png', 'utils/Ebbinghaus_Demo.png', 'utils/MullerLyer_Demo.png', 'utils/Ponzo_Demo.png',
+    'utils/answer/answer_leftright_keyboard.PNG', 'utils/answer/answer_leftright_touch.PNG',
+    'utils/answer/answer_updown_keyboard.PNG', 'utils/answer/answer_updown_touch.PNG']
+
+var instructions_preload = {
+    type: 'preload',
+    trials: instructions_stimuli
+}
+
 
 // Welcome + Informed Consent
 var welcome = {
@@ -670,7 +680,7 @@ var end_experiment = {
 
 /* ----------------- Initialize experiment ----------------- */
 jsPsych.init({
-    timeline: [fullscreen, welcome, participant_info_general, participant_info_repetition, if_not_repeated,
+    timeline: [fullscreen, instructions_preload, welcome, participant_info_general, participant_info_repetition, if_not_repeated,
         delboeuf_preload, delboeuf_instructions, test_delboeuf_procedure, delboeuf_debrief,
         ebbinghaus_preload, ebbinghaus_instructions, test_ebbinghaus_procedure, ebbinghaus_debrief,
         mullerlyer_preload, mullerlyer_instructions, test_mullerlyer_procedure, mullerlyer_debrief,

@@ -6,8 +6,9 @@ library(dplyr)
 # library(jsonlite)
 library(ggplot2)
 
-data <- read.csv("analysis/data.csv") %>% 
-  dplyr::rename(Illusion_Type = Block) %>% 
+setwd("analysis")
+
+data <- read.csv("data.csv") %>% 
   dplyr::mutate(Illusion_Type = as.factor(tools::toTitleCase(Illusion_Type)),
          PlayedBefore = as.factor(PlayedBefore),
          Correct = ifelse(Correct == "TRUE", 1, 0)) 

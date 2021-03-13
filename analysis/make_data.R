@@ -1,6 +1,8 @@
 library(rjson)
 
-data_path <- "data/"
+setwd("analysis")
+
+data_path <- "../data/"
 data <- data.frame()  # Initialize empty dataframe
 
 
@@ -26,7 +28,7 @@ preprocess_session_info <- function(df) {
   names(df) <- tools::toTitleCase(names(df))
   df$Duration_Consent <- df$Rt
   df[c("Button_pressed", "Stimulus", "Screen" ,"Rt", "Internal_node_id", "Time_elapsed", "Trial_index", "Trial_type", "Response")] <- NULL
-  names(df)[names(df) == "Participant_id"] <- "Participant_ID"
+  names(df)[names(df) == "Participant_id"] <- "Participant"
   df
 }
 
@@ -53,6 +55,7 @@ preprocess_trial <- function(df) {
   df <- df[!stringr::str_detect(names(df), pattern="click_")]  # remove click_x and click_y
   names(df) <- tools::toTitleCase(names(df))
   df[c("Screen" ,"Internal_node_id", "Time_elapsed", "Trial_type")] <- NULL
+  names(df)[names(df) == "Block"] = "Illusion_Type"
   names(df)[names(df) == "Illusion_strength"] = "Illusion_Strength"
   names(df)[names(df) == "Illusion_difference"] = "Illusion_Difference"
   names(df)[names(df) == "Rt"] <- "RT"
@@ -63,7 +66,7 @@ preprocess_results <- function(df, per_block = TRUE) {
   scores_cols <- c("accuracy", "rt_mean", "rt_mean_correct", "inverse_efficiency_score")
   if(per_block) {
     df <- df[c(scores_cols, "block")] # keep only these values
-    names(df)[names(df) == "block"] <- "Block"
+    names(df)[names(df) == "block"] <- "Illusion_Type"
   } else {
     df <- df[scores_cols]
   }
@@ -77,7 +80,7 @@ preprocess_results <- function(df, per_block = TRUE) {
     colnames(df) <- paste0('Grand_', colnames(df))
     df
   } else {
-    colnames(df)[colnames(df) != "Block"] <- paste0('Block_', colnames(df[!(colnames(df) %in% "Block")]))
+    colnames(df)[colnames(df) != "Illusion_Type"] <- paste0('Block_', colnames(df[!(colnames(df) %in% "Block")]))
     df
   }
 }
@@ -165,7 +168,7 @@ for(file in list.files(data_path)) {
   }
 
   info$Temp <- NULL
-  trials <- merge(trials, block_results, by = "Block")
+  trials <- merge(trials, block_results, by = "Illusion_Type")
   data <- rbind(data, cbind(trials, info))
 
   }
@@ -184,4 +187,4 @@ for(file in list.files(data_path)) {
 #   dplyr::select(Participant_ID, Age, Initials, PlayedBefore, Stimulus, Illusion_Strength, Illusion_Difference, everything())
 
 
-write.csv(data, "analysis/data.csv", row.names = FALSE)
+write.csv(data, "data.csv", row.names = FALSE)
