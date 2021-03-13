@@ -17,5 +17,6 @@ jobs:
 
       - name: Commit results
         run: |
+          git add variables_scores.js
           git commit variables_scores.js -m 'Make variables_scores.js' || echo "No changes to commit"
           git push origin || echo "No changes to commit"

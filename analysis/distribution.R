@@ -61,36 +61,3 @@ plot_correlation_ID(data, "Ebbinghaus")
 plot_correlation_ID(data, "Mullerlyer")
 plot_correlation_ID(data, "Ponzo")
 
-# Get scores by illusions
-scores_byillusion <- data %>% 
-  dplyr::group_by(Illusion_Type) %>% 
-  dplyr::summarize(IES_Mean = mean(Block_IES, na.rm=TRUE),
-            IES_SD = sd(Block_IES, na.rm=TRUE),
-            RT_Mean = mean(RT, na.rm=TRUE),
-            RT_SD = sd(RT, na.rm=TRUE),
-            Accuracy_Mean = mean(Correct, na.rm=TRUE),
-            Accuracy_SD = sd(Correct, na.rm=TRUE))
-
-Grand_IES_Mean <- mean(data$Grand_IES, na.rm=TRUE)
-Grand_IES_SD <- sd(data$Grand_IES, na.rm=TRUE)
-scores_grand <- as.data.frame(t(c(Grand_IES_Mean, Grand_IES_SD))) 
-rownames(scores_grand) <- NULL
-colnames(scores_grand) <- c("IES_Mean", "IES_SD")
-
-# # Save as js
-jsonlite::write_json(scores_byillusion, "analysis/scores_byillusion.js")
-jsonlite::write_json(scores_grand, "analysis/scores_grand.js")
-
-txt_byillusion <-  readr::read_file("analysis/scores_byillusion.js") %>%
-  paste("var scores_byillusion =", .)
-txt_grand <-  readr::read_file("analysis/scores_grand.js") %>%
-  paste("var scores_grand =", .)
-
-
-file_byillusion <- file("analysis/scores_byillusion.js")
-writeLines(txt_byillusion, file_byillusion)
-close(file_byillusion)
-
-file_grand <- file("analysis/scores_grand.js")
-writeLines(txt_grand, file_grand)
-close(file_grand)

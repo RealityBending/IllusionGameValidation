@@ -1,7 +1,7 @@
 library(dplyr)
 library(jsonlite)
 
-data <- read.csv("data.csv") %>%
+data <- read.csv("analysis/data.csv") %>%
   dplyr::rename(Illusion_Type = Block) %>%
   dplyr::mutate(Illusion_Type = as.factor(tools::toTitleCase(Illusion_Type)),
          PlayedBefore = as.factor(PlayedBefore),
@@ -31,10 +31,10 @@ for(type in df_scores$Illusion_Type){
 
 
 # Save as js
-jsonlite::write_json(scores, "../variables_scores.js")
-text <-  paste("var scores =", readr::read_file("../variables_scores.js"))
+jsonlite::write_json(scores, "variables_scores.js")
+text <-  paste("var scores =", readr::read_file("variables_scores.js"))
 
 
-file <- file("../variables_scores.js")
+file <- file("variables_scores.js")
 writeLines(text, file)
 close(file)
