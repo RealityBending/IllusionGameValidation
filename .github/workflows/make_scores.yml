@@ -11,7 +11,7 @@ jobs:
       - uses: r-lib/actions/setup-r@v1
       - name: Install Dependencies
         run: |
-            Rscript -e 'install.packages(c("dplyr", "jsonlite"))'
+            Rscript -e 'install.packages(c("dplyr", "jsonlite", "readr"))'
       - name: Run script to make data
         run: Rscript -e 'source("analysis/make_scores.R")'
 
