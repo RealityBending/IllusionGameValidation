@@ -1,42 +1,5 @@
 /* SAVING DATA FUNCTION ================== */
 
-// Authenticate github using Octokit (https://octokit.github.io/rest.js/v18/)
-// import { Octokit } from "https://cdn.skypack.dev/@octokit/rest"
-
-// returns Octokit authentication promise
-/* const authenticatedOctokit =
-    fetch(".netlify/functions/api") // fetching gh token from netlify server function
-        .then(response => response.json())
-        .then((json) =>
-            new Octokit({
-                auth: json.auth, // authenticating Octokit
-            })
-        )
-*/
-// Commit info
-// const REPO_NAME = "IllusionGame"
-// const REPO_OWNER = "RealityBending" // update this to use "RealityBending"
-// const AUTHOR_EMAIL = "dom.makowski@gmail.com" // update this to committer/author email
-
-/* function commitToRepo(jsonData, path) {
-    // commits a new file in defined repo
-    authenticatedOctokit
-        .then(octokit => { // "then" makes sure that this runs *after* octokit is authenticated
-            octokit.repos.createOrUpdateFileContents({
-                owner: REPO_OWNER,
-                repo: REPO_NAME,
-                path: `${path}`, // path in repo -- saves to 'results' folder as '<participant_id>.json'
-                message: `Saving ${path}`, // commit message
-                content: btoa(jsonData), // octokit requires base64 encoding for the content; this just encodes the json string
-                "committer.name": REPO_OWNER,
-                "committer.email": AUTHOR_EMAIL,
-                "author.name": REPO_OWNER,
-                "author.email": AUTHOR_EMAIL,
-            })
-        })
-}
-*/
-
 function commitToRepo(jsonData, path) {
     const url = ".netlify/functions/api"
 
@@ -57,7 +20,7 @@ function commitToRepo(jsonData, path) {
         }) // body data type must match "Content-Type" header
     }).then((response) => {
         console.log(response)
-    });
+    })
 }
 
 /* ----------------- Internal Functions ----------------- */
@@ -91,7 +54,7 @@ function get_results(illusion_mean, illusion_sd, illusion_type) {
     }
 }
 
-function get_debrief_display(results, type="Block") {
+function get_debrief_display(results, type = "Block") {
 
     if (type === "Block") { // Debrief at end of each block
         var score = "<p>Your score for this illusion is " + '<p style="color: black; font-size: 48px; font-weight: bold;">' + Math.round(results.score) + '</p>'
@@ -104,7 +67,7 @@ function get_debrief_display(results, type="Block") {
         display_accuracy: "<p style='color:rgb(76,175,80);'>You responded correctly on <b>" + round_digits(results.accuracy * 100) + "" + "%</b> of the trials.</p>",
         display_rt: "<p style='color:rgb(233,30,99);'>Your average response time was <b>" + round_digits(results.mean_reaction_time) + "</b> ms.</p>",
         display_comparison: "<p style='color:rgb(76,175,80);'>You performed better than <b>" + round_digits(results.percentage) + "</b>% of the population.</p>"
-    }    
+    }
 }
 
 
@@ -131,22 +94,6 @@ var session_info = {
 var trial_number = 1 // trial indexing variable starts at 1 for convenience
 var block_number = 0 // block indexing variables (should block 0 be there as practice block?)
 
-// update distribution scores
-var delb_scores = scores_byillusion.filter((scores_byillusion) => scores_byillusion.Illusion_Type === 'Delboeuf')
-var ebbing_scores =  scores_byillusion.filter((scores_byillusion) => scores_byillusion.Illusion_Type === 'Ebbinghaus')
-var muller_scores = scores_byillusion.filter((scores_byillusion) => scores_byillusion.Illusion_Type === 'Mullerlyer')
-var ponzo_scores = scores_byillusion.filter((scores_byillusion) => scores_byillusion.Illusion_Type === 'Ponzo')
-
-const delboeuf_mean = delb_scores.map(o => o.IES_Mean)[0]
-const delboeuf_sd = delb_scores.map(o => o.IES_SD)[0]
-const ebbinghaus_mean = ebbing_scores.map(o => o.IES_Mean)[0]
-const ebbinghaus_sd = ebbing_scores.map(o => o.IES_SD)[0]
-const mullerlyer_mean = muller_scores.map(o => o.IES_Mean)[0]
-const mullerlyer_sd = muller_scores.map(o => o.IES_SD)[0]
-const ponzo_mean = ponzo_scores.map(o => o.IES_Mean)[0]
-const ponzo_sd = ponzo_scores.map(o => o.IES_SD)[0]
-const overall_mean = scores_grand.map(o => o.IES_Mean)[0]
-const overall_sd = scores_grand.map(o => o.IES_SD)[0]
 
 // Welcome + Informed Consent
 var welcome = {
@@ -332,14 +279,14 @@ var delboeuf_debrief = {
     type: "html-button-response",
     choices: ["Next Illusion"],
     stimulus: function () {
-        var results = get_results(delboeuf_mean, delboeuf_sd, 'delboeuf')
+        var results = get_results(scores["Delboeuf"]["IES_Mean"][0], scores["Delboeuf"]["IES_SD"][0], 'delboeuf')
         var show_screen = get_debrief_display(results)
-        return show_screen.display_score + "<hr>" + 
+        return show_screen.display_score + "<hr>" +
             show_screen.display_comparison +
             "<hr><p>Can you do better in the next illusion?</p>"
     },
     on_finish: function (data) {
-        var results = get_results(delboeuf_mean, delboeuf_sd, 'delboeuf')
+        var results = get_results(scores["Delboeuf"]["IES_Mean"][0], scores["Delboeuf"]["IES_SD"][0], 'delboeuf')
         data.block = 'delboeuf'
         data.block_number = block_number
         data.rt_mean = results.mean_reaction_time
@@ -447,14 +394,14 @@ var ebbinghaus_debrief = {
     type: "html-button-response",
     choices: ["Next Illusion"],
     stimulus: function () {
-        var results = get_results(ebbinghaus_mean, ebbinghaus_sd, 'ebbinghaus')
+        var results = get_results(scores["Ebbinghaus"]["IES_Mean"][0], scores["Ebbinghaus"]["IES_SD"][0], 'ebbinghaus')
         var show_screen = get_debrief_display(results)
-        return show_screen.display_score + "<hr>" + 
+        return show_screen.display_score + "<hr>" +
             show_screen.display_comparison +
             "<hr><p>Can you do better in the next illusion?</p>"
     },
     on_finish: function (data) {
-        var results = get_results(ebbinghaus_mean, ebbinghaus_sd, 'ebbinghaus')
+        var results = get_results(scores["Ebbinghaus"]["IES_Mean"][0], scores["Ebbinghaus"]["IES_SD"][0], 'ebbinghaus')
         data.block = 'ebbinghaus'
         data.block_number = block_number
         data.rt_mean = results.mean_reaction_time
@@ -561,15 +508,15 @@ var mullerlyer_debrief = {
     type: "html-button-response",
     choices: ["Next Illusion"],
     stimulus: function () {
-        var results = get_results(mullerlyer_mean, mullerlyer_sd, 'mullerlyer')
+        var results = get_results(scores["Mullerlyer"]["IES_Mean"][0], scores["Mullerlyer"]["IES_SD"][0], 'mullerlyer')
         var show_screen = get_debrief_display(results)
-        return show_screen.display_score + "<hr>" + 
+        return show_screen.display_score + "<hr>" +
             show_screen.display_comparison +
             "<hr><p>Can you do better in the next illusion?</p>"
 
     },
     on_finish: function (data) {
-        var results = get_results(mullerlyer_mean, mullerlyer_sd, 'mullerlyer')
+        var results = get_results(scores["Mullerlyer"]["IES_Mean"][0], scores["Mullerlyer"]["IES_SD"][0], 'mullerlyer')
         data.block = 'mullerlyer'
         data.block_number = block_number
         data.rt_mean = results.mean_reaction_time
@@ -676,15 +623,15 @@ var ponzo_debrief = {
     type: "html-button-response",
     choices: ["Next Illusion"],
     stimulus: function () {
-        var results = get_results(ponzo_mean, ponzo_sd, 'ponzo')
+        var results = get_results(scores["Ponzo"]["IES_Mean"][0], scores["Ponzo"]["IES_SD"][0], 'ponzo')
         var show_screen = get_debrief_display(results)
-        return show_screen.display_score + "<hr>" + 
+        return show_screen.display_score + "<hr>" +
             show_screen.display_comparison +
             "<hr><p>Can you do better in the next illusion?</p>"
 
     },
     on_finish: function (data) {
-        var results = get_results(ponzo_mean, ponzo_sd, 'ponzo')
+        var results = get_results(scores["Ponzo"]["IES_Mean"][0], scores["Ponzo"]["IES_SD"][0], 'ponzo')
         data.block = 'ponzo'
         data.block_number = block_number
         data.rt_mean = results.mean_reaction_time
@@ -702,15 +649,15 @@ var end_experiment = {
     type: "html-button-response",
     choices: ["End"],
     stimulus: function () {
-        var results = get_results(overall_mean, overall_sd)
+        var results = get_results(scores["Total"]["IES_Mean"][0], scores["Total"]["IES_SD"][0])
         var show_screen = get_debrief_display(results, "Final")
-        return show_screen.display_score + "<hr>" + 
+        return show_screen.display_score + "<hr>" +
             show_screen.display_comparison +
             "<hr><p>Challenge your friends to this game!</p>"
     },
     on_finish: function (data) {
         jsPsych.endExperiment('The experiment has ended. You can close the window or press refresh it to start again.')
-        var results = get_results(overall_mean, overall_sd)
+        var results = get_results(scores["Total"]["IES_Mean"][0], scores["Total"]["IES_SD"][0])
         data.rt_mean = results.mean_reaction_time
         data.rt_mean_correct = results.mean_reaction_time_correct
         data.accuracy = results.accuracy

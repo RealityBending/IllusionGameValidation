@@ -9,18 +9,13 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: r-lib/actions/setup-r@v1
-      # - name: Install Dependencies
-      #   run: |
-      #       Rscript -e 'install.packages(c("rjson"))'
+      - name: Install Dependencies
+        run: |
+            Rscript -e 'install.packages(c("dplyr", "jsonlite"))'
+      - name: Run script to make data
+        run: Rscript -e 'source("analysis/make_scores.R")'
 
-      # - name: Run script to aggregate data
-      #   run: |
-      #       source("analysis/distribution.R")
-
-      # - name: Commit results
-      #   run: |
-      #     git config --local user.email "actions@github.com"
-      #     git config --local user.name "GitHub Actions"
-      #     git add analysis/data.csv analysis/scores_byillusion.js analysis/scores_grand.js
-      #     git commit analysis/data.csv analysis/scores_byillusion.js analysis/scores_grand.js -m 'Make data and Compute scores'
-      #     git push origin
+      - name: Commit results
+        run: |
+          git commit variables_scores.js -m 'Make variables_scores.js' || echo "No changes to commit"
+          git push origin || echo "No changes to commit"
