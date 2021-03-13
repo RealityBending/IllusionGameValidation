@@ -12,11 +12,9 @@ jobs:
       - name: Install Dependencies
         run: |
             Rscript -e 'install.packages(c("rjson"))'
-      - name: Run script to make data
+      - name: Run script
         run: Rscript -e 'source("analysis/make_data.R")'
-
       - name: Commit results
         run: |
-          git add data.csv
           git commit analysis/data.csv -m 'Make data.csv' || echo "No changes to commit"
           git push origin || echo "No changes to commit"
