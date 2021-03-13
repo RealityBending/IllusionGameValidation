@@ -1,0 +1,26 @@
+on: push
+
+name: Compute scores
+
+jobs:
+  render:
+    name: Compute scores
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: r-lib/actions/setup-r@v1
+      # - name: Install Dependencies
+      #   run: |
+      #       Rscript -e 'install.packages(c("rjson"))'
+
+      # - name: Run script to aggregate data
+      #   run: |
+      #       source("analysis/distribution.R")
+
+      # - name: Commit results
+      #   run: |
+      #     git config --local user.email "actions@github.com"
+      #     git config --local user.name "GitHub Actions"
+      #     git add analysis/data.csv analysis/scores_byillusion.js analysis/scores_grand.js
+      #     git commit analysis/data.csv analysis/scores_byillusion.js analysis/scores_grand.js -m 'Make data and Compute scores'
+      #     git push origin

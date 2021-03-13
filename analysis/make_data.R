@@ -1,7 +1,6 @@
-#!/usr/bin/env Rscript
-library(dplyr)
+library(rjson)
 
-data_path <- "data/"
+data_path <- "../data/"
 data <- data.frame()  # Initialize empty dataframe
 
 
@@ -72,13 +71,13 @@ preprocess_results <- function(df, per_block = TRUE) {
   names(df)[names(df) == "rt_mean"] <- "RT_Mean"
   names(df)[names(df) == "rt_mean_correct"] <- "RT_Mean_Corr"
   names(df)[names(df) == "accuracy"] <- "Accuracy"
-  
+
   df <- as.data.frame(df)
   if(!per_block) {
     colnames(df) <- paste0('Grand_', colnames(df))
     df
   } else {
-    colnames(df)[colnames(df) != "Block"] <- paste0('Block_', colnames(df[ ,!(colnames(df) %in% "Block")]))
+    colnames(df)[colnames(df) != "Block"] <- paste0('Block_', colnames(df[!(colnames(df) %in% "Block")]))
     df
   }
 }
@@ -133,7 +132,7 @@ for(file in list.files(data_path)) {
 
   # Loop through all the "screens" (each screen is recorded as a separate list)
   for(screen in rawdata){
-    
+
     screen <- clean_object(screen)
 
     if(screen$trial_index == 0) {
@@ -151,7 +150,7 @@ for(file in list.files(data_path)) {
     if(!is.null(screen$screen) && screen$screen == "test") {
       trials <- rbind(trials, preprocess_trial(as.data.frame(screen)))
     }
-    
+
     if(!is.null(screen$screen) && screen$screen == "final_results") {
       info <- cbind(info, preprocess_results(screen, per_block=FALSE))
     }
@@ -164,19 +163,19 @@ for(file in list.files(data_path)) {
     #   info <- cbind(info, preprocess_question(as.data.frame(screen), index="Q_Difficulty"))
     # }
   }
-  
+
   info$Temp <- NULL
-  trials <- dplyr::left_join(trials, block_results)
+  trials <- merge(trials, block_results, by = "Block")
   data <- rbind(data, cbind(trials, info))
-  
+
   }
 
 # remove <- c("str", "diff")
-# 
+#
 # # Rearrange and tidy columns
 # data$Illusion_Strength <- sapply(strsplit(data$Stimulus, "_"), function(x) x[2])
 # data$Illusion_Strength  <- as.numeric(str_remove(data$Illusion_Strength , paste(remove, collapse = "|")))
-# 
+#
 # data$Illusion_Difference <- sapply(strsplit(data$Stimulus, "_"), function(x) x[3])
 # data$Illusion_Difference <-  str_remove(data$Illusion_Difference, paste(remove, collapse = "|"))
 # data$Illusion_Difference <- as.numeric(tools::file_path_sans_ext(data$Illusion_Difference))
@@ -185,8 +184,4 @@ for(file in list.files(data_path)) {
 #   dplyr::select(Participant_ID, Age, Initials, PlayedBefore, Stimulus, Illusion_Strength, Illusion_Difference, everything())
 
 
-write.csv(data, "analysis/data.csv", row.names = FALSE)
-
-# Fix versions of required packages
-# if (!requireNamespace("renv", quietly = TRUE)) install.packages("renv")
-# renv::snapshot()
+write.csv(data, "data.csv", row.names = FALSE)
