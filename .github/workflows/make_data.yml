@@ -37,6 +37,6 @@ jobs:
         run: |
           git config --local user.email "actions@github.com"
           git config --local user.name "GitHub Actions"
-          git add data.csv scores_byillusion.js scores_grand.js
-          git commit data.csv scores_byillusion.js scores_grand.js -m 'Make data and Compute scores'
+          git add analysis/data.csv analysis/scores_byillusion.js analysis/scores_grand.js
+          git commit analysis/data.csv analysis/scores_byillusion.js analysis/scores_grand.js -m 'Make data and Compute scores'
           git push origin
