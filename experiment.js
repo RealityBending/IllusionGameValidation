@@ -189,7 +189,7 @@ var fullscreen = {
 // Instructions
 var delboeuf_instructions = {
     type: "html-button-response",
-    choices: ["Start"],
+    choices: ["Got it!"],
     stimulus: function () {
         if (systemInfo().screen_touchscreen == false) {
             return ("<p>In this experiment, two red circles will appear side by side each other " +
@@ -303,7 +303,7 @@ var delboeuf_debrief = {
 // Instructions
 var ebbinghaus_instructions = {
     type: "html-button-response",
-    choices: ["Start"],
+    choices: ["Got it!"],
     stimulus: function () {
         if (systemInfo().screen_touchscreen == false) {
             return ("<p>In this experiment, two red circles will appear side by side each other " +
@@ -417,7 +417,7 @@ var ebbinghaus_debrief = {
 // Instructions
 var mullerlyer_instructions = {
     type: "html-button-response",
-    choices: ["Start"],
+    choices: ["Got it!"],
     stimulus: function () {
         if (systemInfo().screen_touchscreen == false) {
             return ("<p>In this experiment, two red lines will appear " +
@@ -532,7 +532,7 @@ var mullerlyer_debrief = {
 // Instructions
 var ponzo_instructions = {
     type: "html-button-response",
-    choices: ["Start"],
+    choices: ["Got it!"],
     stimulus: function () {
         if (systemInfo().screen_touchscreen == false) {
             return ("<p>In this experiment, two red lines will appear " +
