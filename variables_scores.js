@@ -1,2 +1,2 @@
-var scores = {"Delboeuf":{"IES_Mean":[913.2278],"IES_SD":[192.6265]},"Ebbinghaus":{"IES_Mean":[627.6319],"IES_SD":[321.3488]},"Mullerlyer":{"IES_Mean":[1099.9454],"IES_SD":[291.6726]},"Ponzo":{"IES_Mean":[933.1764],"IES_SD":[509.8769]},"Total":{"IES_Mean":[893.4954],"IES_SD":[328.8812]}}
+var scores = {"delboeuf":{"IES_Mean":[842.4133],"IES_SD":[223.3891]},"ebbinghaus":{"IES_Mean":[644.4352],"IES_SD":[288.9538]},"mullerlyer":{"IES_Mean":[1082.9683],"IES_SD":[262.6984]},"ponzo":{"IES_Mean":[889.5584],"IES_SD":[463.711]},"Total":{"IES_Mean":[864.8438],"IES_SD":[309.6881]}}
 
