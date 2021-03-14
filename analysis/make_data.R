@@ -187,4 +187,9 @@ for(file in list.files(data_path)) {
 #   dplyr::select(Participant_ID, Age, Initials, PlayedBefore, Stimulus, Illusion_Strength, Illusion_Difference, everything())
 
 
+data <- data %>%
+  dplyr::mutate(Illusion_Type = as.factor(tools::toTitleCase(Illusion_Type)),
+                PlayedBefore = as.factor(PlayedBefore),
+                Correct = ifelse(Correct == "TRUE", 1, 0))
+
 write.csv(data, "data.csv", row.names = FALSE)

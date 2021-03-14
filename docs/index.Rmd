@@ -68,7 +68,7 @@ summary(report::report(sessionInfo()))
 ```{r warning=FALSE, message=TRUE, results='asis'}
 df <- read.csv("../analysis/data.csv")
 
-# cat(paste("The data consists of", report::report_participants(df, participants = "Participant")))
+cat(paste("The data consists of", report::report_participants(df, participants = "Participant")))
 ```
 
 

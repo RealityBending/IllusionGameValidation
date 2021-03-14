@@ -3,11 +3,6 @@ library(jsonlite)
 
 setwd("analysis")
 
-data <- read.csv("data.csv") %>%
-  dplyr::mutate(Illusion_Type = as.factor(tools::toTitleCase(Illusion_Type)),
-         PlayedBefore = as.factor(PlayedBefore),
-         Correct = ifelse(Correct == "TRUE", 1, 0))
-
 
 # Get scores by illusions
 df_scores <- data %>%
