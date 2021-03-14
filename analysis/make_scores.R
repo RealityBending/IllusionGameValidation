@@ -5,7 +5,7 @@ setwd("analysis")
 
 
 # Get scores by illusions
-df_scores <- data %>%
+df_scores <- read.csv('data.csv') %>%
   dplyr::group_by(Illusion_Type) %>%
   dplyr::summarize(
     IES_Mean = mean(Block_IES, na.rm=TRUE),
