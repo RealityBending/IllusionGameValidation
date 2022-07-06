@@ -16,18 +16,18 @@ df_scores <- rbind(df_scores, data.frame(Illusion_Type = "Total",
                                    IES_SD = mean(df_scores$IES_SD)))
 
 # Convert to list
-scores <- list()
+variable_scores <- list()
 for(type in df_scores$Illusion_Type){
-  scores[[type]] <- list()
+  variable_scores[[type]] <- list()
   for(i in c("IES_Mean", "IES_SD")) {
-    scores[[type]][[i]] = as.numeric(df_scores[df_scores$Illusion_Type == type, i])
+    variable_scores[[type]][[i]] = as.numeric(df_scores[df_scores$Illusion_Type == type, i])
   }
 }
 
 
 
 # Save as js
-jsonlite::write_json(scores, "../variables_scores.js")
+jsonlite::write_json(variable_scores, "../variables_scores.js")
 text <-  paste("var scores =", readr::read_file("../variables_scores.js"))
 
 
