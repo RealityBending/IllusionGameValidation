@@ -313,14 +313,14 @@
         type: jsPsychHtmlButtonResponse,
         choices: ["Next Illusion"],
         stimulus: function () {
-            var results = get_results(variable_scores["delboeuf"]["IES_Mean"][0], variable_scores["delboeuf"]["IES_SD"][0], 'delboeuf')
+            var results = get_results(scores["Delboeuf"]["IES_Mean"][0], scores["Delboeuf"]["IES_SD"][0], 'delboeuf')
             var show_screen = get_debrief_display(results)
             return show_screen.display_score + "<hr>" +
                 show_screen.display_comparison +
                 "<hr><p>Can you do better in the next illusion?</p>"
         },
         on_finish: function (data) {
-            var results = get_results(variable_scores["delboeuf"]["IES_Mean"][0], variable_scores["delboeuf"]["IES_SD"][0], 'delboeuf')
+            var results = get_results(scores["Delboeuf"]["IES_Mean"][0], scores["Delboeuf"]["IES_SD"][0], 'delboeuf')
             data.block = 'delboeuf'
             data.block_number = block_number
             data.rt_mean = results.mean_reaction_time
@@ -428,14 +428,14 @@
         type: jsPsychHtmlButtonResponse,
         choices: ["Next Illusion"],
         stimulus: function () {
-            var results = get_results(variable_scores["ebbinghaus"]["IES_Mean"][0], variable_scores["ebbinghaus"]["IES_SD"][0], 'ebbinghaus')
+            var results = get_results(scores["Ebbinghaus"]["IES_Mean"][0], scores["Ebbinghaus"]["IES_SD"][0], 'ebbinghaus')
             var show_screen = get_debrief_display(results)
             return show_screen.display_score + "<hr>" +
                 show_screen.display_comparison +
                 "<hr><p>Can you do better in the next illusion?</p>"
         },
         on_finish: function (data) {
-            var results = get_results(variable_scores["ebbinghaus"]["IES_Mean"][0], variable_scores["ebbinghaus"]["IES_SD"][0], 'ebbinghaus')
+            var results = get_results(scores["Ebbinghaus"]["IES_Mean"][0], scores["Ebbinghaus"]["IES_SD"][0], 'ebbinghaus')
             data.block = 'ebbinghaus'
             data.block_number = block_number
             data.rt_mean = results.mean_reaction_time
@@ -542,7 +542,7 @@
         type: jsPsychHtmlButtonResponse,
         choices: ["Next Illusion"],
         stimulus: function () {
-            var results = get_results(variable_scores["mullerlyer"]["IES_Mean"][0], variable_scores["mullerlyer"]["IES_SD"][0], 'mullerlyer')
+            var results = get_results(scores["Mullerlyer"]["IES_Mean"][0], scores["Mullerlyer"]["IES_SD"][0], 'mullerlyer')
             var show_screen = get_debrief_display(results)
             return show_screen.display_score + "<hr>" +
                 show_screen.display_comparison +
@@ -550,7 +550,7 @@
 
         },
         on_finish: function (data) {
-            var results = get_results(variable_scores["mullerlyer"]["IES_Mean"][0], variable_scores["mullerlyer"]["IES_SD"][0], 'mullerlyer')
+            var results = get_results(scores["Mullerlyer"]["IES_Mean"][0], scores["Mullerlyer"]["IES_SD"][0], 'mullerlyer')
             data.block = 'mullerlyer'
             data.block_number = block_number
             data.rt_mean = results.mean_reaction_time
@@ -657,7 +657,7 @@
         type: jsPsychHtmlButtonResponse,
         choices: ["Next Illusion"],
         stimulus: function () {
-            var results = get_results(variable_scores["ponzo"]["IES_Mean"][0], variable_scores["ponzo"]["IES_SD"][0], 'ponzo')
+            var results = get_results(scores["Ponzo"]["IES_Mean"][0], scores["Ponzo"]["IES_SD"][0], 'ponzo')
             var show_screen = get_debrief_display(results)
             return show_screen.display_score + "<hr>" +
                 show_screen.display_comparison +
@@ -665,7 +665,7 @@
 
         },
         on_finish: function (data) {
-            var results = get_results(variable_scores["ponzo"]["IES_Mean"][0], variable_scores["ponzo"]["IES_SD"][0], 'ponzo')
+            var results = get_results(scores["Ponzo"]["IES_Mean"][0], scores["Ponzo"]["IES_SD"][0], 'ponzo')
             data.block = 'ponzo'
             data.block_number = block_number
             data.rt_mean = results.mean_reaction_time
@@ -683,7 +683,7 @@
         type: jsPsychHtmlButtonResponse,
         choices: ["End"],
         stimulus: function () {
-            var results = get_results(variable_scores["Total"]["IES_Mean"][0], variable_scores["Total"]["IES_SD"][0])
+            var results = get_results(scores["Total"]["IES_Mean"][0], scores["Total"]["IES_SD"][0])
             var show_screen = get_debrief_display(results, "Final")
             return show_screen.display_score + "<hr>" +
                 show_screen.display_comparison +
@@ -691,7 +691,7 @@
         },
         on_finish: function (data) {
             jsPsych.endExperiment('The experiment has ended. You can close the window or press refresh it to start again.')
-            var results = get_results(variable_scores["Total"]["IES_Mean"][0], variable_scores["Total"]["IES_SD"][0])
+            var results = get_results(scores["Total"]["IES_Mean"][0], scores["Total"]["IES_SD"][0])
             data.rt_mean = results.mean_reaction_time
             data.rt_mean_correct = results.mean_reaction_time_correct
             data.accuracy = results.accuracy
@@ -700,7 +700,7 @@
         },
         data: {screen: 'final_results'}
     }
-    var timeline= [fullscreen, instructions_preload, welcome, participant_info_repetition,
+    var timeline= [fullscreen, participant_info, instructions_preload, welcome, participant_info_repetition,
             if_not_repeated, delboeuf_preload, delboeuf_instructions, test_delboeuf_procedure,
             delboeuf_debrief, ebbinghaus_preload, ebbinghaus_instructions, test_ebbinghaus_procedure,
             ebbinghaus_debrief, mullerlyer_preload, mullerlyer_instructions, test_mullerlyer_procedure,
