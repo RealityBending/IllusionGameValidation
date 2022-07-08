@@ -56,7 +56,7 @@ def generate_images(data, strengths, differences, function, name="Delboeuf"):
                 + str(np.round(difference, 2))
                 + ".png"
             )
-           # img.save("../prototype-stimuli/" + path)
+            # img.save("../prototype-stimuli/" + path)
 
             # Compute expected response
             if difference > 0:
