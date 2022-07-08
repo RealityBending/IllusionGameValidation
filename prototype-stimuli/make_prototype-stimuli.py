@@ -34,7 +34,7 @@ def save_mosaic(strengths, differences, function, name="Delboeuf"):
     img = ill.image_mosaic(imgs, ncols=2)
     img = ill.image_line(length=2, rotate=0, image=img)
     img = ill.image_line(length=2, rotate=90, image=img)
-    img.save("..prototype-utils/" + name + "_Mosaic.png")
+    # img.save("../prototype-utils/" + name + "_Mosaic.png")
 
 
 def generate_images(data, strengths, differences, function, name="Delboeuf"):
@@ -56,7 +56,7 @@ def generate_images(data, strengths, differences, function, name="Delboeuf"):
                 + str(np.round(difference, 2))
                 + ".png"
             )
-            img.save("..prototype-stimuli/" + path)
+           # img.save("../prototype-stimuli/" + path)
 
             # Compute expected response
             if difference > 0:
@@ -93,36 +93,34 @@ def generate_images(data, strengths, differences, function, name="Delboeuf"):
     return data
 
 
-# pathdir = "C:/Users/anshu.te/Documents/Github/IllusionGame/"
-
 # -------------------------- Demo Illusions for Instructions --------------------------
 
 ill.Delboeuf(illusion_strength=0, difference=5).to_image(width=800, height=600).save(
-    "..prototype-utils/Delboeuf_Demo.png"
+    "../prototype-utils/Delboeuf_Demo.png"
 )
 ill.Ebbinghaus(illusion_strength=0, difference=5).to_image(width=800, height=600).save(
-    "..prototype-utils/Ebbinghaus_Demo.png"
+    "../prototype-utils/Ebbinghaus_Demo.png"
 )
 ill.MullerLyer(illusion_strength=-20, difference=1).to_image(width=800, height=600).save(
-    "..prototype-utils/MullerLyer_Demo.png"
+    "../prototype-utils/MullerLyer_Demo.png"
 )
 ill.Poggendorff(illusion_strength=0, difference=0.3).to_image(width=800, height=600).save(
-    "..prototype-utils/Poggendorff_Demo.png"
+    "../prototype-utils/Poggendorff_Demo.png"
 )
 ill.Ponzo(illusion_strength=20, difference=1.0).to_image(width=800, height=600).save(
-    "..prototype-utils/Ponzo_Demo.png"
+    "../prototype-utils/Ponzo_Demo.png"
 )
 ill.RodFrame(illusion_strength=0, difference=30).to_image(width=800, height=600).save(
-    "..prototype-utils/RodFrame_Demo.png"
+    "../prototype-utils/RodFrame_Demo.png"
 )
 ill.VerticalHorizontal(illusion_strength=0, difference=0.5).to_image(width=800, height=600).save(
-    "..prototype-utils/VerticalHorizontal_Demo.png"
+    "../prototype-utils/VerticalHorizontal_Demo.png"
 )
 ill.Zollner(illusion_strength=0, difference=15).to_image(width=800, height=600).save(
-    "..prototype-utils/Zollner_Demo.png"
+    "../prototype-utils/Zollner_Demo.png"
 )
 ill.Contrast(illusion_strength=0, difference=30).to_image(width=800, height=600).save(
-    "..prototype-utils/Contrast_Demo.png"
+    "../prototype-utils/Contrast_Demo.png"
 )
 
 
