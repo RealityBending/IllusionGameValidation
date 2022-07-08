@@ -105,7 +105,7 @@
         show_progress_bar: true,
         message_progress_bar: 'Completion',
         // exclusions: { min_width: 800, min_height: 600 }, /* exclude browsers that are not at least 800x600 pix */
-        on_interaction_data_update: function (data) {console.log(JSON.stringify(data))}, /* record browser interactions */
+        //  on_interaction_data_update: function (data) {console.log(JSON.stringify(data))}, /* record browser interactions */
         on_finish: function () {
             jsPsych.data.displayData('json')
             jsPsych.data.get().localSave('json', `${jsPsych.data.get().values()[0]["participant_id"]}_IllusionGame.json`);
@@ -125,10 +125,10 @@
             version: '2.0',
             date: new Date().toLocaleDateString("fr-FR"),
             time: new Date().toLocaleTimeString("fr-FR"),
+        },
+        on_finish: function () {
+            jsPsych.data.addProperties({"participant_id": jsPsych.data.get().last().values()[0]["response"]["Participant_ID"]})
         }
-        // on_finish: function () {
-        //     jsPsych.data.addProperties({ "participant_id": jsPsych.data.get().last().values()[0]["response"]["Participant_ID"] })
-        // }
     };
 
     // Set experiment variables
@@ -157,8 +157,8 @@
             if (data.response == 1) {
                 jsPsych.endExperiment("You're free to leave!")
             }
-        },
-        data: Object.assign({screen: 'participant_info'}, participant_info, systemInfo())
+        }
+        //   data: Object.assign({screen: 'participant_info'}, participant_info, systemInfo())
     }
 
     /* jsPsych.data.addProperties({  // add these variables to all rows of datafile
@@ -338,29 +338,17 @@
     var ebbinghaus_instructions = {
         type: jsPsychHtmlButtonResponse,
         choices: ["Got it!"],
-        stimulus: function () {
-            if (systemInfo().screen_touchscreen == false) {
-                return ("<p>In this experiment, two red circles will appear side by side each other " +
-                    "on the screen. </p><p>Your task is to select which <strong>red</strong> circle is bigger in size as fast as you can without making any errors. </p>" +
-                    "<p>Don't let yourself be distracted by the small black circles around the red circles!</p>" +
-                    "<p>If the <strong>left circle</strong> is bigger, " +
-                    "press the <strong>left arrow key</strong> on the keyboard as fast as you can.</p>" +
-                    "<p>If the <strong>right circle</strong> is bigger, press the <strong>right arrow key</strong> as fast as you can.</p><hr>" +
-                    "<div style='float: center'><img src='utils/Ebbinghaus_Demo.png' height='300'></img>" +
-                    "<p><img src='utils/answer/answer_leftright_keyboard.PNG' height='150'></img></p>" +
-                    "<p class='small'>For example, <strong>press the left arrow key</strong> here.</p></div>")
-            } else {
-                return ("<p>In this experiment, two red circles will appear side by side each other " +
-                    "on the screen. </p><p>Your task is to judge which <strong>red</strong> circle is bigger in size as fast as you can without making any errors. </p>" +
-                    "<p>Don't let yourself be distracted by the small black circles around the red circles!</p>" +
-                    "<p>If the <strong>left circle</strong> is bigger, " +
-                    "<strong>click on the left circle</strong> as fast as you can.</p>" +
-                    "<p>If the <strong>right circle</strong> is bigger, <strong>click on the right circle</strong> as fast as you can.</p><hr>" +
-                    "<div style='float: center'><img src='utils/Ebbinghaus_Demo.png' height='300'></img>" +
-                    "<p><img src='utils/answer/answer_leftright_touch.PNG' height='150'></img></p>" +
-                    "<p class='small'>For example, <strong>click on the left circle</strong> here.</p></div>")
-            }
-        },
+        stimulus: "<p>In this experiment, two red circles will appear side by side each other " +
+            "on the screen. </p><p>Your task is to judge which <strong>red</strong> circle is bigger in size as fast as you can without making any errors. </p>" +
+            "<p>Don't let yourself be distracted by the small black circles around the red circles!</p>" +
+            "<p>If the <strong>left circle</strong> is bigger, " +
+            "<strong>click on the left circle</strong> as fast as you can.</p>" +
+            "<p>If the <strong>right circle</strong> is bigger, <strong>click on the right circle</strong> as fast as you can.</p><hr>" +
+            "<div style='float: center'><img src='utils/Ebbinghaus_Demo.png' height='300'></img>" +
+            "<p><img src='utils/answer/answer_leftright_touch.PNG' height='150'></img></p>" +
+            "<p class='small'>For example, <strong>click on the left circle</strong> here.</p></div>",
+
+        // },
         post_trial_gap: 2000,
         on_finish: function (data) {
             trial_number = 1  // reset trial number for next block
@@ -452,29 +440,17 @@
     var mullerlyer_instructions = {
         type: jsPsychHtmlButtonResponse,
         choices: ["Got it!"],
-        stimulus: function () {
-            if (systemInfo().screen_touchscreen == false) {
-                return ("<p>In this experiment, two red lines will appear " +
-                    "on the screen, one on top and one below. </p><p>Your task is to judge which <strong>red</strong> line is longer as fast as you can without making any errors. </p>" +
-                    "<p>Don't let yourself be distracted by the black arrows at the ends of the red lines!</p>" +
-                    "<p>If the <strong>upper horizontal line</strong> is longer, " +
-                    "press the <strong>up arrow key</strong> on the keyboard as fast as you can.</p>" +
-                    "<p>If the <strong>lower horizontal line</strong> is longer, press the <strong>down arrow key</strong> as fast as you can.</p><hr>" +
-                    "<div style='float: center'><img src='utils/MullerLyer_Demo.png' height='300'></img>" +
-                    "<p><img src='utils/answer/answer_updown_keyboard.PNG' height='150'></img></p>" +
-                    "<p class='small'>For example, <strong>press the up arrow key</strong> here.</p></div>")
-            } else {
-                return ("<p>In this experiment, two red lines will appear " +
-                    "on the screen, one on top and one below. </p><p>Your task is to judge which <strong>red</strong> line is longer as fast as you can without making any errors. </p>" +
-                    "<p>Don't let yourself be distracted by the black arrows at the ends of the red lines!</p>" +
-                    "<p>If the <strong>upper horizontal line</strong> is longer, " +
-                    "<strong>click on the upper line</strong> as fast as you can.</p>" +
-                    "<p>If the <strong>lower horizontal line</strong> is longer, <strong>click on the lower line</strong> as fast as you can.</p><hr>" +
-                    "<div style='float: center'><img src='utils/MullerLyer_Demo.png' height='300'></img>" +
-                    "<p><img src='utils/answer/answer_updown_touch.PNG' height='150'></img></p>" +
-                    "<p class='small'>For example, <strong>click on the upper line</strong> here.</p></div>")
-            }
-        },
+        stimulus: "<p>In this experiment, two red lines will appear " +
+            "on the screen, one on top and one below. </p><p>Your task is to judge which <strong>red</strong> line is longer as fast as you can without making any errors. </p>" +
+            "<p>Don't let yourself be distracted by the black arrows at the ends of the red lines!</p>" +
+            "<p>If the <strong>upper horizontal line</strong> is longer, " +
+            "<strong>click on the upper line</strong> as fast as you can.</p>" +
+            "<p>If the <strong>lower horizontal line</strong> is longer, <strong>click on the lower line</strong> as fast as you can.</p><hr>" +
+            "<div style='float: center'><img src='utils/MullerLyer_Demo.png' height='300'></img>" +
+            "<p><img src='utils/answer/answer_updown_touch.PNG' height='150'></img></p>" +
+            "<p class='small'>For example, <strong>click on the upper line</strong> here.</p></div>",
+        // }
+        //    },
         post_trial_gap: 2000,
         on_finish: function (data) {
             trial_number = 1  // reset trial number for next block
@@ -567,29 +543,17 @@
     var ponzo_instructions = {
         type: jsPsychHtmlButtonResponse,
         choices: ["Got it!"],
-        stimulus: function () {
-            if (systemInfo().screen_touchscreen == false) {
-                return ("<p>In this experiment, two red lines will appear " +
-                    "on the screen, one on top and one below. </p><p>Your task is to judge which <strong>red</strong> line is longer as fast as you can without making any errors.</p>" +
-                    "<p>Don't let yourself be distracted by the black vertical lines on the sides of the red lines!</p>" +
-                    "If the <strong>upper horizontal line</strong> is longer, " +
-                    "press the <strong>up arrow key</strong> on the keyboard as fast as you can.</p>" +
-                    "<p>If the <strong>lower horizontal line</strong> is longer, press the <strong>down arrow key</strong> as fast as you can.</p><hr>" +
-                    "<div style='float: center'><img src='utils/Ponzo_Demo.png' height='300'></img>" +
-                    "<p><img src='utils/answer/answer_updown_keyboard.PNG' height='150'></img></p>" +
-                    "<p class='small'>For example, <strong>press the up arrow key</strong> here.</p></div>")
-            } else {
-                return ("<p>In this experiment, two red lines will appear " +
-                    "on the screen, one on top and one below. </p><p>Your task is to judge which <strong>red</strong> line is longer as fast as you can without making any errors. </p>" +
-                    "<p>Don't let yourself be distracted by the black vertical lines on the sides of the red lines!</p>" +
-                    "If the <strong>upper horizontal line</strong> is longer, " +
-                    "<strong>click on the upper line</strong> as fast as you can.</p>" +
-                    "<p>If the <strong>lower horizontal line</strong> is longer, <strong>click on the lower line</strong> as fast as you can.</p><hr>" +
-                    "<div style='float: center'><img src='utils/Ponzo_Demo.png' height='300'></img>" +
-                    "<p><img src='utils/answer/answer_updown_touch.PNG' height='150'></img></p>" +
-                    "<p class='small'>For example, <strong>click on the upper line</strong> here.</p></div>")
-            }
-        },
+        stimulus: "<p>In this experiment, two red lines will appear " +
+            "on the screen, one on top and one below. </p><p>Your task is to judge which <strong>red</strong> line is longer as fast as you can without making any errors. </p>" +
+            "<p>Don't let yourself be distracted by the black vertical lines on the sides of the red lines!</p>" +
+            "If the <strong>upper horizontal line</strong> is longer, " +
+            "<strong>click on the upper line</strong> as fast as you can.</p>" +
+            "<p>If the <strong>lower horizontal line</strong> is longer, <strong>click on the lower line</strong> as fast as you can.</p><hr>" +
+            "<div style='float: center'><img src='utils/Ponzo_Demo.png' height='300'></img>" +
+            "<p><img src='utils/answer/answer_updown_touch.PNG' height='150'></img></p>" +
+            "<p class='small'>For example, <strong>click on the upper line</strong> here.</p></div>",
+        //  }
+        //    },
         post_trial_gap: 2000,
         on_finish: function (data) {
             trial_number = 1  // reset trial number for next block
@@ -700,12 +664,11 @@
         },
         data: {screen: 'final_results'}
     }
-    var timeline= [fullscreen, participant_info, instructions_preload, welcome, participant_info_repetition,
-            if_not_repeated, delboeuf_preload, delboeuf_instructions, test_delboeuf_procedure,
-            delboeuf_debrief, ebbinghaus_preload, ebbinghaus_instructions, test_ebbinghaus_procedure,
-            ebbinghaus_debrief, mullerlyer_preload, mullerlyer_instructions, test_mullerlyer_procedure,
-            mullerlyer_debrief, ponzo_preload, ponzo_instructions, test_ponzo_procedure, ponzo_debrief,
-            end_experiment]
+    var timeline = [fullscreen, participant_info, instructions_preload, welcome,
+        participant_info_repetition, if_not_repeated, delboeuf_preload, delboeuf_instructions, test_delboeuf_procedure, delboeuf_debrief, ebbinghaus_preload, ebbinghaus_instructions, test_ebbinghaus_procedure,
+        ebbinghaus_debrief, mullerlyer_preload, mullerlyer_instructions,
+        test_mullerlyer_procedure, mullerlyer_debrief,
+        ponzo_preload, ponzo_instructions, test_ponzo_procedure, ponzo_debrief, end_experiment]
 
     jsPsych.run(timeline)
 
