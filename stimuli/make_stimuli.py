@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import json
+
 import numpy as np
 import pandas as pd
 import pyllusion as ill
@@ -10,166 +12,209 @@ n = 4
 data = []
 
 
-
 # Convenience functions
-def save_mosaic(strengths, differences, function, name = "Delboeuf"):
+def save_mosaic(strengths, differences, function, name="Delboeuf"):
     imgs = []
     for strength in [abs(min(strengths, key=abs)), max(strengths)]:
         if name == "Ponzo":
-            strength = -strength # negative value for facilitating illusion
-        for difference in [abs(min(differences, key=abs)), max(differences)]:            
-            
-            img = function(illusion_strength=strength, difference=difference, width=width, height=height)
-            img = ill.image_text("Difference: " + str(np.round(difference, 2)) + ", Strength: " + str(np.round(strength, 2)), y=0.88, size=40, image=img)
+            strength = -strength  # negative value for facilitating illusion
+        for difference in [abs(min(differences, key=abs)), max(differences)]:
+
+            img = function(illusion_strength=strength, difference=difference).to_image(
+                width=width, height=height
+            )
+            img = ill.image_text(
+                "Difference: "
+                + str(np.round(difference, 2))
+                + ", Strength: "
+                + str(np.round(strength, 2)),
+                y=0.88,
+                size=40,
+                image=img,
+            )
             imgs.append(img)
     img = ill.image_mosaic(imgs, ncols=2)
-    img = ill.image_line(length=2, rotate=0, image = img)
-    img = ill.image_line(length=2, rotate=90, image = img)
-    img.save("../utils/" + name + "_Mosaic.png")
+    img = ill.image_line(length=2, rotate=0, image=img)
+    img = ill.image_line(length=2, rotate=90, image=img)
+    img.save("../utils/stimuli_examples/" + name + "_Mosaic.png")
+    return img
 
 
-def generate_images(data, strengths, differences, function, name = "Delboeuf"):
+def generate_images(data, strengths, differences, function, name="Delboeuf"):
 
-    illusion_leftright = ["Delboeuf", "Ebbinghaus"]
-    illusion_updown = ["MullerLyer", "Ponzo"]
+    illusion_leftright = ["Delboeuf", "Ebbinghaus", "VerticalHorizontal", "RodFrame", "Poggendorff"]
+    illusion_updown = ["MullerLyer", "Ponzo", "Zollner", "Contrast"]
 
     for strength in strengths:
         for difference in differences:
 
-            img = function(illusion_strength=strength, difference=difference, width=width, height=height)
-            path = name + "_str" + str(np.round(strength, 2)) + "_diff" + str(np.round(difference, 2)) + ".png"
+            img = function(illusion_strength=strength, difference=difference).to_image(
+                width=width, height=height
+            )
+            path = (
+                name
+                + "_str"
+                + str(np.round(strength, 2))
+                + "_diff"
+                + str(np.round(difference, 2))
+                + ".png"
+            )
             img.save(path)
 
-            # Compute expected response            
+            # Compute expected response
             if difference > 0:
                 if name in illusion_leftright:
-                    correct = 'arrowleft'
+                    correct = "arrowleft"
                 elif name in illusion_updown:
-                    correct = 'arrowup'
+                    correct = "arrowup"
                 else:
-                    correct = 'tbc'
+                    correct = "tbc"
             elif difference < 0:
                 if name in illusion_leftright:
-                    correct = 'arrowright'
+                    correct = "arrowright"
                 elif name in illusion_updown:
-                    correct = 'arrowdown'
+                    correct = "arrowdown"
                 else:
-                    correct = 'tbc'
-            
+                    correct = "tbc"
+
             # Save parameters for Delboeuf Illusion
-            data.append({'Illusion_Type': name,
-                         'Illusion_Strength': strength,
-                         'Difference': difference,
-                         'stimulus': 'stimuli/' + path,
-                         'data': { 'screen': 'test', 'block': name, 'correct_response': correct }})
+            data.append(
+                {
+                    "Illusion_Type": name,
+                    "Illusion_Strength": strength,
+                    "Difference": difference,
+                    "stimulus": "stimuli/" + path,
+                    "data": {"screen": "test", "block": name, "correct_response": correct},
+                }
+            )
 
-            # data.append({'Illusion_Type': name,
-            #              'Illusion_Strength': strength,
-            #              'Difference': difference,
-            #              'File': path})
-    save_mosaic(strengths, differences, function, name = name)
+    save_mosaic(strengths, differences, function, name=name)
     return data
-
-
-
 
 
 # -------------------------- Demo Illusions for Instructions --------------------------
 
-ill.delboeuf_image(illusion_strength=0, difference=5, width=800, height=600).save("../utils/" + "Delboeuf_Demo.png")
-ill.ebbinghaus_image(illusion_strength=0, difference=5, width=800, height=600).save("../utils/" + "Ebbinghaus_Demo.png")
-ill.mullerlyer_image(illusion_strength=-20, difference=1, width=800, height=600).save("../utils/" + "MullerLyer_Demo.png")
-ill.poggendorff_image(illusion_strength=0, difference=0.3, width=800, height=600).save("../utils/" + "Poggendorff_Demo.png")
-ill.ponzo_image(illusion_strength=20, difference=1.0, width=800, height=600).save("../utils/" + "Ponzo_Demo.png")
-ill.rodframe_image(illusion_strength=0, difference=30, width=800, height=600).save("../utils/" + "RodFrame_Demo.png")
-ill.verticalhorizontal_image(illusion_strength=0, difference=0.5, width=800, height=600).save("../utils/" + "VerticalHorizontal_Demo.png")
-ill.zollner_image(illusion_strength=0, difference=15, width=800, height=600).save("../utils/" + "Zollner_Demo.png")
-ill.contrast_image(illusion_strength=0, difference=30, width=800, height=600).save("../utils/" + "Contrast_Demo.png")
-
+ill.Delboeuf(illusion_strength=0, difference=5).to_image(width=800, height=600).save(
+    "../utils/stimuli_demo/Delboeuf_Demo.png"
+)
+ill.Ebbinghaus(illusion_strength=0, difference=5).to_image(width=800, height=600).save(
+    "../utils/stimuli_demo/Ebbinghaus_Demo.png"
+)
+# ill.MullerLyer(illusion_strength=-20, difference=1).to_image(width=800, height=600).save(
+#     "../utils/stimuli_demo/MullerLyer_Demo.png"
+# )
+# ill.Poggendorff(illusion_strength=0, difference=0.3).to_image(width=800, height=600).save(
+#     "../utils/stimuli_demo/Poggendorff_Demo.png"
+# )
+# ill.Ponzo(illusion_strength=20, difference=1.0).to_image(width=800, height=600).save(
+#     "../utils/stimuli_demo/Ponzo_Demo.png"
+# )
+# ill.RodFrame(illusion_strength=0, difference=30).to_image(width=800, height=600).save(
+#     "../utils/stimuli_demo/RodFrame_Demo.png"
+# )
+# ill.VerticalHorizontal(illusion_strength=0, difference=0.5).to_image(width=800, height=600).save(
+#     "../utils/stimuli_demo/VerticalHorizontal_Demo.png"
+# )
+# ill.Zollner(illusion_strength=0, difference=15).to_image(width=800, height=600).save(
+#     "../utils/stimuli_demo/Zollner_Demo.png"
+# )
+# ill.Contrast(illusion_strength=0, difference=30).to_image(width=800, height=600).save(
+#     "../utils/stimuli_demo/Contrast_Demo.png"
+# )
 
 
 # -------------------------- Delboeuf Illusion --------------------------
-data = generate_images(data,
-                       strengths = np.linspace(-1, 1, num = n),
-                       differences = np.linspace(-1, 1, num = n),
-                       function = ill.delboeuf_image,
-                       name = "Delboeuf")
+data = generate_images(
+    data,
+    strengths=np.linspace(-1, 1, num=n),
+    differences=np.linspace(-1, 1, num=n),
+    function=ill.Delboeuf,
+    name="Delboeuf",
+)
 
 # -------------------------- Ebbinghaus Illusion --------------------------
-data = generate_images(data,
-                       strengths = np.linspace(-1, 1, num = n),
-                       differences = np.linspace(-1, 1, num = n),
-                       function = ill.ebbinghaus_image,
-                       name = "Ebbinghaus")
+data = generate_images(
+    data,
+    strengths=np.linspace(-1, 1, num=n),
+    differences=np.linspace(-1, 1, num=n),
+    function=ill.Ebbinghaus,
+    name="Ebbinghaus",
+)
 
-# -------------------------- MullerLyer Illusion --------------------------
-data = generate_images(data,
-                       strengths = np.linspace(-50, 50, num = n),
-                       differences = np.linspace(-0.3, 0.3, num = n),
-                       function = ill.mullerlyer_image,
-                       name = "MullerLyer")
+# # -------------------------- MullerLyer Illusion --------------------------
+# data = generate_images(
+#     data,
+#     strengths=np.linspace(-50, 50, num=n),
+#     differences=np.linspace(-0.3, 0.3, num=n),
+#     function=ill.MullerLyer,
+#     name="MullerLyer",
+# )
 
-# -------------------------- Ponzo Illusion --------------------------
-data = generate_images(data,
-                       strengths = np.linspace(-20, 20, num = n),
-                       differences = np.linspace(-0.3, 0.3, num = n),
-                       function = ill.ponzo_image,
-                       name = "Ponzo")
+# # -------------------------- Ponzo Illusion --------------------------
+# data = generate_images(
+#     data,
+#     strengths=np.linspace(-20, 20, num=n),
+#     differences=np.linspace(-0.3, 0.3, num=n),
+#     function=ill.Ponzo,
+#     name="Ponzo",
+# )
 
-# -------------------------- Rod Frame Illusion -------------------------- (revise again?)
-data = generate_images(data,
-                       strengths = np.linspace(-30, 30, num = n),
-                       differences = np.linspace(-30, 30, num = n),
-                       function = ill.rodframe_image,
-                       name = "RodFrame")
+# # -------------------------- Rod Frame Illusion -------------------------- (revise again?)
+# data = generate_images(
+#     data,
+#     strengths=np.linspace(-30, 30, num=n),
+#     differences=np.linspace(-30, 30, num=n),
+#     function=ill.RodFrame,
+#     name="RodFrame",
+# )
 
-# -------------------------- Zollner Illusion --------------------------
-data = generate_images(data,
-                       strengths = np.linspace(-70, 70, num = n),
-                       differences = np.linspace(-10, 10, num = n),
-                       function = ill.zollner_image,
-                       name = "Zollner")
+# # -------------------------- Zollner Illusion --------------------------
+# data = generate_images(
+#     data,
+#     strengths=np.linspace(-70, 70, num=n),
+#     differences=np.linspace(-10, 10, num=n),
+#     function=ill.Zollner,
+#     name="Zollner",
+# )
 
-# -------------------------- Vertical Horizontal Illusion --------------------------
-data = generate_images(data,
-                       strengths = np.linspace(-90, 90, num = n),
-                       differences = np.linspace(-0.3, 0.3, num = n),
-                       function = ill.verticalhorizontal_image,
-                       name = "VerticalHorizontal")
+# # -------------------------- Vertical Horizontal Illusion --------------------------
+# data = generate_images(
+#     data,
+#     strengths=np.linspace(-90, 90, num=n),
+#     differences=np.linspace(-0.3, 0.3, num=n),
+#     function=ill.VerticalHorizontal,
+#     name="VerticalHorizontal",
+# )
 
-# -------------------------- Poggendorff Illusion --------------------------
-data = generate_images(data,
-                       strengths = np.linspace(25, 55, num = n), # sign does not change feature
-                       differences = np.linspace(-0.3, 0.3, num = n),
-                       function = ill.poggendorff_image,
-                       name = "Poggendorff")
+# # -------------------------- Poggendorff Illusion --------------------------
+# data = generate_images(
+#     data,
+#     strengths=np.linspace(25, 55, num=n),  # sign does not change feature
+#     differences=np.linspace(-0.3, 0.3, num=n),
+#     function=ill.Poggendorff,
+#     name="Poggendorff",
+# )
 
-# -------------------------- Contrast Illusion --------------------------
-data = generate_images(data,
-                       strengths = np.linspace(-50, 50, num = n),
-                       differences = np.linspace(-40, 40, num = n),
-                       function = ill.contrast_image,
-                       name = "Contrast")
-
-
-
-
+# # -------------------------- Contrast Illusion --------------------------
+# data = generate_images(
+#     data,
+#     strengths=np.linspace(-50, 50, num=n),
+#     differences=np.linspace(-40, 40, num=n),
+#     function=ill.Contrast,
+#     name="Contrast",
+# )
 
 
 # -------------------------- Save data --------------------------
-# df = pd.DataFrame(data).sort_values('Illusion_Type')
-# df.to_csv('stimuli.csv', index=False)
-import json
-
-with open('stimuli.js', 'w') as fp:
+# 1. Save data to a javascript file
+with open("stimuli.js", "w") as fp:
     json.dump(data, fp)
 
-# adding "var test_stimuli ="
-with open('stimuli.js') as f: 
-	updatedfile = 'var test_stimuli = ' + f.read() 
-with open('stimuli.js','w') as f: 
-	f.write(updatedfile) 
-
+# 2. Re-read and add "var test_stimuli ="
+with open("stimuli.js") as f:
+    updatedfile = "var test_stimuli = " + f.read()
+with open("stimuli.js", "w") as f:
+    f.write(updatedfile)
 
 # # -------------------------- Line Length Illusions --------------------------
 # ### Ponzo, MullerLyer, Vertical Horizontal
@@ -334,7 +379,3 @@ with open('stimuli.js','w') as f:
 #                               'Illusion_Strength':strength,
 #                               'Difference':difference,
 #                               'File':  "stimuli/" + contrast_image_name})
-
-
-
-
