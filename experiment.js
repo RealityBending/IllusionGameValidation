@@ -3,9 +3,9 @@ function get_results(illusion_mean, illusion_sd, illusion_type) {
     if (typeof illusion_type != "undefined") {
         var trials = jsPsych.data
             .get()
-            .filter({ screen: "test", block: illusion_type }) // results by block
+            .filter({ screen: "Trial", block: illusion_type }) // results by block
     } else {
-        var trials = jsPsych.data.get().filter({ screen: "test" }) // overall results
+        var trials = jsPsych.data.get().filter({ screen: "Trial" }) // overall results
     }
     var correct_trials = trials.filter({ correct: true })
     var proportion_correct = correct_trials.count() / trials.count()
@@ -19,8 +19,8 @@ function get_results(illusion_mean, illusion_sd, illusion_type) {
     } else {
         var rt_mean_correct = ""
         var ies = ""
-        var percentile = ""
-        var score_to_display = ""
+        var percentile = 0
+        var score_to_display = 0
     }
     return {
         accuracy: proportion_correct,
@@ -66,3 +66,23 @@ function get_debrief_display(results, type = "Block") {
             "</b>% of the population.</p>",
     }
 }
+
+// Set fixation cross
+var fixation = {
+    type: jsPsychHtmlKeyboardResponse,
+    stimulus: '<div style="font-size:60px;">+</div>',
+    choices: "NO_KEYS" /* no responses will be accepted as a valid response */,
+    // trial_duration: 0, (for testing)
+    trial_duration: function () {
+        return randomInteger(250, 750) // Function from RealityBending/JSmisc
+    },
+    /* trial_duration: function(){
+                return jsPsych.randomization.sampleWithoutReplacement([250, 500, 750, 1000], 1)[0];
+                }, */
+    save_trial_parameters: {
+        trial_duration: true,
+    },
+    data: { screen: "fixation" },
+}
+
+

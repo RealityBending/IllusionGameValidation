@@ -84,7 +84,7 @@ def generate_images(data, strengths, differences, function, name="Delboeuf"):
                     "Illusion_Strength": strength,
                     "Difference": difference,
                     "stimulus": "stimuli/" + path,
-                    "data": {"screen": "test", "block": name, "correct_response": correct},
+                    "data": {"screen": "Trial", "block": name, "correct_response": correct},
                 }
             )
 
@@ -212,7 +212,7 @@ with open("stimuli.js", "w") as fp:
 
 # 2. Re-read and add "var test_stimuli ="
 with open("stimuli.js") as f:
-    updatedfile = "var test_stimuli = " + f.read()
+    updatedfile = "var stimuli = " + f.read()
 with open("stimuli.js", "w") as f:
     f.write(updatedfile)
 
