@@ -19,14 +19,14 @@ for f in glob.glob("stimuli/*"):
     os.remove(f)
 
 # Convenience functions
-def save_mosaic(strengths, differences, function, name="Delboeuf"):
+def save_mosaic(strengths, differences, function, name="Delboeuf", **kwargs):
     imgs = []
     for strength in [abs(min(strengths, key=abs)), max(strengths)]:
         if name == "Ponzo":
             strength = -strength  # negative value for facilitating illusion
         for difference in [abs(min(differences, key=abs)), max(differences)]:
 
-            img = function(illusion_strength=strength, difference=difference).to_image(
+            img = function(illusion_strength=strength, difference=difference, **kwargs).to_image(
                 width=width, height=height
             )
             img = ill.image_text(
@@ -46,12 +46,12 @@ def save_mosaic(strengths, differences, function, name="Delboeuf"):
     return img
 
 
-def generate_images(data, strengths, differences, function, name="Delboeuf"):
+def generate_images(data, strengths, differences, function, name="Delboeuf", **kwargs):
 
     for strength in strengths:
         for difference in differences:
 
-            img = function(illusion_strength=strength, difference=difference).to_image(
+            img = function(illusion_strength=strength, difference=difference, **kwargs).to_image(
                 width=width, height=height
             )
             path = (
@@ -92,7 +92,7 @@ def generate_images(data, strengths, differences, function, name="Delboeuf"):
                 }
             )
 
-    save_mosaic(strengths, differences, function, name=name)
+    save_mosaic(strengths, differences, function, name=name, **kwargs)
     return data
 
 
@@ -102,120 +102,46 @@ def sqrtspace(mini=0.1, maxi=1, size=6):
     return np.concatenate((-1 * x[::-1], x))
 
 
-# -------------------------- Demo Illusions for Instructions --------------------------
-
-# Left-right
+# Left-right ======================================================================================
+# -------------------------- Delboeuf Illusion --------------------------
 ill.Delboeuf(illusion_strength=0.3, difference=1.2).to_image(width=800, height=600).save(
     "utils/stimuli_demo/Delboeuf_Demo.png"
 )
-ill.Ebbinghaus(illusion_strength=0.1, difference=2).to_image(width=800, height=600).save(
-    "utils/stimuli_demo/Ebbinghaus_Demo.png"
-)
-
-ill.Zollner(illusion_strength=-20, difference=10).to_image(width=800, height=600).save(
-    "utils/stimuli_demo/Zollner_Demo.png"
-)
-ill.VerticalHorizontal(illusion_strength=45, difference=1).to_image(width=800, height=600).save(
-    "utils/stimuli_demo/VerticalHorizontal_Demo.png"
-)
-ill.RodFrame(illusion_strength=5, difference=-30).to_image(width=800, height=600).save(
-    "utils/stimuli_demo/RodFrame_Demo.png"
-)
-
-
-# Up-Down
-ill.MullerLyer(illusion_strength=10, difference=0.5).to_image(width=800, height=600).save(
-    "utils/stimuli_demo/MullerLyer_Demo.png"
-)
-ill.Ponzo(illusion_strength=5, difference=0.6).to_image(width=800, height=600).save(
-    "utils/stimuli_demo/Ponzo_Demo.png"
-)
-
-ill.Poggendorff(illusion_strength=20, difference=0.3).to_image(width=800, height=600).save(
-    "utils/stimuli_demo/Poggendorff_Demo.png"
-)
-
-# Contrast
-ill.Contrast(illusion_strength=0, difference=30).to_image(width=800, height=600).save(
-    "utils/stimuli_demo/Contrast_Demo.png"
-)
-ill.White(illusion_strength=5, difference=50).to_image(width=800, height=600).save(
-    "utils/stimuli_demo/White_Demo.png"
-)
-
-# -------------------------- MullerLyer Illusion --------------------------
 data = generate_images(
     data,
-    strengths=np.linspace(-50, 50, num=n),
-    differences=sqrtspace(mini=0.05, maxi=0.4, size=n),
-    function=ill.MullerLyer,
-    name="MullerLyer",
-)
-
-# -------------------------- Delboeuf Illusion --------------------------
-data = generate_images(
-    data,
-    strengths=np.linspace(-1, 1, num=n),
-    differences=sqrtspace(mini=0.1, maxi=1, size=n),
+    strengths=np.linspace(-1.8, 1.8, num=n),
+    differences=sqrtspace(mini=0.08, maxi=0.8, size=n),
     function=ill.Delboeuf,
     name="Delboeuf",
 )
 
-# -------------------------- Ponzo Illusion --------------------------
-data = generate_images(
-    data,
-    strengths=np.linspace(-25, 25, num=n),
-    differences=sqrtspace(mini=0.05, maxi=0.6, size=n),
-    function=ill.Ponzo,
-    name="Ponzo",
-)
-
 # -------------------------- Ebbinghaus Illusion --------------------------
+ill.Ebbinghaus(illusion_strength=0.1, difference=1.5).to_image(width=800, height=600).save(
+    "utils/stimuli_demo/Ebbinghaus_Demo.png"
+)
 data = generate_images(
     data,
-    strengths=np.linspace(-2, 2, num=n),
-    differences=sqrtspace(mini=0.1, maxi=1, size=n),
+    strengths=np.linspace(-1.8, 1.8, num=n),
+    differences=sqrtspace(mini=0.1, maxi=0.5, size=n),
     function=ill.Ebbinghaus,
     name="Ebbinghaus",
+    distance=0.9,  # Distance between circles
 )
-
-# -------------------------- Zollner Illusion --------------------------
-data = generate_images(
-    data,
-    strengths=np.linspace(-70, 70, num=n),
-    differences=sqrtspace(mini=1, maxi=5, size=n),
-    function=ill.Zollner,
-    name="Zollner",
-)
-
-# -------------------------- Contrast Illusion --------------------------
-data = generate_images(
-    data,
-    strengths=np.linspace(-40, 40, num=n),
-    differences=sqrtspace(mini=15, maxi=35, size=n),
-    function=ill.Contrast,
-    name="Contrast",
-)
-
 # -------------------------- Rod Frame Illusion --------------------------
+ill.RodFrame(illusion_strength=5, difference=-30).to_image(width=800, height=600).save(
+    "utils/stimuli_demo/RodFrame_Demo.png"
+)
 data = generate_images(
     data,
-    strengths=np.linspace(-40, 40, num=n),
-    differences=sqrtspace(mini=1, maxi=15, size=n),
+    strengths=np.linspace(-45, 45, num=n),
+    differences=sqrtspace(mini=0.05, maxi=10, size=n),
     function=ill.RodFrame,
     name="RodFrame",
 )
-
-# -------------------------- Poggendorff Illusion --------------------------
-data = generate_images(
-    data,
-    strengths=np.linspace(-60, 60, num=n),
-    differences=sqrtspace(mini=0.03, maxi=0.4, size=n),
-    function=ill.Poggendorff,
-    name="Poggendorff",
-)
-
 # -------------------------- Vertical Horizontal Illusion --------------------------
+ill.VerticalHorizontal(illusion_strength=45, difference=1).to_image(width=800, height=600).save(
+    "utils/stimuli_demo/VerticalHorizontal_Demo.png"
+)
 data = generate_images(
     data,
     strengths=np.linspace(-90, 90, num=n),
@@ -223,15 +149,75 @@ data = generate_images(
     function=ill.VerticalHorizontal,
     name="VerticalHorizontal",
 )
-
-
 # -------------------------- White Illusion --------------------------
+ill.White(illusion_strength=5, difference=50).to_image(width=800, height=600).save(
+    "utils/stimuli_demo/White_Demo.png"
+)
+data = generate_images(
+    data,
+    strengths=np.linspace(-35, 35, num=n),
+    differences=sqrtspace(mini=5, maxi=20, size=n),
+    function=ill.White,
+    name="White",
+)
+# -------------------------- Zollner Illusion --------------------------
+ill.Zollner(illusion_strength=-20, difference=0.8).to_image(width=800, height=600).save(
+    "utils/stimuli_demo/Zollner_Demo.png"
+)
+data = generate_images(
+    data,
+    strengths=np.linspace(-70, 70, num=n),
+    differences=sqrtspace(mini=0.7, maxi=3, size=n),
+    function=ill.Zollner,
+    name="Zollner",
+)
+
+# Up-Down ======================================================================================
+# -------------------------- MullerLyer Illusion --------------------------
+ill.MullerLyer(illusion_strength=10, difference=0.5).to_image(width=800, height=600).save(
+    "utils/stimuli_demo/MullerLyer_Demo.png"
+)
 data = generate_images(
     data,
     strengths=np.linspace(-40, 40, num=n),
-    differences=sqrtspace(mini=15, maxi=35, size=n),
-    function=ill.White,
-    name="White",
+    differences=sqrtspace(mini=0.04, maxi=0.4, size=n),
+    function=ill.MullerLyer,
+    name="MullerLyer",
+)
+
+
+# -------------------------- Ponzo Illusion --------------------------
+ill.Ponzo(illusion_strength=5, difference=0.6).to_image(width=800, height=600).save(
+    "utils/stimuli_demo/Ponzo_Demo.png"
+)
+data = generate_images(
+    data,
+    strengths=np.linspace(-25, 25, num=n),
+    differences=sqrtspace(mini=0.04, maxi=0.4, size=n),
+    function=ill.Ponzo,
+    name="Ponzo",
+)
+# -------------------------- Contrast Illusion --------------------------
+ill.Contrast(illusion_strength=-5, difference=30).to_image(width=800, height=600).save(
+    "utils/stimuli_demo/Contrast_Demo.png"
+)
+data = generate_images(
+    data,
+    strengths=np.linspace(-35, 35, num=n),
+    differences=sqrtspace(mini=5, maxi=20, size=n),
+    function=ill.Contrast,
+    name="Contrast",
+)
+# -------------------------- Poggendorff Illusion --------------------------
+ill.Poggendorff(illusion_strength=20, difference=0.3).to_image(width=800, height=600).save(
+    "utils/stimuli_demo/Poggendorff_Demo.png"
+)
+data = generate_images(
+    data,
+    strengths=np.linspace(-60, 60, num=n),
+    differences=sqrtspace(mini=0.05, maxi=0.2, size=n),
+    function=ill.Poggendorff,
+    name="Poggendorff",
 )
 
 
