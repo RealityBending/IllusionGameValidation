@@ -611,8 +611,8 @@
                 "<p><b>Part " +
                 block_number +
                 "</b></p>" +
-                "<p>In this part, two red lines will appear, one above the other, but their overlapping section is hidden behind a grey rectangle.</p>" +
-                "<p>Your task is to tell if the <b>right</b> red line, <b>behind the rectangle, is above or below</b> the left line. You need to answer as fast as you can, without making errors.</p>" +
+                "<p>In this part, two parallel red lines will appear, but they are partially hidden by a grey rectangle.</p>"+
+                "<p>Your task is to tell if the <b>red line to the right</b> of the rectangle is above or below the line to the left. You need to answer as fast as you can, without making errors.</p>" +
                 "<p>Press <b>the UP or the DOWN arrow</b> to indicate whether the <b>right red line is actually above or below the left red line.</b></p>" +
                 "<div style='float: center'><img src='utils/stimuli_demo/Poggendorff_Demo.png' height='300'></img>" +
                 "<p><img src='utils/answer/answer_updown_keyboard.PNG' height='150'></img></p>" +
@@ -638,7 +638,6 @@
     // Debriefing Information
     timeline_poggendorff.push(create_debrief(illusion_name = "Poggendorff"))
 
-    // timeline.push({ timeline: timeline_poggendorff })
 
 
     /* ================================================================ */
@@ -700,7 +699,6 @@
     // Debriefing Information
     timeline_verticalhorizontal.push(create_debrief(illusion_name = "VerticalHorizontal"))
 
-    // timeline.push({ timeline: timeline_verticalhorizontal })
 
 
     /* ================================================================ */
@@ -762,8 +760,6 @@
     // Debriefing Information
     timeline_white.push(create_debrief(illusion_name = "White"))
 
-    // timeline.push({ timeline: timeline_white })
-
 
     /* ================================================================ */
     /* ---------------------- END OF EXPERIMENT ----------------------- */
@@ -783,8 +779,10 @@
         ])) {
             timeline.push({ timeline: t })
         }
+        if(i === 1) {
+            timeline.push(make_break)
+        }
     }
-
 
 
     // Debriefing Information

@@ -25,13 +25,18 @@ preprocess_IllusionGame <- function(file) {
                      Block = trials$block_number,
                      Trial = trials$trial_number,
                      Illusion_Strength = trials$illusion_strength,
-                     Illusion_Difference = trials$illusion_difference,
+                     Illusion_Side = sign(trials$illusion_difference),
+                     Illusion_Difference = abs(trials$illusion_difference),
                      Answer = unlist(trials$response),
-                     Correct = as.integer(as.logical(trials$correct)),
+                     Error = as.integer(!as.logical(trials$correct)),
                      ISI = json[json$screen == "fixation" & !is.na(json$screen), "trial_duration"],
                      RT = trials$rt)
 
+  # Format names
   data$Illusion_Type <- ifelse(data$Illusion_Type == "MullerLyer", "Müller-Lyer", data$Illusion_Type)
+  data$Illusion_Type <- ifelse(data$Illusion_Type == "Zollner", "Zöllner", data$Illusion_Type)
+  data$Illusion_Type <- ifelse(data$Illusion_Type == "RodFrame", "Rod-Frame", data$Illusion_Type)
+  data$Illusion_Type <- ifelse(data$Illusion_Type == "VerticalHorizontal", "Vertical-Horizontal", data$Illusion_Type)
 
   # data$Stimulus <- trials$stimulus |>
   #                   stringr::str_remove(pattern="stimuli/") |>

@@ -82,6 +82,21 @@ var fixation = {
     data: { screen: "fixation" },
 }
 
+// Break
+var make_break = {
+    type: jsPsychHtmlButtonResponse,
+    choices: ["I am ready to continue!"],
+    stimulus:
+        "<p><b>BREAK</b></p><br>" +
+        "<p>You have reached the middle of the game.</p>" +
+        "<p>In the second part, you will see all the illusions once again. <b>Try to beat your previous score!</b></p>" +
+        "<p>We know it's long and challenging, so take a moment to rest. When you are ready, press the button below.</p>",
+    save_trial_parameters: {
+        trial_duration: true,
+    },
+    data: { screen: "break" },
+}
+
 // Marker
 var marker_position = [0, 0, 0, 0] // [0, 0, 100, 100]
 function create_marker(marker_position, color = "black") {
