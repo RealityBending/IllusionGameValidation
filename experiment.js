@@ -3,7 +3,7 @@ function get_results(illusion_mean, illusion_sd, illusion_type) {
     if (typeof illusion_type != "undefined") {
         var trials = jsPsych.data
             .get()
-            .filter({ screen: "Trial", block: illusion_type }) // results by block
+            .filter({ screen: "Trial", type: illusion_type }) // results by block
     } else {
         var trials = jsPsych.data.get().filter({ screen: "Trial" }) // overall results
     }
@@ -72,17 +72,180 @@ var fixation = {
     type: jsPsychHtmlKeyboardResponse,
     stimulus: '<div style="font-size:60px;">+</div>',
     choices: "NO_KEYS" /* no responses will be accepted as a valid response */,
-    // trial_duration: 0, (for testing)
-    trial_duration: function () {
-        return randomInteger(250, 750) // Function from RealityBending/JSmisc
-    },
-    /* trial_duration: function(){
-                return jsPsych.randomization.sampleWithoutReplacement([250, 500, 750, 1000], 1)[0];
-                }, */
+    trial_duration: 0, // (for testing)
+    // trial_duration: function () {
+    //     return randomInteger(250, 750) // Function from RealityBending/JSmisc
+    // },
     save_trial_parameters: {
         trial_duration: true,
     },
     data: { screen: "fixation" },
 }
 
+// Marker
+var marker_position = [0, 0, 0, 0] // [0, 0, 100, 100]
+function create_marker(marker_position, color = "black") {
+    const html = `<div id="marker" style="position: absolute; background-color: ${color};\
+    left:${marker_position[0]}; top:${marker_position[1]}; \
+    width:${marker_position[2]}px; height:${marker_position[3]}px";></div>`
+    document.querySelector("body").insertAdjacentHTML("beforeend", html)
+}
 
+// Trial
+function create_trial(illusion_name = "Ponzo", type = "updown") {
+    if (type == "updown") {
+        var trial = {
+            type: jsPsychImageKeyboardResponse,
+            stimulus: jsPsych.timelineVariable("stimulus"),
+            choices: ["arrowup", "arrowdown"],
+            data: jsPsych.timelineVariable("data"),
+            on_load: function () {
+                create_marker(marker_position)
+            },
+            on_finish: function (data) {
+                document.querySelector("#marker").remove()
+                data.prestimulus_duration =
+                    jsPsych.data.get().last(2).values()[0].time_elapsed -
+                    jsPsych.data.get().last(3).values()[0].time_elapsed
+                // Score the response as correct or incorrect.
+                if (data.response != -1) {
+                    if (
+                        jsPsych.pluginAPI.compareKeys(
+                            data.response,
+                            data.correct_response
+                        )
+                    ) {
+                        data.correct = true
+                    } else {
+                        data.correct = false
+                    }
+                } else {
+                    // code mouse clicks as correct or wrong
+                    if (data.click_x < window.innerHeight / 2) {
+                        // use window.innerHeight for up vs down presses
+                        data.response = "arrowdown"
+                    } else {
+                        data.response = "arrowup"
+                    }
+                    if (
+                        jsPsych.pluginAPI.compareKeys(
+                            data.response,
+                            data.correct_response
+                        )
+                    ) {
+                        data.correct = true
+                    } else {
+                        data.correct = false
+                    }
+                }
+                // track block and trial numbers
+                data.type = illusion_name
+                data.illusion_strength =
+                    jsPsych.timelineVariable("Illusion_Strength")
+                data.illusion_difference =
+                    jsPsych.timelineVariable("Difference")
+                data.block_number = block_number
+                data.trial_number = trial_number
+                trial_number += 1
+            },
+        }
+    } else {
+        var trial = {
+            type: jsPsychImageKeyboardResponse,
+            stimulus: jsPsych.timelineVariable("stimulus"),
+            choices: ["arrowleft", "arrowright"],
+            data: jsPsych.timelineVariable("data"),
+            on_load: function () {
+                create_marker(marker_position)
+            },
+            on_finish: function (data) {
+                document.querySelector("#marker").remove()
+                data.prestimulus_duration =
+                    jsPsych.data.get().last(2).values()[0].time_elapsed -
+                    jsPsych.data.get().last(3).values()[0].time_elapsed
+                // Score the response as correct or incorrect.
+                if (data.response != -1) {
+                    if (
+                        jsPsych.pluginAPI.compareKeys(
+                            data.response,
+                            data.correct_response
+                        )
+                    ) {
+                        data.correct = true
+                    } else {
+                        data.correct = false
+                    }
+                } else {
+                    // code mouse clicks as correct or wrong
+                    if (data.click_x < window.innerWidth / 2) {
+                        // use window.innerHeight for up vs down presses
+                        data.response = "arrowleft"
+                    } else {
+                        data.response = "arrowright"
+                    }
+                    if (
+                        jsPsych.pluginAPI.compareKeys(
+                            data.response,
+                            data.correct_response
+                        )
+                    ) {
+                        data.correct = true
+                    } else {
+                        data.correct = false
+                    }
+                }
+                // track block and trial numbers
+                data.type = illusion_name
+                data.illusion_strength =
+                    jsPsych.timelineVariable("Illusion_Strength")
+                data.illusion_difference =
+                    jsPsych.timelineVariable("Difference")
+                data.block_number = block_number
+                data.trial_number = trial_number
+                trial_number += 1
+            },
+        }
+    }
+    return trial
+}
+
+// Debrief
+function create_debrief(illusion_name = "Ponzo") {
+    var debrief = {
+        type: jsPsychHtmlButtonResponse,
+        choices: ["Continue"],
+        on_start: function () {
+            ;(document.body.style.cursor = "auto"),
+                (document.querySelector(
+                    "#jspsych-progressbar-container"
+                ).style.display = "inline")
+        },
+        stimulus: function () {
+            var results = get_results(
+                population_scores[illusion_name]["IES_Mean"][0],
+                population_scores[illusion_name]["IES_SD"][0],
+                illusion_name
+            )
+            var show_screen = get_debrief_display(results)
+            return (
+                show_screen.display_score +
+                "<hr>" +
+                // // For debugging purposes, show the raw data.
+                // show_screen.display_accuracy +
+                // "<hr>" +
+                // show_screen.display_rt +
+                // "<hr>" +
+                // //
+                show_screen.display_comparison +
+                "<hr><p>Can you do better in the next illusion?</p>"
+            )
+        },
+        data: { screen: "block_results" },
+        // Reset trial number and update block number
+        on_finish: function () {
+            block_number += 1
+            trial_number = 1
+        },
+    }
+    return debrief
+}
