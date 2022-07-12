@@ -42,14 +42,17 @@ preprocess_IllusionGame <- function(file) {
 
 
 # Run ---------------------------------------------------------------------
-files <- list.files(path="data/", pattern = "\\.json$", full.names = TRUE)
 
-# Loop over each file and compute function
-df <- data.frame()
-for(file in files) df <- rbind(df, preprocess_IllusionGame(file))
+# Uncomment the lines below to run it.
 
-# Clean dataframe
-df
+# files <- list.files(path="data/", pattern = "\\.json$", full.names = TRUE)
+#
+# # Loop over each file and compute function
+# df <- data.frame()
+# for(file in files) df <- rbind(df, preprocess_IllusionGame(file))
+#
+# # Clean dataframe
+# df
 
 
 
