@@ -208,7 +208,7 @@
     // Debriefing Information
     timeline_delboeuf.push(create_debrief(illusion_name = "Delboeuf"))
 
-    timeline.push({ timeline: timeline_delboeuf })
+    // timeline.push({ timeline: timeline_delboeuf })
 
     /* ================================================================ */
     /* ---------------------- MULLERLYER ILLUSION --------------------- */
@@ -269,7 +269,7 @@
     // Debriefing Information
     timeline_mullerlyer.push(create_debrief(illusion_name = "MullerLyer"))
 
-    timeline.push({ timeline: timeline_mullerlyer })
+    // timeline.push({ timeline: timeline_mullerlyer })
 
     /* ================================================================ */
     /* --------------------- EBBINGHAUS ILLUSION ---------------------- */
@@ -330,7 +330,7 @@
     // Debriefing Information
     timeline_ebbinghaus.push(create_debrief(illusion_name = "Ebbinghaus"))
 
-    timeline.push({ timeline: timeline_ebbinghaus })
+    // timeline.push({ timeline: timeline_ebbinghaus })
 
     /* ================================================================ */
     /* ------------------------ PONZO ILLUSION ------------------------ */
@@ -391,7 +391,7 @@
     // Debriefing Information
     timeline_ponzo.push(create_debrief(illusion_name = "Ponzo"))
 
-    timeline.push({ timeline: timeline_ponzo })
+    // timeline.push({ timeline: timeline_ponzo })
 
 
 
@@ -455,7 +455,7 @@
     // Debriefing Information
     timeline_zollner.push(create_debrief(illusion_name = "Zollner"))
 
-    timeline.push({ timeline: timeline_zollner })
+    // timeline.push({ timeline: timeline_zollner })
 
 
     /* ================================================================ */
@@ -517,7 +517,7 @@
     // Debriefing Information
     timeline_contrast.push(create_debrief(illusion_name = "Contrast"))
 
-    timeline.push({ timeline: timeline_contrast })
+    // timeline.push({ timeline: timeline_contrast })
 
     /* ================================================================ */
     /* ---------------------- RODFRAME ILLUSION ----------------------- */
@@ -578,7 +578,7 @@
     // Debriefing Information
     timeline_rodframe.push(create_debrief(illusion_name = "RodFrame"))
 
-    timeline.push({ timeline: timeline_rodframe })
+    // timeline.push({ timeline: timeline_rodframe })
 
     /* ================================================================ */
     /* --------------------- POGGENDORFF ILLUSION --------------------- */
@@ -638,7 +638,7 @@
     // Debriefing Information
     timeline_poggendorff.push(create_debrief(illusion_name = "Poggendorff"))
 
-    timeline.push({ timeline: timeline_poggendorff })
+    // timeline.push({ timeline: timeline_poggendorff })
 
 
     /* ================================================================ */
@@ -700,28 +700,91 @@
     // Debriefing Information
     timeline_verticalhorizontal.push(create_debrief(illusion_name = "VerticalHorizontal"))
 
-    timeline.push({ timeline: timeline_verticalhorizontal })
+    // timeline.push({ timeline: timeline_verticalhorizontal })
+
+
+    /* ================================================================ */
+    /* ------------------------- WHITE ILLUSION ----------------------- */
+    /* ================================================================ */
+    var timeline_white = []
+
+    // Set stimuli (var stimuli is loaded in stimuli/stimuli.js)
+    var stimuli_white = stimuli.filter(
+        (stimuli) => stimuli.Illusion_Type === "White"
+    )
+
+    // Preload images
+    timeline_white.push({
+        type: jsPsychPreload,
+        trials: stimuli_white,
+    })
+
+    // Instructions
+    var instructions_white = {
+        type: jsPsychHtmlKeyboardResponse,
+        on_start: function () {
+            ;(document.body.style.cursor = "none"),
+                (document.querySelector(
+                    "#jspsych-progressbar-container"
+                ).style.display = "none")
+        },
+        choices: ["enter"],
+        stimulus: function () {
+            return (
+                "<p><b>Part " +
+                block_number +
+                "</b></p>" +
+                "<p>In this part, two vertical grey rectangles will appear side by side.</p>" +
+                "<p>Your task is to tell <b>which rectangle is of a lighter color</b>, as fast as you can, and without making errors.</p>" +
+                "<p>Don't get distracted by the background color!</p>" +
+                "<p>Press <b>the LEFT or the RIGHT arrow</b> to indicate which <b>side has the lighter rectangle.</b></p>" +
+                "<div style='float: center'><img src='utils/stimuli_demo/White_Demo.png' height='300'></img>" +
+                "<p><img src='utils/answer/answer_leftright_keyboard.PNG' height='150'></img></p>" +
+                "<p class='small'>In this example, the correct answer is the <b>LEFT arrow</b>.</p></div>" +
+                "<p>Are you ready? <b>Press ENTER to start</b></p>"
+            )
+        },
+        post_trial_gap: 500,
+    }
+    timeline_white.push(instructions_white)
+
+    // Define trial
+    var trial_white = create_trial("White", type = "leftright")
+
+    // Create Trials timeline
+    timeline_white.push({
+        timeline: [fixation, trial_white],
+        timeline_variables: stimuli_white,
+        randomize_order: true,
+        repetitions: 1,
+    })
+
+    // Debriefing Information
+    timeline_white.push(create_debrief(illusion_name = "White"))
+
+    // timeline.push({ timeline: timeline_white })
 
 
     /* ================================================================ */
     /* ---------------------- END OF EXPERIMENT ----------------------- */
     /* ================================================================ */
-    // TODO: this doesn't work, cannot randomize full timelines?
-    // // Illusion Timelines
-    // timeline.push({
-    //     timeline: [timeline_delboeuf, timeline_mullerlyer, timeline_ebbinghaus, timeline_ponzo],
-    //     randomize_order: true,
-    //     repetitions: 1,
-    // })
-    timeline.push({ timeline: timeline_delboeuf })
-    timeline.push({ timeline: timeline_mullerlyer })
-    timeline.push({ timeline: timeline_ebbinghaus })
-    timeline.push({ timeline: timeline_ponzo })
-    timeline.push({ timeline: timeline_zollner })
-    timeline.push({ timeline: timeline_contrast })
-    timeline.push({ timeline: timeline_rodframe })
-    timeline.push({ timeline: timeline_poggendorff })
-    timeline.push({ timeline: timeline_verticalhorizontal })
+    for (var i of [1, 2]) {
+        for (var t of jsPsych.randomization.shuffleNoRepeats([
+            timeline_delboeuf,
+            timeline_mullerlyer,
+            timeline_ebbinghaus,
+            timeline_ponzo,
+            timeline_zollner,
+            timeline_contrast,
+            timeline_rodframe,
+            timeline_poggendorff,
+            timeline_verticalhorizontal,
+            timeline_white,
+        ])) {
+            timeline.push({ timeline: t })
+        }
+    }
+
 
 
     // Debriefing Information

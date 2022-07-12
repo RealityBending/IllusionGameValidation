@@ -8,7 +8,7 @@ import pyllusion as ill
 # Parameters
 width = 800
 height = 800
-n = 6
+n = 2
 data = []
 
 
@@ -59,7 +59,7 @@ def generate_images(data, strengths, differences, function, name="Delboeuf"):
             img.save("stimuli/" + path)
 
             # Compute expected response
-            if name in ["Delboeuf", "Ebbinghaus", "VerticalHorizontal"]:
+            if name in ["Delboeuf", "Ebbinghaus", "VerticalHorizontal", "White"]:
                 if difference > 0:
                     correct = "arrowleft"
                 else:
@@ -92,32 +92,43 @@ def generate_images(data, strengths, differences, function, name="Delboeuf"):
 
 # -------------------------- Demo Illusions for Instructions --------------------------
 
+# Left-right
 ill.Delboeuf(illusion_strength=1, difference=5).to_image(width=800, height=600).save(
     "utils/stimuli_demo/Delboeuf_Demo.png"
-)
-ill.MullerLyer(illusion_strength=20, difference=1).to_image(width=800, height=600).save(
-    "utils/stimuli_demo/MullerLyer_Demo.png"
 )
 ill.Ebbinghaus(illusion_strength=1, difference=5).to_image(width=800, height=600).save(
     "utils/stimuli_demo/Ebbinghaus_Demo.png"
 )
-ill.Ponzo(illusion_strength=5, difference=2.0).to_image(width=800, height=600).save(
-    "utils/stimuli_demo/Ponzo_Demo.png"
-)
+
 ill.Zollner(illusion_strength=20, difference=-10).to_image(width=800, height=600).save(
     "utils/stimuli_demo/Zollner_Demo.png"
 )
-ill.Contrast(illusion_strength=0, difference=30).to_image(width=800, height=600).save(
-    "utils/stimuli_demo/Contrast_Demo.png"
+ill.VerticalHorizontal(illusion_strength=45, difference=1).to_image(width=800, height=600).save(
+    "utils/stimuli_demo/VerticalHorizontal_Demo.png"
 )
 ill.RodFrame(illusion_strength=5, difference=-30).to_image(width=800, height=600).save(
     "utils/stimuli_demo/RodFrame_Demo.png"
 )
+
+
+# Up-Down
+ill.MullerLyer(illusion_strength=20, difference=1).to_image(width=800, height=600).save(
+    "utils/stimuli_demo/MullerLyer_Demo.png"
+)
+ill.Ponzo(illusion_strength=5, difference=2.0).to_image(width=800, height=600).save(
+    "utils/stimuli_demo/Ponzo_Demo.png"
+)
+
 ill.Poggendorff(illusion_strength=20, difference=0.3).to_image(width=800, height=600).save(
     "utils/stimuli_demo/Poggendorff_Demo.png"
 )
-ill.VerticalHorizontal(illusion_strength=45, difference=1).to_image(width=800, height=600).save(
-    "utils/stimuli_demo/VerticalHorizontal_Demo.png"
+
+# Contrast
+ill.Contrast(illusion_strength=0, difference=30).to_image(width=800, height=600).save(
+    "utils/stimuli_demo/Contrast_Demo.png"
+)
+ill.White(illusion_strength=5, difference=50).to_image(width=800, height=600).save(
+    "utils/stimuli_demo/White_Demo.png"
 )
 
 
@@ -200,6 +211,16 @@ data = generate_images(
     differences=np.linspace(-0.3, 0.3, num=n),
     function=ill.VerticalHorizontal,
     name="VerticalHorizontal",
+)
+
+
+# -------------------------- White Illusion --------------------------
+data = generate_images(
+    data,
+    strengths=np.linspace(-30, 30, num=n),
+    differences=np.linspace(-40, 40, num=n),
+    function=ill.White,
+    name="White",
 )
 
 

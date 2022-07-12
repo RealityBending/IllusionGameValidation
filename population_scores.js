@@ -8,5 +8,6 @@ var population_scores = {
     RodFrame: { IES_Mean: [1000], IES_SD: [500] },
     Poggendorff: { IES_Mean: [1000], IES_SD: [500] },
     VerticalHorizontal: { IES_Mean: [1000], IES_SD: [500] },
+    White: { IES_Mean: [1000], IES_SD: [500] },
     Total: { IES_Mean: [864.8438], IES_SD: [309.6881] },
 }
