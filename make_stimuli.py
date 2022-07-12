@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
+import glob
 import json
+import os
 
 import numpy as np
 import pandas as pd
@@ -8,9 +10,12 @@ import pyllusion as ill
 # Parameters
 width = 800
 height = 800
-n = 2
+n = 6
 data = []
 
+# Delete all existing stimuli
+for f in glob.glob("stimuli/*"):
+    os.remove(f)
 
 # Convenience functions
 def save_mosaic(strengths, differences, function, name="Delboeuf"):

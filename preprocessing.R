@@ -6,8 +6,9 @@ preprocess_IllusionGame <- function(file) {
   # Info
   info <- json[json$screen == "participant_info" & !is.na(json$screen), ]
 
+
   # Trials
-  trials <- json[!is.na(json$block)]
+  trials <- json[!is.na(json$block),]
 
 
   data <- data.frame(Participant = trials$participant_id,
@@ -21,12 +22,13 @@ preprocess_IllusionGame <- function(file) {
                      Device = ifelse(trials$mobile == TRUE, "Mobile", "Desktop"),
                      Device_OS = trials$os,
                      Illusion_Type = trials$type,
-                     Trial = trials$trial_number,
                      Block = trials$block_number,
+                     Trial = trials$trial_number,
                      Illusion_Strength = trials$illusion_strength,
                      Illusion_Difference = trials$illusion_difference,
                      Answer = unlist(trials$response),
                      Correct = as.integer(as.logical(trials$correct)),
+                     ISI = json[json$screen == "fixation" & !is.na(json$screen), "trial_duration"],
                      RT = trials$rt)
 
   data$Illusion_Type <- ifelse(data$Illusion_Type == "MullerLyer", "Müller-Lyer", data$Illusion_Type)

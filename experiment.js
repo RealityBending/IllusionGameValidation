@@ -72,10 +72,10 @@ var fixation = {
     type: jsPsychHtmlKeyboardResponse,
     stimulus: '<div style="font-size:60px;">+</div>',
     choices: "NO_KEYS" /* no responses will be accepted as a valid response */,
-    trial_duration: 0, // (for testing)
-    // trial_duration: function () {
-    //     return randomInteger(250, 750) // Function from RealityBending/JSmisc
-    // },
+    // trial_duration: 0, // (for testing)
+    trial_duration: function () {
+        return randomInteger(250, 1000) // Function from RealityBending/JSmisc
+    },
     save_trial_parameters: {
         trial_duration: true,
     },
@@ -236,7 +236,7 @@ function create_debrief(illusion_name = "Ponzo") {
                 // show_screen.display_rt +
                 // "<hr>" +
                 // //
-                show_screen.display_comparison +
+                // show_screen.display_comparison +
                 "<hr><p>Can you do better in the next illusion?</p>"
             )
         },
@@ -249,5 +249,3 @@ function create_debrief(illusion_name = "Ponzo") {
     }
     return debrief
 }
-
-
