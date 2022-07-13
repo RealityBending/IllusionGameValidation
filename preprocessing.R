@@ -16,7 +16,7 @@ preprocess_IllusionGame <- function(file) {
                      Date = info$date,
                      Time = info$time,
                      Duration = json[json$screen == "final_results" & !is.na(json$screen), "time_elapsed"] / 1000 / 60,
-                     # Break_Duration = json[json$screen == "break" & !is.na(json$screen), "rt"] / 1000 / 60,
+                     Break_Duration = json[json$screen == "break" & !is.na(json$screen), "rt"] / 1000 / 60,
                      Screen_Resolution = paste0(trials$screen_width, "x", trials$screen_height),
                      Screen_Refresh = trials$vsync_rate,
                      Browser = trials$browser,
