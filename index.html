@@ -22,8 +22,8 @@
     <style>
         /* set canvas to be full screen */
         .jspsych-content {
-                max-width: 100%;
-            }
+            max-width: 100%;
+        }
 
         /*Hide scrollbar while keeping it functional */
         body {
@@ -58,10 +58,10 @@
                 .get()
                 .localSave(
                     "json",
-                    `${
-                        jsPsych.data.get().values()[0]["participant_id"]
+                    `${jsPsych.data.get().values()[0]["participant_id"]
                     }_IllusionGame.json`
                 )
+            window.location = "https://app.prolific.co/submissions/complete?cc=XXX" /* redirect to prolific when experiment is finished */
         },
     })
 
@@ -79,7 +79,7 @@
             screen: "browser_info",
         },
         on_finish: function () {
-            data = jsPsych.data.get().filter({ screen: "browser_info" }).values()[0]
+            data = jsPsych.data.get().filter({screen: "browser_info"}).values()[0]
             jsPsych.data.addProperties({
                 ["screen_height"]: data["height"],
                 ["screen_width"]: data["width"],
@@ -106,31 +106,65 @@
 
     /* ----------------- Experiment  ----------------- */
 
-    // Participant information
-    var participant_info = {
+    // Subject Information (Get from Prolific)
+    var prolific_id = jsPsych.data.getURLVariable("PROLIFIC_PID")
+    var participant_id = jsPsych.randomization.randomID(5);
+    var study_id = jsPsych.data.getURLVariable("STUDY_ID")
+    var session_id = jsPsych.data.getURLVariable("SESSION_ID")
+
+    var demographics = {
         type: jsPsychSurveyText,
         questions: [
             {
-                prompt: "Enter the participant's ID:",
-                placeholder: "S00",
-                name: "Participant_ID",
+                prompt: "Please describe your gender",
+                placeholder: "Male / Female / Prefer not to say",
+                name: "gender",
             },
+            {
+                prompt: "What ethnic group do you belong to?",
+                placeholder: "White / Black / Asian / Mixed / Other",
+                name: "ethnicity",
+            }
         ],
-        data: {
-            screen: "participant_info",
-            version: "1.0",
-            date: new Date().toLocaleDateString("fr-FR"),
-            time: new Date().toLocaleTimeString("fr-FR"),
-        },
         on_finish: function () {
             jsPsych.data.addProperties({
-                participant_id: jsPsych.data.get().last().values()[0]["response"][
-                    "Participant_ID"
-                ],
+                participant_id: prolific_id + "_" + participant_id,
+                study_id: study_id,
+                session_id: session_id,
             })
         },
+        data: {
+            screen: "demographics",
+        },
     }
-    timeline.push(participant_info)
+
+    timeline.push(demographics);
+
+    // // Participant information
+    // var participant_info = {
+    //     type: jsPsychSurveyText,
+    //     questions: [
+    //         {
+    //             prompt: "Enter the participant's ID:",
+    //             placeholder: "S00",
+    //             name: "Participant_ID",
+    //         },
+    //     ],
+    //     data: {
+    //         screen: "participant_info",
+    //         version: "1.0",
+    //         date: new Date().toLocaleDateString("fr-FR"),
+    //         time: new Date().toLocaleTimeString("fr-FR"),
+    //     },
+    //     on_finish: function () {
+    //         jsPsych.data.addProperties({
+    //             participant_id: jsPsych.data.get().last().values()[0]["response"][
+    //                 "Participant_ID"
+    //             ],
+    //         })
+    //     },
+    // }
+    // timeline.push(participant_info)
 
     // Preload Instructions Stimuli
     timeline.push({
@@ -161,7 +195,7 @@
             "<p>A score will be computed based on your speed and accuracy and will be displayed after each illusion block.</p><br>" +
             "<p>Don't worry, we will show you examples of each illusion before each block. Each illusion block will be repeated two times (so that you have an opportunity to improve your score!), but the order of the blocks is random.</p>" +
             "<p>Remember, your goal is to be as <b>fast</b> and <b>accurate</b> as possible. Good luck!</p>",
-        data: { screen: "general_instructions" },
+        data: {screen: "general_instructions"},
     }
     timeline.push(general_instructions)
 
@@ -175,16 +209,16 @@
     var timeline_delboeuf = make_trial(
         (instructions = function () {
             return "<p><b>Part " +
-            block_number +
-            "</b></p>" +
-            "<p>In this part, two red circles will appear side by side on the screen.</p>" +
-            "<p>Your task is to select which <b>red circle is bigger</b> in size as fast as you can, without making errors.</p>" +
-            "<p>Don't get distracted by the black outlines around the red circles!</p>" +
-            "<p>Press <b>the LEFT or the RIGHT arrow</b> to indicate which is the bigger <b>red circle.</b></p>" +
-            "<div style='float: center'><img src='utils/stimuli_demo/Delboeuf_Demo.png' height='300'></img>" +
-            "<p><img src='utils/answer/answer_leftright_keyboard.PNG' height='150'></img></p>" +
-            "<p class='small'>In this example, the correct answer is the <b>LEFT arrow</b>.</p></div>" +
-            "<p>Are you ready? <b>Press ENTER to start</b></p>"
+                block_number +
+                "</b></p>" +
+                "<p>In this part, two red circles will appear side by side on the screen.</p>" +
+                "<p>Your task is to select which <b>red circle is bigger</b> in size as fast as you can, without making errors.</p>" +
+                "<p>Don't get distracted by the black outlines around the red circles!</p>" +
+                "<p>Press <b>the LEFT or the RIGHT arrow</b> to indicate which is the bigger <b>red circle.</b></p>" +
+                "<div style='float: center'><img src='utils/stimuli_demo/Delboeuf_Demo.png' height='300'></img>" +
+                "<p><img src='utils/answer/answer_leftright_keyboard.PNG' height='150'></img></p>" +
+                "<p class='small'>In this example, the correct answer is the <b>LEFT arrow</b>.</p></div>" +
+                "<p>Are you ready? <b>Press ENTER to start</b></p>"
         }),
         (illusion_name = "Delboeuf"),
         (type = "leftright")
@@ -206,7 +240,7 @@
                 "<p><img src='utils/answer/answer_updown_keyboard.PNG' height='150'></img></p>" +
                 "<p class='small'>In this example, the correct answer is the <b>UP arrow</b>.</p></div>" +
                 "<p>Are you ready? <b>Press ENTER to start</b></p>"
-            }),
+        }),
         (illusion_name = "MullerLyer"),
         (type = "updown")
     )
@@ -227,7 +261,7 @@
                 "<p><img src='utils/answer/answer_leftright_keyboard.PNG' height='150'></img></p>" +
                 "<p class='small'>In this example, the correct answer is the <b>LEFT arrow</b>.</p></div>" +
                 "<p>Are you ready? <b>Press ENTER to start</b></p>"
-            }),
+        }),
         (illusion_name = "Ebbinghaus"),
         (type = "leftright")
     )
@@ -248,7 +282,7 @@
                 "<p><img src='utils/answer/answer_updown_keyboard.PNG' height='150'></img></p>" +
                 "<p class='small'>In this example, the correct answer is the <b>UP arrow</b>.</p></div>" +
                 "<p>Are you ready? <b>Press ENTER to start</b></p>"
-            }),
+        }),
         (illusion_name = "Ponzo"),
         (type = "updown")
     )
@@ -270,7 +304,7 @@
                 "<p><img src='utils/answer/answer_leftright_keyboard.PNG' height='150'></img></p>" +
                 "<p class='small'>In this example, the correct answer is the <b>LEFT arrow</b>.</p></div>" +
                 "<p>Are you ready? <b>Press ENTER to start</b></p>"
-            }),
+        }),
         (illusion_name = "Zollner"),
         (type = "leftright")
     )
@@ -292,7 +326,7 @@
                 "<p><img src='utils/answer/answer_updown_keyboard.PNG' height='150'></img></p>" +
                 "<p class='small'>In this example, the correct answer is the <b>UP arrow</b>.</p></div>" +
                 "<p>Are you ready? <b>Press ENTER to start</b></p>"
-            }),
+        }),
         (illusion_name = "Contrast"),
         (type = "updown")
     )
@@ -314,7 +348,7 @@
                 "<p><img src='utils/answer/answer_leftright_keyboard.PNG' height='150'></img></p>" +
                 "<p class='small'>In this example, the correct answer is the <b>LEFT arrow</b>.</p></div>" +
                 "<p>Are you ready? <b>Press ENTER to start</b></p>"
-            }),
+        }),
         (illusion_name = "RodFrame"),
         (type = "leftright")
     )
@@ -327,14 +361,14 @@
             return "<p><b>Part " +
                 block_number +
                 "</b></p>" +
-                "<p>In this part, two parallel red lines will appear, but they are partially hidden by a grey rectangle.</p>"+
+                "<p>In this part, two parallel red lines will appear, but they are partially hidden by a grey rectangle.</p>" +
                 "<p>Your task is to tell if the <b>red line to the right</b> of the rectangle is above or below the line to the left. You need to answer as fast as you can, without making errors.</p>" +
                 "<p>Press <b>the UP or the DOWN arrow</b> to indicate whether the <b>right red line is actually above or below the left red line.</b></p>" +
                 "<div style='float: center'><img src='utils/stimuli_demo/Poggendorff_Demo.png' height='300'></img>" +
                 "<p><img src='utils/answer/answer_updown_keyboard.PNG' height='150'></img></p>" +
                 "<p class='small'>In this example, the correct answer is the <b>UP arrow</b>.</p></div>" +
                 "<p>Are you ready? <b>Press ENTER to start</b></p>"
-            }),
+        }),
         (illusion_name = "Poggendorff"),
         (type = "updown")
     )
@@ -355,7 +389,7 @@
                 "<p><img src='utils/answer/answer_leftright_keyboard.PNG' height='150'></img></p>" +
                 "<p class='small'>In this example, the correct answer is the <b>LEFT arrow</b>.</p></div>" +
                 "<p>Are you ready? <b>Press ENTER to start</b></p>"
-            }),
+        }),
         (illusion_name = "VerticalHorizontal"),
         (type = "leftright")
     )
@@ -376,7 +410,7 @@
                 "<p><img src='utils/answer/answer_leftright_keyboard.PNG' height='150'></img></p>" +
                 "<p class='small'>In this example, the correct answer is the <b>LEFT arrow</b>.</p></div>" +
                 "<p>Are you ready? <b>Press ENTER to start</b></p>"
-            }),
+        }),
         (illusion_name = "White"),
         (type = "leftright")
     )
@@ -397,9 +431,9 @@
             timeline_verticalhorizontal,
             timeline_white,
         ])) {
-            timeline.push({ timeline: t })
+            timeline.push({timeline: t})
         }
-        if(i === 1) {
+        if (i === 1) {
             timeline.push(make_break)
         }
     }
@@ -422,7 +456,7 @@
                 "<hr><p>Wait for the experimenter to end the session.</p>"
             )
         },
-        data: { screen: "final_results" },
+        data: {screen: "final_results"},
     }
     timeline.push(end_experiment)
 
@@ -440,4 +474,3 @@
 </script>
 
 </html>
-
