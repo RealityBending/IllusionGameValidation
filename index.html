@@ -132,22 +132,23 @@
     }
     timeline.push(participant_info)
 
-    // Preload Demo Stimuli
-
-    var preload_demo = {
+    // Preload Instructions Stimuli
+    timeline.push({
         type: jsPsychPreload,
-        images: ['utils/stimuli_demo/Contrast_Demo.png',
-                 'utils/stimuli_demo/Delboeuf_Demo.png',
-                 'utils/stimuli_demo/Ebbinghaus_Demo.png',
-                 'utils/stimuli_demo/MullerLyer_Demo.png',
-                 'utils/stimuli_demo/Poggendorff_Demo_.png',
-                 'utils/stimuli_dem/Ponzo_Demo.png',
-                 'utils/stimuli_demo/RodFrame_Demo.png',
-                 'utils/stimuli_demo/VerticalHorizontal_Demo.png',
-                 'utils/stimuli_demo/White_Demo.png',
-                 'utils/stimuli_demo/Zollner_Demo.png'
-                ]
-    }
+        images: [
+            "utils/stimuli_demo/Contrast_Demo.png",
+            "utils/stimuli_demo/Delboeuf_Demo.png",
+            "utils/stimuli_demo/Ebbinghaus_Demo.png",
+            "utils/stimuli_demo/MullerLyer_Demo.png",
+            "utils/stimuli_demo/Poggendorff_Demo.png",
+            "utils/stimuli_demo/Ponzo_Demo.png",
+            "utils/stimuli_demo/RodFrame_Demo.png",
+            "utils/stimuli_demo/VerticalHorizontal_Demo.png",
+            "utils/stimuli_demo/White_Demo.png",
+            "utils/stimuli_demo/Zollner_Demo.png",
+        ],
+    })
+
 
     // General Instructions
     var general_instructions = {
@@ -170,63 +171,23 @@
     /* ============================================================== */
     /* ---------------------- DELBOEUF ILLUSION --------------------- */
     /* ============================================================== */
-    var timeline_delboeuf = []
-
-    // Set stimuli (var stimuli is loaded in stimuli/stimuli.js)
-    var stimuli_delboeuf = stimuli.filter(
-        (stimuli) => stimuli.Illusion_Type === "Delboeuf"
+    var timeline_delboeuf = make_trial(
+        (instructions = function () {
+            return "<p><b>Part " +
+            block_number +
+            "</b></p>" +
+            "<p>In this part, two red circles will appear side by side on the screen.</p>" +
+            "<p>Your task is to select which <b>red circle is bigger</b> in size as fast as you can, without making errors.</p>" +
+            "<p>Don't get distracted by the black outlines around the red circles!</p>" +
+            "<p>Press <b>the LEFT or the RIGHT arrow</b> to indicate which is the bigger <b>red circle.</b></p>" +
+            "<div style='float: center'><img src='utils/stimuli_demo/Delboeuf_Demo.png' height='300'></img>" +
+            "<p><img src='utils/answer/answer_leftright_keyboard.PNG' height='150'></img></p>" +
+            "<p class='small'>In this example, the correct answer is the <b>LEFT arrow</b>.</p></div>" +
+            "<p>Are you ready? <b>Press ENTER to start</b></p>"
+        }),
+        (illusion_name = "Delboeuf"),
+        (type = "leftright")
     )
-
-    // Preload images
-    timeline_delboeuf.push({
-        type: jsPsychPreload,
-        trials: stimuli_delboeuf,
-    })
-
-    // Instructions
-    var instructions_delboeuf = {
-        type: jsPsychHtmlKeyboardResponse,
-        on_start: function () {
-            ;(document.body.style.cursor = "none"),
-                (document.querySelector(
-                    "#jspsych-progressbar-container"
-                ).style.display = "none")
-        },
-        choices: ["enter"],
-        stimulus: function () {
-            return (
-                "<p><b>Part " +
-                block_number +
-                "</b></p>" +
-                "<p>In this part, two red circles will appear side by side on the screen.</p>" +
-                "<p>Your task is to select which <b>red circle is bigger</b> in size as fast as you can, without making errors.</p>" +
-                "<p>Don't get distracted by the black outlines around the red circles!</p>" +
-                "<p>Press <b>the LEFT or the RIGHT arrow</b> to indicate which is the bigger <b>red circle.</b></p>" +
-                "<div style='float: center'><img src='utils/stimuli_demo/Delboeuf_Demo.png' height='300'></img>" +
-                "<p><img src='utils/answer/answer_leftright_keyboard.PNG' height='150'></img></p>" +
-                "<p class='small'>In this example, the correct answer is the <b>LEFT arrow</b>.</p></div>" +
-                "<p>Are you ready? <b>Press ENTER to start</b></p>"
-            )
-        },
-        post_trial_gap: 500,
-    }
-    timeline_delboeuf.push(instructions_delboeuf)
-
-    // Define trial
-    var trial_delboeuf = create_trial("Delboeuf", type = "leftright")
-
-    // Create Trials timeline
-    timeline_delboeuf.push({
-        timeline: [fixation, trial_delboeuf],
-        timeline_variables: stimuli_delboeuf,
-        randomize_order: true,
-        repetitions: 1,
-    })
-
-    // Debriefing Information
-    timeline_delboeuf.push(create_debrief(illusion_name = "Delboeuf"))
-
-    // timeline.push({ timeline: timeline_delboeuf })
 
     /* ================================================================ */
     /* ---------------------- MULLERLYER ILLUSION --------------------- */
@@ -782,25 +743,25 @@
     /* ================================================================ */
     /* ---------------------- END OF EXPERIMENT ----------------------- */
     /* ================================================================ */
-    for (var i of [1, 2]) {
-        for (var t of jsPsych.randomization.shuffleNoRepeats([
-            timeline_delboeuf,
-            timeline_mullerlyer,
-            timeline_ebbinghaus,
-            timeline_ponzo,
-            timeline_zollner,
-            timeline_contrast,
-            timeline_rodframe,
-            timeline_poggendorff,
-            timeline_verticalhorizontal,
-            timeline_white,
-        ])) {
-            timeline.push({ timeline: t })
-        }
-        if(i === 1) {
-            timeline.push(make_break)
-        }
-    }
+    // for (var i of [1, 2]) {
+    //     for (var t of jsPsych.randomization.shuffleNoRepeats([
+    //         timeline_delboeuf,
+    //         timeline_mullerlyer,
+    //         timeline_ebbinghaus,
+    //         timeline_ponzo,
+    //         timeline_zollner,
+    //         timeline_contrast,
+    //         timeline_rodframe,
+    //         timeline_poggendorff,
+    //         timeline_verticalhorizontal,
+    //         timeline_white,
+    //     ])) {
+    //         timeline.push({ timeline: t })
+    //     }
+    //     if(i === 1) {
+    //         timeline.push(make_break)
+    //     }
+    // }
 
 
     // Debriefing Information

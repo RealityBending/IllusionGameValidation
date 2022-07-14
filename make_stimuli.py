@@ -11,7 +11,7 @@ import pyllusion as ill
 # Parameters
 width = 800
 height = 800
-n = 6
+n = 2
 data = []
 
 # Delete all existing stimuli

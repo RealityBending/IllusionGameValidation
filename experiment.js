@@ -72,10 +72,10 @@ var fixation = {
     type: jsPsychHtmlKeyboardResponse,
     stimulus: '<div style="font-size:60px;">+</div>',
     choices: "NO_KEYS" /* no responses will be accepted as a valid response */,
-    // trial_duration: 0, // (for testing)
-    trial_duration: function () {
-        return randomInteger(250, 1000) // Function from RealityBending/JSmisc
-    },
+    trial_duration: 0, // (for testing)
+    // trial_duration: function () {
+    //     return randomInteger(250, 1000) // Function from RealityBending/JSmisc
+    // },
     save_trial_parameters: {
         trial_duration: true,
     },
@@ -264,3 +264,49 @@ function create_debrief(illusion_name = "Ponzo") {
     }
     return debrief
 }
+
+// Debrief
+function make_trial(instructions, illusion_name, type) {
+    var timeline = []
+
+    // Set stimuli (var stimuli is loaded in stimuli/stimuli.js)
+    var stim_list = stimuli.filter(
+        (stimuli) => stimuli.Illusion_Type === illusion_name
+    )
+
+    // Preload images
+    timeline.push({
+        type: jsPsychPreload,
+        trials: stim_list,
+    })
+
+    // Instructions
+    timeline.push({
+        type: jsPsychHtmlKeyboardResponse,
+        on_start: function () {
+            ;(document.body.style.cursor = "none"),
+                (document.querySelector(
+                    "#jspsych-progressbar-container"
+                ).style.display = "none")
+        },
+        choices: ["enter"],
+        stimulus: instructions,
+        post_trial_gap: 500,
+    })
+
+    // Define trial
+    var trial = create_trial(illusion_name, (type = type))
+
+    // Create Trials timeline
+    timeline.push({
+        timeline: [fixation, trial],
+        timeline_variables: stim_list,
+        randomize_order: true,
+        repetitions: 1,
+    })
+
+    // Debriefing Information
+    timeline.push(create_debrief((illusion_name = illusion_name)))
+    return timeline
+}
+
