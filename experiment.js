@@ -87,7 +87,7 @@ var make_break = {
     type: jsPsychHtmlButtonResponse,
     choices: ["I am ready to continue!"],
     stimulus:
-        "<p><b>BREAK</b></p><br>" +
+        "<p><b>BREAK</b></p>" +
         "<p>You have reached the middle of the game.</p>" +
         "<p>In the second part, you will see all the illusions once again. <b>Try to beat your previous score!</b></p>" +
         "<p>We know it's long and challenging, so take a moment to rest. When you are ready, press the button below.</p>",
@@ -244,7 +244,7 @@ function create_debrief(illusion_name = "Ponzo") {
             var show_screen = get_debrief_display(results)
             return (
                 show_screen.display_score +
-                "<hr>" +
+                // "<hr>" +
                 // // For debugging purposes, show the raw data.
                 // show_screen.display_accuracy +
                 // "<hr>" +
@@ -309,4 +309,3 @@ function make_trial(instructions, illusion_name, type) {
     timeline.push(create_debrief((illusion_name = illusion_name)))
     return timeline
 }
-

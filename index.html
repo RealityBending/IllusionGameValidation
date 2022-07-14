@@ -156,8 +156,9 @@
         choices: ["Let's play!"],
         stimulus:
             "<p><b>The Illusion Game</b></p>" +
-            "<p>In this reaction-time game, you will need to be <b>as fast as possible</b> and make correct responses by resisting different visual illusions.</p>" +
-            "<p>Sometimes, it's very hard and you want to rely on your intuition and gut feeling to answer fast without making errors.</p>" +
+            "<p>In this reaction-time game, you will need to make <b>visual judgments</b> (for instance, which circle is the biggest, or which line is the longest), as fast and as correctly as possible, while <b>resisting different visual illusions</b>.</p>" +
+            "<p>It can be challenging at times, so you want to rely on your intuition and gut feeling to answer as fast as you can, without making errors.</p>" +
+            "<p>A score will be computed based on your speed and accuracy and will be displayed after each illusion block.</p><br>" +
             "<p>Don't worry, we will show you examples of each illusion before each block. Each illusion block will be repeated two times (so that you have an opportunity to improve your score!), but the order of the blocks is random.</p>" +
             "<p>Remember, your goal is to be as <b>fast</b> and <b>accurate</b> as possible. Good luck!</p>",
         data: { screen: "general_instructions" },
@@ -192,32 +193,9 @@
     /* ================================================================ */
     /* ---------------------- MULLERLYER ILLUSION --------------------- */
     /* ================================================================ */
-    var timeline_mullerlyer = []
-
-    // Set stimuli (var stimuli is loaded in stimuli/stimuli.js)
-    var stimuli_mullerlyer = stimuli.filter(
-        (stimuli) => stimuli.Illusion_Type === "MullerLyer"
-    )
-
-    // Preload images
-    timeline_mullerlyer.push({
-        type: jsPsychPreload,
-        trials: stimuli_mullerlyer,
-    })
-
-    // Instructions
-    var instructions_mullerlyer = {
-        type: jsPsychHtmlKeyboardResponse,
-        on_start: function () {
-            ;(document.body.style.cursor = "none"),
-                (document.querySelector(
-                    "#jspsych-progressbar-container"
-                ).style.display = "none")
-        },
-        choices: ["enter"],
-        stimulus: function () {
-            return (
-                "<p><b>Part " +
+    var timeline_mullerlyer = make_trial(
+        (instructions = function () {
+            return "<p><b>Part " +
                 block_number +
                 "</b></p>" +
                 "<p>In this part, two horizontal red lines will appear one above the other.</p>" +
@@ -228,57 +206,17 @@
                 "<p><img src='utils/answer/answer_updown_keyboard.PNG' height='150'></img></p>" +
                 "<p class='small'>In this example, the correct answer is the <b>UP arrow</b>.</p></div>" +
                 "<p>Are you ready? <b>Press ENTER to start</b></p>"
-            )
-        },
-        post_trial_gap: 500,
-    }
-    timeline_mullerlyer.push(instructions_mullerlyer)
-
-    // Define trial
-    var trial_mullerlyer = create_trial("MullerLyer", type = "updown")
-
-    // Create Trials timeline
-    timeline_mullerlyer.push({
-        timeline: [fixation, trial_mullerlyer],
-        timeline_variables: stimuli_mullerlyer,
-        randomize_order: true,
-        repetitions: 1,
-    })
-
-    // Debriefing Information
-    timeline_mullerlyer.push(create_debrief(illusion_name = "MullerLyer"))
-
-    // timeline.push({ timeline: timeline_mullerlyer })
+            }),
+        (illusion_name = "MullerLyer"),
+        (type = "updown")
+    )
 
     /* ================================================================ */
     /* --------------------- EBBINGHAUS ILLUSION ---------------------- */
     /* ================================================================ */
-    var timeline_ebbinghaus = []
-
-    // Set stimuli (var stimuli is loaded in stimuli/stimuli.js)
-    var stimuli_ebbinghaus = stimuli.filter(
-        (stimuli) => stimuli.Illusion_Type === "Ebbinghaus"
-    )
-
-    // Preload images
-    timeline_ebbinghaus.push({
-        type: jsPsychPreload,
-        trials: stimuli_ebbinghaus,
-    })
-
-    // Instructions
-    var instructions_ebbinghaus = {
-        type: jsPsychHtmlKeyboardResponse,
-        on_start: function () {
-            ;(document.body.style.cursor = "none"),
-                (document.querySelector(
-                    "#jspsych-progressbar-container"
-                ).style.display = "none")
-        },
-        choices: ["enter"],
-        stimulus: function () {
-            return (
-                "<p><b>Part " +
+    var timeline_ebbinghaus = make_trial(
+        (instructions = function () {
+            return "<p><b>Part " +
                 block_number +
                 "</b></p>" +
                 "<p>In this part, two red circles will appear side by side on the screen.</p>" +
@@ -289,57 +227,17 @@
                 "<p><img src='utils/answer/answer_leftright_keyboard.PNG' height='150'></img></p>" +
                 "<p class='small'>In this example, the correct answer is the <b>LEFT arrow</b>.</p></div>" +
                 "<p>Are you ready? <b>Press ENTER to start</b></p>"
-            )
-        },
-        post_trial_gap: 500,
-    }
-    timeline_ebbinghaus.push(instructions_ebbinghaus)
-
-    // Define trial
-    var trial_ebbinghaus = create_trial("Ebbinghaus", type = "leftright")
-
-    // Create Trials timeline
-    timeline_ebbinghaus.push({
-        timeline: [fixation, trial_ebbinghaus],
-        timeline_variables: stimuli_ebbinghaus,
-        randomize_order: true,
-        repetitions: 1,
-    })
-
-    // Debriefing Information
-    timeline_ebbinghaus.push(create_debrief(illusion_name = "Ebbinghaus"))
-
-    // timeline.push({ timeline: timeline_ebbinghaus })
+            }),
+        (illusion_name = "Ebbinghaus"),
+        (type = "leftright")
+    )
 
     /* ================================================================ */
     /* ------------------------ PONZO ILLUSION ------------------------ */
     /* ================================================================ */
-    var timeline_ponzo = []
-
-    // Set stimuli (var stimuli is loaded in stimuli/stimuli.js)
-    var stimuli_ponzo = stimuli.filter(
-        (stimuli) => stimuli.Illusion_Type === "Ponzo"
-    )
-
-    // Preload images
-    timeline_ponzo.push({
-        type: jsPsychPreload,
-        trials: stimuli_ponzo,
-    })
-
-    // Instructions
-    var instructions_ponzo = {
-        type: jsPsychHtmlKeyboardResponse,
-        on_start: function () {
-            ;(document.body.style.cursor = "none"),
-                (document.querySelector(
-                    "#jspsych-progressbar-container"
-                ).style.display = "none")
-        },
-        choices: ["enter"],
-        stimulus: function () {
-            return (
-                "<p><b>Part " +
+    var timeline_ponzo = make_trial(
+        (instructions = function () {
+            return "<p><b>Part " +
                 block_number +
                 "</b></p>" +
                 "<p>In this part, two horizontal red lines will appear one above the other.</p>" +
@@ -350,60 +248,18 @@
                 "<p><img src='utils/answer/answer_updown_keyboard.PNG' height='150'></img></p>" +
                 "<p class='small'>In this example, the correct answer is the <b>UP arrow</b>.</p></div>" +
                 "<p>Are you ready? <b>Press ENTER to start</b></p>"
-            )
-        },
-        post_trial_gap: 500,
-    }
-    timeline_ponzo.push(instructions_ponzo)
-
-    // Define trial
-    var trial_ponzo = create_trial("Ponzo", type = "updown")
-
-    // Create Trials timeline
-    timeline_ponzo.push({
-        timeline: [fixation, trial_ponzo],
-        timeline_variables: stimuli_ponzo,
-        randomize_order: true,
-        repetitions: 1,
-    })
-
-    // Debriefing Information
-    timeline_ponzo.push(create_debrief(illusion_name = "Ponzo"))
-
-    // timeline.push({ timeline: timeline_ponzo })
-
-
+            }),
+        (illusion_name = "Ponzo"),
+        (type = "updown")
+    )
 
 
     /* ================================================================ */
     /* ----------------------- ZOLLNER ILLUSION ----------------------- */
     /* ================================================================ */
-    var timeline_zollner = []
-
-    // Set stimuli (var stimuli is loaded in stimuli/stimuli.js)
-    var stimuli_zollner = stimuli.filter(
-        (stimuli) => stimuli.Illusion_Type === "Zollner"
-    )
-
-    // Preload images
-    timeline_zollner.push({
-        type: jsPsychPreload,
-        trials: stimuli_zollner,
-    })
-
-    // Instructions
-    var instructions_zollner = {
-        type: jsPsychHtmlKeyboardResponse,
-        on_start: function () {
-            ;(document.body.style.cursor = "none"),
-                (document.querySelector(
-                    "#jspsych-progressbar-container"
-                ).style.display = "none")
-        },
-        choices: ["enter"],
-        stimulus: function () {
-            return (
-                "<p><b>Part " +
+    var timeline_zollner = make_trial(
+        (instructions = function () {
+            return "<p><b>Part " +
                 block_number +
                 "</b></p>" +
                 "<p>In this part, two horizontal red lines will appear one above the other.</p>" +
@@ -414,58 +270,18 @@
                 "<p><img src='utils/answer/answer_leftright_keyboard.PNG' height='150'></img></p>" +
                 "<p class='small'>In this example, the correct answer is the <b>LEFT arrow</b>.</p></div>" +
                 "<p>Are you ready? <b>Press ENTER to start</b></p>"
-            )
-        },
-        post_trial_gap: 500,
-    }
-    timeline_zollner.push(instructions_zollner)
-
-    // Define trial
-    var trial_zollner = create_trial("Zollner", type = "leftright")
-
-    // Create Trials timeline
-    timeline_zollner.push({
-        timeline: [fixation, trial_zollner],
-        timeline_variables: stimuli_zollner,
-        randomize_order: true,
-        repetitions: 1,
-    })
-
-    // Debriefing Information
-    timeline_zollner.push(create_debrief(illusion_name = "Zollner"))
-
-    // timeline.push({ timeline: timeline_zollner })
+            }),
+        (illusion_name = "Zollner"),
+        (type = "leftright")
+    )
 
 
     /* ================================================================ */
     /* ---------------------- CONTRAST ILLUSION ----------------------- */
     /* ================================================================ */
-    var timeline_contrast = []
-
-    // Set stimuli (var stimuli is loaded in stimuli/stimuli.js)
-    var stimuli_contrast = stimuli.filter(
-        (stimuli) => stimuli.Illusion_Type === "Contrast"
-    )
-
-    // Preload images
-    timeline_contrast.push({
-        type: jsPsychPreload,
-        trials: stimuli_contrast,
-    })
-
-    // Instructions
-    var instructions_contrast = {
-        type: jsPsychHtmlKeyboardResponse,
-        on_start: function () {
-            ;(document.body.style.cursor = "none"),
-                (document.querySelector(
-                    "#jspsych-progressbar-container"
-                ).style.display = "none")
-        },
-        choices: ["enter"],
-        stimulus: function () {
-            return (
-                "<p><b>Part " +
+    var timeline_contrast = make_trial(
+        (instructions = function () {
+            return "<p><b>Part " +
                 block_number +
                 "</b></p>" +
                 "<p>In this part, two small grey rectangles will appear one above the other.</p>" +
@@ -476,57 +292,18 @@
                 "<p><img src='utils/answer/answer_updown_keyboard.PNG' height='150'></img></p>" +
                 "<p class='small'>In this example, the correct answer is the <b>UP arrow</b>.</p></div>" +
                 "<p>Are you ready? <b>Press ENTER to start</b></p>"
-            )
-        },
-        post_trial_gap: 500,
-    }
-    timeline_contrast.push(instructions_contrast)
+            }),
+        (illusion_name = "Contrast"),
+        (type = "updown")
+    )
 
-    // Define trial
-    var trial_contrast = create_trial("Contrast", type = "updown")
-
-    // Create Trials timeline
-    timeline_contrast.push({
-        timeline: [fixation, trial_contrast],
-        timeline_variables: stimuli_contrast,
-        randomize_order: true,
-        repetitions: 1,
-    })
-
-    // Debriefing Information
-    timeline_contrast.push(create_debrief(illusion_name = "Contrast"))
-
-    // timeline.push({ timeline: timeline_contrast })
 
     /* ================================================================ */
     /* ---------------------- RODFRAME ILLUSION ----------------------- */
     /* ================================================================ */
-    var timeline_rodframe = []
-
-    // Set stimuli (var stimuli is loaded in stimuli/stimuli.js)
-    var stimuli_rodframe = stimuli.filter(
-        (stimuli) => stimuli.Illusion_Type === "RodFrame"
-    )
-
-    // Preload images
-    timeline_rodframe.push({
-        type: jsPsychPreload,
-        trials: stimuli_rodframe,
-    })
-
-    // Instructions
-    var instructions_rodframe = {
-        type: jsPsychHtmlKeyboardResponse,
-        on_start: function () {
-            ;(document.body.style.cursor = "none"),
-                (document.querySelector(
-                    "#jspsych-progressbar-container"
-                ).style.display = "none")
-        },
-        choices: ["enter"],
-        stimulus: function () {
-            return (
-                "<p><b>Part " +
+    var timeline_rodframe = make_trial(
+        (instructions = function () {
+            return "<p><b>Part " +
                 block_number +
                 "</b></p>" +
                 "<p>In this part, one vertical red line will appear in a square.</p>" +
@@ -537,57 +314,17 @@
                 "<p><img src='utils/answer/answer_leftright_keyboard.PNG' height='150'></img></p>" +
                 "<p class='small'>In this example, the correct answer is the <b>LEFT arrow</b>.</p></div>" +
                 "<p>Are you ready? <b>Press ENTER to start</b></p>"
-            )
-        },
-        post_trial_gap: 500,
-    }
-    timeline_rodframe.push(instructions_rodframe)
-
-    // Define trial
-    var trial_rodframe = create_trial("RodFrame", type = "leftright")
-
-    // Create Trials timeline
-    timeline_rodframe.push({
-        timeline: [fixation, trial_rodframe],
-        timeline_variables: stimuli_rodframe,
-        randomize_order: true,
-        repetitions: 1,
-    })
-
-    // Debriefing Information
-    timeline_rodframe.push(create_debrief(illusion_name = "RodFrame"))
-
-    // timeline.push({ timeline: timeline_rodframe })
+            }),
+        (illusion_name = "RodFrame"),
+        (type = "leftright")
+    )
 
     /* ================================================================ */
     /* --------------------- POGGENDORFF ILLUSION --------------------- */
     /* ================================================================ */
-    var timeline_poggendorff = []
-
-    // Set stimuli (var stimuli is loaded in stimuli/stimuli.js)
-    var stimuli_poggendorff = stimuli.filter(
-        (stimuli) => stimuli.Illusion_Type === "Poggendorff"
-    )
-
-    // Preload images
-    timeline_poggendorff.push({
-        type: jsPsychPreload,
-        trials: stimuli_poggendorff,
-    })
-
-    // Instructions
-    var instructions_poggendorff = {
-        type: jsPsychHtmlKeyboardResponse,
-        on_start: function () {
-            ;(document.body.style.cursor = "none"),
-                (document.querySelector(
-                    "#jspsych-progressbar-container"
-                ).style.display = "none")
-        },
-        choices: ["enter"],
-        stimulus: function () {
-            return (
-                "<p><b>Part " +
+    var timeline_poggendorff = make_trial(
+        (instructions = function () {
+            return "<p><b>Part " +
                 block_number +
                 "</b></p>" +
                 "<p>In this part, two parallel red lines will appear, but they are partially hidden by a grey rectangle.</p>"+
@@ -597,57 +334,17 @@
                 "<p><img src='utils/answer/answer_updown_keyboard.PNG' height='150'></img></p>" +
                 "<p class='small'>In this example, the correct answer is the <b>UP arrow</b>.</p></div>" +
                 "<p>Are you ready? <b>Press ENTER to start</b></p>"
-            )
-        },
-        post_trial_gap: 500,
-    }
-    timeline_poggendorff.push(instructions_poggendorff)
-
-    // Define trial
-    var trial_poggendorff = create_trial("Poggendorff", type = "updown")
-
-    // Create Trials timeline
-    timeline_poggendorff.push({
-        timeline: [fixation, trial_poggendorff],
-        timeline_variables: stimuli_poggendorff,
-        randomize_order: true,
-        repetitions: 1,
-    })
-
-    // Debriefing Information
-    timeline_poggendorff.push(create_debrief(illusion_name = "Poggendorff"))
-
-
+            }),
+        (illusion_name = "Poggendorff"),
+        (type = "updown")
+    )
 
     /* ================================================================ */
     /* ----------------- VERTICAL-HORIZONTAL ILLUSION ----------------- */
     /* ================================================================ */
-    var timeline_verticalhorizontal = []
-
-    // Set stimuli (var stimuli is loaded in stimuli/stimuli.js)
-    var stimuli_verticalhorizontal = stimuli.filter(
-        (stimuli) => stimuli.Illusion_Type === "VerticalHorizontal"
-    )
-
-    // Preload images
-    timeline_verticalhorizontal.push({
-        type: jsPsychPreload,
-        trials: stimuli_verticalhorizontal,
-    })
-
-    // Instructions
-    var instructions_verticalhorizontal = {
-        type: jsPsychHtmlKeyboardResponse,
-        on_start: function () {
-            ;(document.body.style.cursor = "none"),
-                (document.querySelector(
-                    "#jspsych-progressbar-container"
-                ).style.display = "none")
-        },
-        choices: ["enter"],
-        stimulus: function () {
-            return (
-                "<p><b>Part " +
+    var timeline_verticalhorizontal = make_trial(
+        (instructions = function () {
+            return "<p><b>Part " +
                 block_number +
                 "</b></p>" +
                 "<p>In this part, two red lines will appear side by side.</p>" +
@@ -658,57 +355,17 @@
                 "<p><img src='utils/answer/answer_leftright_keyboard.PNG' height='150'></img></p>" +
                 "<p class='small'>In this example, the correct answer is the <b>LEFT arrow</b>.</p></div>" +
                 "<p>Are you ready? <b>Press ENTER to start</b></p>"
-            )
-        },
-        post_trial_gap: 500,
-    }
-    timeline_verticalhorizontal.push(instructions_verticalhorizontal)
-
-    // Define trial
-    var trial_verticalhorizontal = create_trial("VerticalHorizontal", type = "leftright")
-
-    // Create Trials timeline
-    timeline_verticalhorizontal.push({
-        timeline: [fixation, trial_verticalhorizontal],
-        timeline_variables: stimuli_verticalhorizontal,
-        randomize_order: true,
-        repetitions: 1,
-    })
-
-    // Debriefing Information
-    timeline_verticalhorizontal.push(create_debrief(illusion_name = "VerticalHorizontal"))
-
-
+            }),
+        (illusion_name = "VerticalHorizontal"),
+        (type = "leftright")
+    )
 
     /* ================================================================ */
     /* ------------------------- WHITE ILLUSION ----------------------- */
     /* ================================================================ */
-    var timeline_white = []
-
-    // Set stimuli (var stimuli is loaded in stimuli/stimuli.js)
-    var stimuli_white = stimuli.filter(
-        (stimuli) => stimuli.Illusion_Type === "White"
-    )
-
-    // Preload images
-    timeline_white.push({
-        type: jsPsychPreload,
-        trials: stimuli_white,
-    })
-
-    // Instructions
-    var instructions_white = {
-        type: jsPsychHtmlKeyboardResponse,
-        on_start: function () {
-            ;(document.body.style.cursor = "none"),
-                (document.querySelector(
-                    "#jspsych-progressbar-container"
-                ).style.display = "none")
-        },
-        choices: ["enter"],
-        stimulus: function () {
-            return (
-                "<p><b>Part " +
+    var timeline_white = make_trial(
+        (instructions = function () {
+            return "<p><b>Part " +
                 block_number +
                 "</b></p>" +
                 "<p>In this part, two vertical grey rectangles will appear side by side.</p>" +
@@ -719,49 +376,33 @@
                 "<p><img src='utils/answer/answer_leftright_keyboard.PNG' height='150'></img></p>" +
                 "<p class='small'>In this example, the correct answer is the <b>LEFT arrow</b>.</p></div>" +
                 "<p>Are you ready? <b>Press ENTER to start</b></p>"
-            )
-        },
-        post_trial_gap: 500,
-    }
-    timeline_white.push(instructions_white)
-
-    // Define trial
-    var trial_white = create_trial("White", type = "leftright")
-
-    // Create Trials timeline
-    timeline_white.push({
-        timeline: [fixation, trial_white],
-        timeline_variables: stimuli_white,
-        randomize_order: true,
-        repetitions: 1,
-    })
-
-    // Debriefing Information
-    timeline_white.push(create_debrief(illusion_name = "White"))
-
+            }),
+        (illusion_name = "White"),
+        (type = "leftright")
+    )
 
     /* ================================================================ */
     /* ---------------------- END OF EXPERIMENT ----------------------- */
     /* ================================================================ */
-    // for (var i of [1, 2]) {
-    //     for (var t of jsPsych.randomization.shuffleNoRepeats([
-    //         timeline_delboeuf,
-    //         timeline_mullerlyer,
-    //         timeline_ebbinghaus,
-    //         timeline_ponzo,
-    //         timeline_zollner,
-    //         timeline_contrast,
-    //         timeline_rodframe,
-    //         timeline_poggendorff,
-    //         timeline_verticalhorizontal,
-    //         timeline_white,
-    //     ])) {
-    //         timeline.push({ timeline: t })
-    //     }
-    //     if(i === 1) {
-    //         timeline.push(make_break)
-    //     }
-    // }
+    for (var i of [1, 2]) {
+        for (var t of jsPsych.randomization.shuffleNoRepeats([
+            timeline_delboeuf,
+            timeline_mullerlyer,
+            timeline_ebbinghaus,
+            timeline_ponzo,
+            timeline_zollner,
+            timeline_contrast,
+            timeline_rodframe,
+            timeline_poggendorff,
+            timeline_verticalhorizontal,
+            timeline_white,
+        ])) {
+            timeline.push({ timeline: t })
+        }
+        if(i === 1) {
+            timeline.push(make_break)
+        }
+    }
 
 
     // Debriefing Information
@@ -776,8 +417,8 @@
             var show_screen = get_debrief_display(results, "Final")
             return (
                 show_screen.display_score +
-                "<hr>" +
-                show_screen.display_comparison +
+                // "<hr>" +
+                // show_screen.display_comparison +
                 "<hr><p>Wait for the experimenter to end the session.</p>"
             )
         },
