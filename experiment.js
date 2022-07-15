@@ -277,7 +277,7 @@ function make_trial(instructions, illusion_name, type) {
     // Preload images
     timeline.push({
         type: jsPsychPreload,
-        trials: stim_list,
+        images: stim_list.map((a) => a.stimulus),
     })
 
     // Instructions
@@ -309,3 +309,4 @@ function make_trial(instructions, illusion_name, type) {
     timeline.push(create_debrief((illusion_name = illusion_name)))
     return timeline
 }
+
