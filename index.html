@@ -13,14 +13,14 @@
     <script src="https://unpkg.com/@jspsych/plugin-browser-check"></script>
     <!-- Other modules -->
     <script src="https://realitybending.github.io/JSmisc/misc/utils.js"></script>
-    <script src = "utils/plugin-jsPsychPavlovia.js"></script>
+    <!-- <script src = "utils/plugin-jsPsychPavlovia.js"></script> -->
     <!-- Load stimuli -->
     <script src="stimuli/stimuli.js"></script>
     <script src="experiment.js"></script>
     <script src="population_scores.js"></script>
     <!-- CSS -->
     <link href="https://unpkg.com/jspsych@7.2.3/css/jspsych.css" rel="stylesheet" type="text/css" />
-    <script type="text/javascript" src="lib/jspsych-7-pavlovia-2022.1.1.js"></script>
+    <!-- <script type="text/javascript" src="lib/jspsych-7-pavlovia-2022.1.1.js"></script> -->   
     <style>
         /* set canvas to be full screen */
         .jspsych-content {
@@ -50,14 +50,14 @@
     /* ----------------- Initialize experiment ----------------- */
     var timeline = []
 
-        /* Initialize connection to Pavlovia ----*/
-        var pavlovia_init = {
-            type: jsPsychPavlovia,
-            comamand: "init"
+        // /* Initialize connection to Pavlovia ----*/    (to run with pavlovia)
+        // var pavlovia_init = {
+        //     type: jsPsychPavlovia,
+        //     comamand: "init"
 
-        };
+        // };
 
-    timeline.push(pavlovia_init);
+    // timeline.push(pavlovia_init);
 
     var jsPsych = initJsPsych({
         show_progress_bar: true,
@@ -495,15 +495,15 @@
         fullscreen_mode: false,
     })
 
-        /* Close connection to Pavlovia---*/
-        var pavlovia_finish = {
-                type: jsPsychPavlovia,
-                command: "finish",
-                participantId: "JSPSYCH-DEMO"
-            };
+        // /* Close connection to Pavlovia---*/
+        // var pavlovia_finish = {
+        //         type: jsPsychPavlovia,
+        //         command: "finish",
+        //         participantId: "JSPSYCH-DEMO"
+        //     };
 
 
-    timeline.push(pavlovia_finish);
+    // timeline.push(pavlovia_finish);
 
     jsPsych.run(timeline)
 
