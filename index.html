@@ -20,7 +20,7 @@
     <script src="population_scores.js"></script>
     <!-- CSS -->
     <link href="https://unpkg.com/jspsych@7.2.3/css/jspsych.css" rel="stylesheet" type="text/css" />
-    <!-- <script type="text/javascript" src="lib/jspsych-7-pavlovia-2022.1.1.js"></script> -->   
+    <!-- <script type="text/javascript" src="lib/jspsych-7-pavlovia-2022.1.1.js"></script> -->
     <style>
         /* set canvas to be full screen */
         .jspsych-content {
@@ -134,6 +134,10 @@
             {
                 prompt: "Please enter your country of birth",
                 name: "nationality",
+            },
+            {
+                prompt: "Please enter the ethnicity you most identify with",
+                name: "ethnicity"
             }
         ],
         on_finish: function () {
@@ -153,13 +157,8 @@
         questions: [
             {
                 prompt:'What is your assigned sex?',
-                options: ["Male", "Female", "Prefer not to say"],
+                options: ["Male", "Female", "Other", "Prefer not to say"],
                 name: "sex",
-            },
-            {
-                prompt: "What is your ethnicity?",
-                options: ["White", "Black", "Asian",  "Mixed", "Other"],
-                name: "ethnicity",
             }
         ],
         data: {
@@ -219,7 +218,7 @@
         choices: ["Let's play!"],
         stimulus:
             "<p><b>The Illusion Game</b></p>" +
-            "<p>In this reaction-time game, you will need to make <b>visual judgments</b> (for instance, which circle is the biggest, or which line is the longest), as fast and as correctly as possible, while <b>resisting different visual illusions</b>.</p>" +
+            "<p>In this game of speed and reflex, you will need to make <b>visual judgments</b> (for instance, which circle is the biggest, or which line is the longest), as fast and as correctly as possible, while <b>resisting different visual illusions</b>.</p>" +
             "<p>It can be challenging at times, so you want to rely on your intuition and gut feeling to answer as fast as you can, without making errors.</p>" +
             "<p>A score will be computed based on your speed and accuracy and will be displayed after each illusion block.</p><br>" +
             "<p>Don't worry, we will show you examples of each illusion before each block. Each illusion block will be repeated two times (so that you have an opportunity to improve your score!), but the order of the blocks is random.</p>" +
