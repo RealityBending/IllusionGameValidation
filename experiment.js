@@ -72,10 +72,10 @@ var fixation = {
     type: jsPsychHtmlKeyboardResponse,
     stimulus: '<div style="font-size:60px;">+</div>',
     choices: "NO_KEYS" /* no responses will be accepted as a valid response */,
-    trial_duration: 0, // (for testing)
-    // trial_duration: function () {
-    //     return randomInteger(250, 1000) // Function from RealityBending/JSmisc
-    // },
+    //trial_duration: 0, // (for testing)
+    trial_duration: function () {
+        return randomInteger(250, 1000) // Function from RealityBending/JSmisc
+    },
     save_trial_parameters: {
         trial_duration: true,
     },
