@@ -36,7 +36,6 @@
         Body::-webkit-scrollbar {
             display: none
         }
-
     </style>
 </head>
 
@@ -50,12 +49,12 @@
     /* ----------------- Initialize experiment ----------------- */
     var timeline = []
 
-        // /* Initialize connection to Pavlovia ----*/    (to run with pavlovia)
-        // var pavlovia_init = {
-        //     type: jsPsychPavlovia,
-        //     comamand: "init"
+    // /* Initialize connection to Pavlovia ----*/    (to run with pavlovia)
+    // var pavlovia_init = {
+    //     type: jsPsychPavlovia,
+    //     comamand: "init"
 
-        // };
+    // };
 
     // timeline.push(pavlovia_init);
 
@@ -156,9 +155,14 @@
         type: jsPsychSurveyMultiChoice,
         questions: [
             {
-                prompt:'What is your assigned sex?',
+                prompt: 'What is your assigned sex?',
                 options: ["Male", "Female", "Other", "Prefer not to say"],
                 name: "sex",
+            },
+            {
+                prompt: "What is your highest level of education?",
+                options: ["Diploma", "Bachelor's Degree", "Master's Degree", "PhD or higher", "Vocational School", "Prefer not to say"],
+                name: "education",
             }
         ],
         data: {
@@ -494,12 +498,12 @@
         fullscreen_mode: false,
     })
 
-        // /* Close connection to Pavlovia---*/
-        // var pavlovia_finish = {
-        //         type: jsPsychPavlovia,
-        //         command: "finish",
-        //         participantId: "JSPSYCH-DEMO"
-        //     };
+    // /* Close connection to Pavlovia---*/
+    // var pavlovia_finish = {
+    //         type: jsPsychPavlovia,
+    //         command: "finish",
+    //         participantId: "JSPSYCH-DEMO"
+    //     };
 
 
     // timeline.push(pavlovia_finish);
