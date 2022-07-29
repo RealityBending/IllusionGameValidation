@@ -48,10 +48,10 @@
     /* ----------------- Initialize experiment ----------------- */
     var timeline = []
 
-    // /* Initialize connection to Pavlovia ----*/    (to run with pavlovia)
+    // /* Initialize connection to Pavlovia ----*/
     // var pavlovia_init = {
     //     type: jsPsychPavlovia,
-    //     comamand: "init"
+    //     command: "init"
 
     // };
 
@@ -71,7 +71,7 @@
                     `${jsPsych.data.get().values()[0]["participant_id"]
                     }_IllusionGame.json`
                 )
-            window.location = "https://app.prolific.co/submissions/complete?cc=XXX" /* redirect to prolific when experiment is finished */
+            window.location = "https://app.prolific.co/submissions/complete?cc=CUWXHNY5" /* redirect to prolific when experiment is finished */
         },
     })
 
@@ -118,7 +118,8 @@
 
     // Subject Information (Get from Prolific)
     var prolific_id = jsPsych.data.getURLVariable("PROLIFIC_PID")
-    var participant_id = jsPsych.randomization.randomID(5);
+    var jspsych_id = jsPsych.randomization.randomID(5)
+    var participant_id = `${prolific_id}_${jspsych_id}`
     var study_id = jsPsych.data.getURLVariable("STUDY_ID")
     var session_id = jsPsych.data.getURLVariable("SESSION_ID")
 
@@ -134,13 +135,13 @@
                 name: "nationality",
             },
             {
-                prompt: "Please enter your ethnicity (e.g., 'asian')",
+                prompt: "Please enter your ethnicity (e.g., 'Caucasian')",
                 name: "ethnicity"
             }
         ],
         on_finish: function () {
             jsPsych.data.addProperties({
-                participant_id: prolific_id + "_" + participant_id,
+                participant_id: participant_id,
                 study_id: study_id,
                 session_id: session_id,
             })
@@ -484,7 +485,8 @@
                 show_screen.display_score +
                 // "<hr>" +
                 // show_screen.display_comparison +
-                "<hr><p>Wait for the experimenter to end the session.</p>"
+                "<hr><p>Thank you for participating!</p>" +
+                "<p> You will now be redirected to Prolific to be reimbursed.</p>"
             )
         },
         data: {screen: "final_results"},
