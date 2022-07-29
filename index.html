@@ -17,7 +17,6 @@
     <!-- Load stimuli -->
     <script src="stimuli/stimuli.js"></script>
     <script src="experiment.js"></script>
-    <script src="population_scores.js"></script>
     <!-- CSS -->
     <link href="utils/jspsych/jspsych.css" rel="stylesheet" type="text/css" />
     <!-- <script type="text/javascript" src="lib/jspsych-7-pavlovia-2022.1.1.js"></script> -->
@@ -477,8 +476,8 @@
         choices: ["End"],
         stimulus: function () {
             var results = get_results(
-                population_scores["Total"]["IES_Mean"][0],
-                population_scores["Total"]["IES_SD"][0]
+                1000, // population_scores["Total"]["IES_Mean"][0],
+                400 // population_scores["Total"]["IES_SD"][0]
             )
             var show_screen = get_debrief_display(results, "Final")
             return (

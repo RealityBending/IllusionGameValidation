@@ -237,8 +237,8 @@ function create_debrief(illusion_name = "Ponzo") {
         },
         stimulus: function () {
             var results = get_results(
-                population_scores[illusion_name]["IES_Mean"][0],
-                population_scores[illusion_name]["IES_SD"][0],
+                1000, // population_scores[illusion_name]["IES_Mean"][0],
+                400, // population_scores[illusion_name]["IES_SD"][0],
                 illusion_name
             )
             var show_screen = get_debrief_display(results)
@@ -309,4 +309,3 @@ function make_trial(instructions, illusion_name, type) {
     timeline.push(create_debrief((illusion_name = illusion_name)))
     return timeline
 }
-
