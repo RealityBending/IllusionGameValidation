@@ -11,7 +11,7 @@ import pyllusion as ill
 # Parameters
 width = 800
 height = 800
-n = 4
+n = 8
 data = []
 
 # Delete all existing stimuli
@@ -105,6 +105,11 @@ def doublelinspace(mini=0.1, maxi=1, size=6):
     return np.concatenate((-1 * x[::-1], x))
 
 
+# =============================================================================
+# STUDY 1
+# =============================================================================
+
+
 # Left-right ======================================================================================
 # -------------------------- Delboeuf Illusion --------------------------
 ill.Delboeuf(illusion_strength=0.8, difference=1.2).to_image(width=800, height=600).save(
@@ -112,10 +117,11 @@ ill.Delboeuf(illusion_strength=0.8, difference=1.2).to_image(width=800, height=6
 )
 data = generate_images(
     data,
-    strengths=np.linspace(-2, 2, num=n),
+    strengths=np.linspace(-2.1, 2.1, n - 1),
     differences=doublelinspace(mini=0.08, maxi=0.8, size=n),
     function=ill.Delboeuf,
     name="Delboeuf",
+    distance=0.9,  # Distance between circles
 )
 
 # -------------------------- Ebbinghaus Illusion --------------------------
@@ -124,8 +130,8 @@ ill.Ebbinghaus(illusion_strength=0.1, difference=1.5).to_image(width=800, height
 )
 data = generate_images(
     data,
-    strengths=np.linspace(-2, 2, num=n),
-    differences=doublelinspace(mini=0.1, maxi=0.5, size=n),
+    strengths=np.linspace(-2.1, 2.1, n - 1),
+    differences=doublelinspace(mini=0.08, maxi=0.8, size=n),
     function=ill.Ebbinghaus,
     name="Ebbinghaus",
     distance=0.9,  # Distance between circles
@@ -136,8 +142,8 @@ ill.RodFrame(illusion_strength=5, difference=-30).to_image(width=800, height=600
 )
 data = generate_images(
     data,
-    strengths=np.linspace(-45, 45, num=n),
-    differences=doublelinspace(mini=0.04, maxi=8, size=n),
+    strengths=np.linspace(-20, 20, num=n - 1),
+    differences=doublelinspace(mini=0.05, maxi=8, size=n),
     function=ill.RodFrame,
     name="RodFrame",
 )
@@ -147,8 +153,8 @@ ill.VerticalHorizontal(illusion_strength=45, difference=1).to_image(width=800, h
 )
 data = generate_images(
     data,
-    strengths=np.linspace(-90, 90, num=n),
-    differences=doublelinspace(mini=0.05, maxi=0.3, size=n),
+    strengths=np.linspace(-90, 90, num=n - 1),
+    differences=doublelinspace(mini=0.03, maxi=0.3, size=n),
     function=ill.VerticalHorizontal,
     name="VerticalHorizontal",
 )
@@ -158,7 +164,7 @@ ill.White(illusion_strength=5, difference=50).to_image(width=800, height=600).sa
 )
 data = generate_images(
     data,
-    strengths=np.linspace(-30, 30, num=n),
+    strengths=np.linspace(-25, 25, num=n - 1),
     differences=doublelinspace(mini=5, maxi=20, size=n),
     function=ill.White,
     name="White",
@@ -169,8 +175,8 @@ ill.Zollner(illusion_strength=-20, difference=-8).to_image(width=800, height=600
 )
 data = generate_images(
     data,
-    strengths=np.linspace(-80, 80, num=n),
-    differences=doublelinspace(mini=0.3, maxi=3, size=n),
+    strengths=np.linspace(-85, 85, num=n - 1),
+    differences=doublelinspace(mini=0.2, maxi=5, size=n),
     function=ill.Zollner,
     name="Zollner",
 )
@@ -182,7 +188,7 @@ ill.MullerLyer(illusion_strength=10, difference=0.5).to_image(width=800, height=
 )
 data = generate_images(
     data,
-    strengths=np.linspace(-50, 50, num=n),
+    strengths=np.linspace(-50, 50, num=n - 1),
     differences=doublelinspace(mini=0.05, maxi=0.5, size=n),
     function=ill.MullerLyer,
     name="MullerLyer",
@@ -195,7 +201,7 @@ ill.Ponzo(illusion_strength=5, difference=0.6).to_image(width=800, height=600).s
 )
 data = generate_images(
     data,
-    strengths=np.linspace(-25, 25, num=n),
+    strengths=np.linspace(-25, 25, num=n - 1),
     differences=doublelinspace(mini=0.04, maxi=0.4, size=n),
     function=ill.Ponzo,
     name="Ponzo",
@@ -206,7 +212,7 @@ ill.Contrast(illusion_strength=-5, difference=30).to_image(width=800, height=600
 )
 data = generate_images(
     data,
-    strengths=np.linspace(-35, 35, num=n),
+    strengths=np.linspace(-36, 36, num=n - 1),
     differences=doublelinspace(mini=5, maxi=20, size=n),
     function=ill.Contrast,
     name="Contrast",
@@ -217,11 +223,15 @@ ill.Poggendorff(illusion_strength=20, difference=0.3).to_image(width=800, height
 )
 data = generate_images(
     data,
-    strengths=np.linspace(-60, 60, num=n),
+    strengths=np.linspace(-66, 66, num=n - 1),
     differences=doublelinspace(mini=0.03, maxi=0.3, size=n),
     function=ill.Poggendorff,
     name="Poggendorff",
 )
+
+# =============================================================================
+# STUDY 2
+# =============================================================================
 
 
 # -------------------------- Save data --------------------------
