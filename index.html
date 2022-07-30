@@ -482,11 +482,13 @@
             )
             var show_screen = get_debrief_display(results, "Final")
             return (
-                show_screen.display_score +
+                //show_screen.display_score +
                 // "<hr>" +
                 // show_screen.display_comparison +
-                "<hr><p>Thank you for participating!</p>" +
-                "<p> You will now be redirected to Prolific to be reimbursed.</p>"
+                //"<hr>" +
+                "<p>Thank you for participating!</p>" +
+                "<p>You will now be redirected to Prolific to be reimbursed.</p>" +
+                "<p>Please click 'OK' when asked to leave the site.</p>"
             )
         },
         data: {screen: "final_results"},
