@@ -11,17 +11,15 @@
     <script src="utils/jspsych/plugin-image-keyboard-response.js"></script>
     <script src="utils/jspsych/plugin-survey-multi-choice.js"></script>
     <script src="utils/jspsych/plugin-browser-check.js"></script>
-    <script type="text/javascript" src="utils/jspsych/jspsych-7-pavlovia-2021.12.js"></script>
-    <script type="text/javascript" src="lib/vendors/jquery-2.2.0.min.js"></script>
     <!-- Other modules -->
     <script src="https://realitybending.github.io/JSmisc/misc/utils.js"></script>
-    <!-- <script src = "utils/jspsych/plugin-jsPsychPavlovia.js"></script>!-->
+    <!-- <script src = "utils/jspsych/plugin-jsPsychPavlovia.js"></script> -->
     <!-- Load stimuli -->
     <script src="stimuli/stimuli.js"></script>
     <script src="experiment.js"></script>
     <!-- CSS -->
     <link href="utils/jspsych/jspsych.css" rel="stylesheet" type="text/css" />
-    <!-- <script type="text/javascript" src="lib/jspsych-7-pavlovia-2022.1.1.js"></script>!-->
+    <!-- <script type="text/javascript" src="lib/jspsych-7-pavlovia-2022.1.1.js"></script> -->
     <style>
         /* set canvas to be full screen */
         .jspsych-content {
@@ -50,19 +48,14 @@
     /* ----------------- Initialize experiment ----------------- */
     var timeline = []
 
-    var pavloviaInfo
+    // /* Initialize connection to Pavlovia ----*/
+    // var pavlovia_init = {
+    //     type: jsPsychPavlovia,
+    //     command: "init"
 
-    /* Initialize connection to Pavlovia ----*/
-    var pavlovia_init = {
-        type: jsPsychPavlovia,
-        command: "init",
-        setPavloviaInfo: function (info) {
-            console.log(info);
-            pavloviaInfo = info;
-        }
-    }
+    // };
 
-    timeline.push(pavlovia_init)
+    // timeline.push(pavlovia_init);
 
     var jsPsych = initJsPsych({
         show_progress_bar: true,
@@ -70,14 +63,14 @@
         // exclusions: { min_width: 800, min_height: 600 }, /* exclude browsers that are not at least 800x600 pix */
         //  on_interaction_data_update: function (data) {console.log(JSON.stringify(data))}, /* record browser interactions */
         on_finish: function () {
-            // jsPsych.data.displayData("json")
-            // jsPsych.data
-            //    .get()
-            //    .localSave(
-            //        "json",
-            //        `${jsPsych.data.get().values()[0]["participant_id"]
-            //        }_IllusionGame.json`
-            //    )
+            jsPsych.data.displayData("json")
+            jsPsych.data
+                .get()
+                .localSave(
+                    "json",
+                    `${jsPsych.data.get().values()[0]["participant_id"]
+                    }_IllusionGame.json`
+                )
             window.location = "https://app.prolific.co/submissions/complete?cc=CUWXHNY5" /* redirect to prolific when experiment is finished */
         },
     })
@@ -230,7 +223,7 @@
         stimulus:
             "<p><b>The Illusion Game</b></p>" +
             "<p>In this game of speed and reflex, you will need to make <b>visual judgments</b> (for instance, which circle is the biggest, or which line is the longest), as fast and as correctly as possible, while <b>resisting different visual illusions</b>.</p>" +
-            "<p>It can be challenging at times, so you may want to rely on your intuition and gut feeling to answer as fast as you can, without making errors.</p>" +
+            "<p>It can be challenging at times, so you want to rely on your intuition and gut feeling to answer as fast as you can, without making errors.</p>" +
             "<p>A score will be computed based on your speed and accuracy and will be displayed after each illusion block.</p><br>" +
             "<p>Don't worry, we will show you examples of each illusion before each block. Each illusion block will be repeated two times (so that you have an opportunity to improve your score!), but the order of the blocks is random.</p>" +
             "<p>Remember, your goal is to be as <b>fast</b> and <b>accurate</b> as possible. Good luck!</p>",
@@ -489,12 +482,13 @@
             )
             var show_screen = get_debrief_display(results, "Final")
             return (
-                // show_screen.display_score +
-                /* "<hr>"---*/
+                //show_screen.display_score +
+                // "<hr>" +
                 // show_screen.display_comparison +
+                //"<hr>" +
                 "<p>Thank you for participating!</p>" +
                 "<p>You will now be redirected to Prolific to be reimbursed.</p>" +
-                "<p>Please click 'ok' when you receive the request to leave the site.</p>"
+                "<p>Please click 'OK' when asked to leave the site.</p>"
             )
         },
         data: {screen: "final_results"},
@@ -507,18 +501,15 @@
         fullscreen_mode: false,
     })
 
-    /* Close connection to Pavlovia---*/
-    var pavlovia_finish = {
-        type: jsPsychPavlovia,
-        command: "finish",
-        participantId: participant_id,
-        completedCallback: function () {
-            window.location.replace("https://app.prolific.co/submissions/complete?cc=CUWXHNY5");
-        },
-    }
+    // /* Close connection to Pavlovia---*/
+    // var pavlovia_finish = {
+    //         type: jsPsychPavlovia,
+    //         command: "finish",
+    //         participantId: "JSPSYCH-DEMO"
+    //     };
 
 
-    timeline.push(pavlovia_finish)
+    // timeline.push(pavlovia_finish);
 
     jsPsych.run(timeline)
 
