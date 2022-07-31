@@ -48,12 +48,17 @@
     /* ----------------- Initialize experiment ----------------- */
     var timeline = []
 
+
     // /* Initialize connection to Pavlovia ----*/
     // var pavlovia_init = {
     //     type: jsPsychPavlovia,
-    //     command: "init"
+    //     command: "init",
+    //     setPavloviaInfo: function (info) {
+    //         console.log(info);
+    //         pavloviaInfo = info;
+    //     }
+    // }
 
-    // };
 
     // timeline.push(pavlovia_init);
 
@@ -87,6 +92,9 @@
         type: jsPsychBrowserCheck,
         data: {
             screen: "browser_info",
+            version: "1.0",
+            date: new Date().toLocaleDateString("fr-FR"),
+            time: new Date().toLocaleTimeString("fr-FR"),
         },
         on_finish: function () {
             data = jsPsych.data.get().filter({screen: "browser_info"}).values()[0]
@@ -501,15 +509,17 @@
         fullscreen_mode: false,
     })
 
+
     // /* Close connection to Pavlovia---*/
     // var pavlovia_finish = {
     //         type: jsPsychPavlovia,
     //         command: "finish",
-    //         participantId: "JSPSYCH-DEMO"
-    //     };
+    //         participantId: participant_id,
+    //         completedCallback: function (){
+    //             window.location.replace('https://app.prolific.co/submissions/complete?cc=CUWXHNY5');
+    //     }
+    // }
 
-
-    // timeline.push(pavlovia_finish);
 
     jsPsych.run(timeline)
 
