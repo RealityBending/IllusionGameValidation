@@ -1,0 +1,414 @@
+---
+title: "Illusion Game Validation"
+output: html_document
+date: "`r Sys.Date()`"
+editor_options: 
+  chunk_output_type: console
+---
+
+
+```{r, echo = FALSE, warning=FALSE, message=FALSE}
+options(digits = 3)
+
+cache <- FALSE
+fig.width <- see::golden_ratio(7)
+fig.height <- 7
+
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  dpi = 450,
+  fig.path = "./figures/",
+  fig.width = fig.width,
+  fig.height = fig.height
+)
+```
+
+
+
+## Introduction
+
+Behavioural findings regarding the Illusion Game.
+
+## Methods
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+library(ggdist)
+library(ggside)
+library(easystats)
+library(patchwork)
+library(brms)
+
+
+# This is a local folder containing raw data from unzipped pavlovia
+dfraw <- read.csv("data/study1.csv") |> 
+  mutate(Screen_Refresh = as.character(Screen_Refresh),
+         Illusion_Side = as.factor(Illusion_Side))
+```
+
+### Exclusions 
+
+
+For each block, we computed the error rate and, if more than 50%, we discarded the whole block (as it likely indicates that instructions got mixed up, for instance participants were selecting the smaller instead of the bigger circle).
+
+
+```{r message=FALSE, warning=FALSE}
+dfsub <- dfraw |>
+  group_by(Participant) |>
+  summarize(Error = sum(Error) / n(),
+            RT = mean(RT)) |>
+  ungroup() 
+
+
+
+
+dfraw |>
+  group_by(Participant, Illusion_Type, Block) |>
+  summarize(ErrorRate_per_block = sum(Error) / n()) |>
+  ungroup() |>
+  estimate_density(at = c("Illusion_Type", "Block")) |>
+  ggplot(aes(x = x, y = y)) +
+  geom_line(aes(color = Illusion_Type, linetype= as.factor(Block)))
+
+
+df <- dfraw |>
+  group_by(Participant, Illusion_Type, Block) |>
+  mutate(ErrorRate_per_block = sum(Error) / n()) |> 
+  ungroup() |> 
+  filter(ErrorRate_per_block < 0.5) |> 
+  select(-ErrorRate_per_block)
+
+nrow(dfraw) - nrow(df)
+```
+
+
+### Participants
+
+
+
+
+
+```{r message=FALSE, warning=FALSE}
+dfsub <- df |>
+  group_by(Participant) |>
+  select(Participant, Age, Sex, Education, Nationality, Ethnicity, Duration, Break_Duration, Screen_Resolution, Screen_Refresh, Device_OS) |> 
+  slice(1) |> 
+  ungroup()
+```
+
+`r report::report_participants(dfsub, age="Age", sex="Sex")`
+
+```{r }
+plot_distribution <- function(dfsub, what="Age", title=what, subtitle="", fill="orange") {
+  dfsub |> 
+    ggplot(aes_string(x = what)) +
+    geom_density(fill = fill) + 
+    geom_vline(xintercept = mean(dfsub[[what]]), color = "red", linetype="dashed") +
+    scale_x_continuous(expand = c(0, 0)) +
+    scale_y_continuous(expand = c(0, 0)) +
+    ggtitle(title, subtitle=subtitle) +
+    theme_modern() +
+    theme(plot.title = element_text(face = "bold", hjust = 0.5),
+          plot.subtitle = element_text(face = "italic", hjust = 0.5),
+          axis.title.x = element_blank(),
+          axis.title.y = element_blank(),
+          axis.text.y = element_blank())
+}
+
+plot_waffle <- function(data, title="Nationality") {
+  data |> 
+    # mutate(label = emojifont::fontawesome('fa-twitter')) |> 
+    ggplot(aes(x, y, fill = group)) + 
+    ggwaffle::geom_waffle() +
+    # geom_point() +
+    # geom_text(aes(label=label), family='fontawesome-webfont', size=4) +
+    coord_equal() + 
+    ggtitle(title) +
+    labs(fill = "") +
+    theme_void() +
+    theme(plot.title = element_text(face = "bold", hjust = 0.5))
+}
+```
+
+```{r }
+p1 <- plot_distribution(dfsub, "Age", fill="#FF9800")
+p2 <- plot_distribution(dfsub, "Duration", title="Total Duration", subtitle="in minutes", fill="#F44336")
+p3 <- plot_distribution(dfsub, "Break_Duration", title="Break Duration", subtitle="in minutes", fill="#3F51B5")
+
+p4 <- ggwaffle::waffle_iron(dfsub, ggwaffle::aes_d(group = Sex)) |> 
+  plot_waffle("Sex") +
+  scale_fill_manual(values = c("Male" = "#2196F3", "Female" = "#E91E63")) 
+
+p5 <- ggwaffle::waffle_iron(dfsub, ggwaffle::aes_d(group = Education)) |> 
+  plot_waffle("Education") +
+  scale_fill_viridis_d()
+
+p6 <- ggwaffle::waffle_iron(dfsub, ggwaffle::aes_d(group = Nationality)) |> 
+  plot_waffle("Nationality") +
+  scale_fill_viridis_d()
+
+p7 <- ggwaffle::waffle_iron(dfsub, ggwaffle::aes_d(group = Ethnicity)) |> 
+  plot_waffle("Ethnicity") +
+  scale_fill_viridis_d()
+
+p8 <- ggwaffle::waffle_iron(dfsub, ggwaffle::aes_d(group = Screen_Resolution)) |> 
+  plot_waffle("Screen Resolution") +
+  scale_fill_viridis_d()
+
+p9 <- ggwaffle::waffle_iron(dfsub, ggwaffle::aes_d(group = Device_OS)) |> 
+  plot_waffle("Device OS") +
+  scale_fill_viridis_d()
+
+# p10 <- ggwaffle::waffle_iron(dfsub, ggwaffle::aes_d(group = Screen_Refresh)) |> 
+#   plot_waffle("Screen Refresh Rate") +
+#   scale_fill_viridis_d()
+
+
+(p1 / p2 / p3) | (p4 / p5 / p6) | (p7 / p8 / p9) 
+```
+
+
+
+## Results
+
+
+
+
+### Manipulation Checks
+
+We tested whether at illusion strength = 0, no effect of right / left (no bias of illusion at 0).
+
+
+```{r message=FALSE, warning=FALSE}
+model <- glmmTMB::glmmTMB(Error ~ Illusion_Type / Illusion_Side + (1|Participant), 
+                          data = filter(df, Illusion_Strength == 0), 
+                          family="binomial")
+
+parameters(model, effects="fixed") |> 
+  tail(10)
+```
+
+
+
+### Full Models
+
+#### Outliers
+
+```{r message=FALSE, warning=FALSE}
+p1 <- estimate_density(df, select="RT", at="Participant") |> 
+  normalize(select = "y") |> 
+  ggplot(aes(x=x, y=y)) +
+  geom_area(data=normalize(estimate_density(df, select="RT"), select="y"), alpha=0.2) +
+  geom_line(aes(color=Participant, group=Participant)) + 
+  geom_vline(xintercept = 2500, linetype = "dashed", color = "red") +
+  scale_color_material_d("rainbow", guide="none") +
+  scale_x_continuous(expand = c(0, 0)) +
+  scale_y_continuous(expand = c(0, 0)) +
+  coord_cartesian(xlim = c(0, 5000)) +
+  theme_modern() +
+  theme(axis.text.y = element_blank())
+
+
+df$Outlier <- df$RT > 2500
+
+p2 <- df |> 
+  group_by(Participant) |> 
+  summarize(Outlier = sum(Outlier) / n()) |> 
+  mutate(Participant = fct_reorder(Participant, Outlier)) |> 
+  ggplot(aes(x = Participant, y = Outlier)) +
+  geom_bar(stat="identity", aes(fill=Participant)) +
+  scale_fill_material_d(guide="none") +
+  scale_x_discrete(expand = c(0, 0)) +
+  scale_y_continuous(expand = c(0, 0), labels = scales::percent) +
+  theme_modern("rainbow") +
+  theme(axis.text.x = element_blank())
+
+p1 | p2
+
+df <- filter(df, Outlier == FALSE)
+```
+
+
+#### Errors
+
+```{r message=FALSE, warning=FALSE}
+model_errors <- function(df, illusion = "Delboeuf") {
+  data <- filter(df, Illusion_Type == illusion)
+
+  # formula <- brms::bf(
+  #   # Error ~ t2(Illusion_Difference, Illusion_Strength, k = 4) + (1 | Participant),
+  #   Error ~ s(Illusion_Strength, by=Illusion_Difference, k = 7) + (1 | Participant),
+  #   family = "bernoulli"
+  # )
+  # model <- brms::brm(formula,
+  #   data = data,
+  #   algorithm = "meanfield",
+  #   refresh = 0
+  # )
+  # model <- glmmTMB::glmmTMB(
+  #   Error ~ Illusion_Difference * Illusion_Strength + (1 | Participant),
+  #   data = data,
+  #   family = "binomial"
+  # )
+  model <- mgcv::gamm(
+    Error ~ s(Illusion_Difference, by = Illusion_Strength, k=4),
+    random = list(Participant = ~1),
+    data = data,
+    family = "binomial"
+  )
+
+  n_lines <- 5
+  pred <- estimate_relation(model, at = c("Illusion_Strength", "Illusion_Difference"), length = c(30, n_lines)) |>
+    mutate(Illusion_Difference = as.factor(Illusion_Difference),
+           Illusion_Type = illusion)
+
+  p <- pred |>
+    ggplot(aes(x = Illusion_Strength, y = Predicted, group = Illusion_Difference)) +
+    geom_ribbon(aes(ymin = CI_low, ymax = CI_high, fill = Illusion_Difference), alpha = 0.2) +
+    geom_vline(xintercept = 0, linetype = "dashed") +
+    geom_hline(yintercept=c(0.05, 0.5, 0.95), linetype="dotted", alpha=0.5) +
+    geom_line(aes(color = Illusion_Difference)) +
+    scale_y_continuous(limits = c(0, 1), expand = c(0, 0), labels = scales::percent) +
+    scale_x_continuous(expand = c(0, 0)) +
+    scale_color_manual(values = colorRampPalette(c("#F44336", "#FFC107", "#4CAF50"))(n_lines)) +
+    scale_fill_manual(values = colorRampPalette(c("#F44336", "#FFC107", "#4CAF50"))(n_lines)) +
+    theme_modern() +
+    labs(
+      title = paste0(illusion, " Illusion"),
+      color = "Difficulty", fill = "Difficulty",
+      y = "Probability of Error",
+      x = "Illusion Strength"
+    ) +
+    theme(plot.title = element_text(face = "bold", hjust = 0.5))
+
+
+  list(p = p, model = model, pred = pred)
+}
+```
+
+```{r message=FALSE, warning=FALSE}
+rez_ponzo <- model_errors(df, illusion = "Ponzo")
+rez_mullerlyer <- model_errors(df, illusion = "Müller-Lyer")
+rez_delboeuf <- model_errors(df, illusion = "Delboeuf")
+rez_ebbinghaus <- model_errors(df, illusion = "Ebbinghaus")
+rez_contrast <- model_errors(df, illusion = "Contrast")
+rez_white <- model_errors(df, illusion = "White")
+rez_poggendorff <- model_errors(df, illusion = "Poggendorff")
+rez_zollner <- model_errors(df, illusion = "Zöllner")
+rez_rodframe <- model_errors(df, illusion = "Rod-Frame")
+rez_verticalhorizontal <- model_errors(df, illusion = "Vertical-Horizontal")
+```
+
+```{r message=FALSE, warning=FALSE}
+rez_ponzo$p
+rez_mullerlyer$p
+rez_delboeuf$p
+rez_ebbinghaus$p
+rez_verticalhorizontal$p
+rez_rodframe$p
+rez_zollner$p
+rez_poggendorff$p
+rez_contrast$p
+rez_white$p
+```
+
+
+
+<!-- ```{r message=FALSE, warning=FALSE} -->
+<!-- rbind( -->
+<!--   rez_delboeuf$pred, -->
+<!--   rez_ebbinghaus$pred, -->
+<!--   rez_ponzo$pred, -->
+<!--   rez_mullerlyer$pred, -->
+<!--   rez_contrast$pred, -->
+<!--   rez_white$pred, -->
+<!--   rez_poggendorff$pred, -->
+<!--   rez_zollner$pred, -->
+<!--   rez_rodframe$pred, -->
+<!--   rez_verticalhorizontal$pred -->
+<!--   ) |>  -->
+<!--   ggplot(aes(x = Illusion_Strength, y = Predicted, group = Illusion_Difference)) + -->
+<!--   geom_ribbon(aes(ymin = CI_low, ymax = CI_high, fill = Illusion_Difference), alpha = 0.2) + -->
+<!--   # geom_vline(xintercept = 0, linetype = "dotted") + -->
+<!--   geom_line(aes(color = Illusion_Difference)) + -->
+<!--   scale_y_continuous(limits = c(0, 1), expand = c(0, 0), labels = scales::percent) + -->
+<!--   scale_x_continuous(expand = c(0, 0)) + -->
+<!--   scale_color_manual(values = colorRampPalette(c("#F44336", "#FFC107", "#4CAF50"))(5)) + -->
+<!--   scale_fill_manual(values = colorRampPalette(c("#F44336", "#FFC107", "#4CAF50"))(5)) + -->
+<!--   theme_modern() + -->
+<!--   labs( -->
+<!--     title = paste0(illusion, " Illusion"), -->
+<!--     color = "Difficulty", fill = "Difficulty", -->
+<!--     y = "Probability of Error", -->
+<!--     x = "Illusion Strength" -->
+<!--   ) + -->
+<!--   theme(plot.title = element_text(face = "bold", hjust = 0.5)) + -->
+<!--   facet_wrap(~Illusion_Type, scales="free") -->
+<!-- ``` -->
+
+#### RT
+
+
+<!-- ```{r message=FALSE, warning=FALSE} -->
+<!-- run_model_rt <- function(df, illusion = "Delboeuf") { -->
+<!--   data <- df |> -->
+<!--     filter(Illusion_Type == illusion) |>  -->
+<!--     mutate(Error = ifelse(Error == 1, "Error", "Correct")) -->
+
+<!--   model <- lme4::lmer( -->
+<!--     RT ~ Error * (Illusion_Difference * Illusion_Strength) + (1 | Participant), -->
+<!--     data = data -->
+<!--   ) -->
+
+<!--   pred <- estimate_relation(model, at = c("Illusion_Strength", "Illusion_Difference", "Error"), length = c(30, 5)) |> -->
+<!--     mutate(Illusion_Difference = as.factor(Illusion_Difference), -->
+<!--            Illusion_Type = illusion) -->
+
+<!--   p <- pred |> -->
+<!--     mutate(Predicted = ifelse(Error == "Error", -Predicted, Predicted)) |>  -->
+<!--     ggplot(aes(x = Illusion_Strength, y = Predicted, group = interaction(Illusion_Difference, Error))) + -->
+<!--     # geom_ribbon(aes(ymin = CI_low, ymax = CI_high, fill = Illusion_Difference), alpha = 0.2) + -->
+<!--     geom_line(aes(color = Illusion_Difference)) + -->
+<!--     scale_y_continuous(expand = c(0, 0)) + -->
+<!--     scale_x_continuous(expand = c(0, 0)) + -->
+<!--     scale_color_manual(values = colorRampPalette(c("#F44336", "#FFC107", "#4CAF50"))(5)) + -->
+<!--     scale_fill_manual(values = colorRampPalette(c("#F44336", "#FFC107", "#4CAF50"))(5)) + -->
+<!--     theme_modern() + -->
+<!--     labs( -->
+<!--       title = paste0(illusion, " Illusion"), -->
+<!--       color = "Difficulty", fill = "Difficulty", -->
+<!--       y = "Reaction Time", -->
+<!--       x = "Illusion Strength" -->
+<!--     ) + -->
+<!--     theme(plot.title = element_text(face = "bold", hjust = 0.5)) -->
+
+
+<!--   list(p = p, model = model, pred = pred) -->
+
+<!-- } -->
+<!-- ``` -->
+<!-- ```{r message=FALSE, warning=FALSE} -->
+<!-- run_model_rt(df, illusion = "Delboeuf")$p -->
+<!-- run_model_rt(df, illusion = "Ebbinghaus")$p -->
+<!-- run_model_rt(df, illusion = "Ponzo")$p -->
+<!-- run_model_rt(df, illusion = "Müller-Lyer")$p -->
+<!-- run_model_rt(df, illusion = "Contrast")$p -->
+<!-- run_model_rt(df, illusion = "White")$p -->
+<!-- run_model_rt(df, illusion = "Poggendorff")$p -->
+<!-- run_model_rt(df, illusion = "Zöllner")$p -->
+<!-- run_model_rt(df, illusion = "Rod-Frame")$p -->
+<!-- run_model_rt(df, illusion = "Vertical-Horizontal")$p -->
+<!-- ``` -->
+
+
+### Inter-Illusion Parameters Standardization
+
+
+
+### Individual Score Approximation
+
+correlation between inter-individual indices extracted from full model with that of individual models (with and without priors)
+
+<!-- ### Drift Model -->
+
+## References

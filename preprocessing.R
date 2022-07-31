@@ -1,65 +1,83 @@
 # Preprocessing Function
-preprocess_IllusionGame <- function(file) {
+preprocess_raw <- function(file) {
 
-  json <- jsonlite::fromJSON(file)
+  data <- read.csv(file)
+
+  # Demographics
+  dem <- data[data$screen == "demographics" & !is.na(data$screen), "response"]
 
   # Info
-  info <- json[json$screen == "participant_info" & !is.na(json$screen), ]
+  info <- data[data$screen == "browser_info" & !is.na(data$screen), ]
 
 
-
-  # Trials
-  trials <- json[!is.na(json$block),]
-
-
-  data <- data.frame(Participant = trials$participant_id,
-                     Date = info$date,
-                     Time = info$time,
-                     Duration = json[json$screen == "final_results" & !is.na(json$screen), "time_elapsed"] / 1000 / 60,
-                     Break_Duration = json[json$screen == "break" & !is.na(json$screen), "rt"] / 1000 / 60,
-                     Screen_Resolution = paste0(trials$screen_width, "x", trials$screen_height),
-                     Screen_Refresh = trials$vsync_rate,
-                     Browser = trials$browser,
-                     Browser_Version = trials$browser_version,
-                     Device = ifelse(trials$mobile == TRUE, "Mobile", "Desktop"),
-                     Device_OS = trials$os,
-                     Illusion_Type = trials$type,
-                     Block = trials$block_number,
-                     Trial = trials$trial_number,
-                     Illusion_Strength = trials$illusion_strength,
-                     Illusion_Side = sign(trials$illusion_difference),
-                     Illusion_Difference = abs(trials$illusion_difference),
-                     Answer = unlist(trials$response),
-                     Error = as.integer(!as.logical(trials$correct)),
-                     ISI = json[json$screen == "fixation" & !is.na(json$screen), "trial_duration"],
-                     RT = trials$rt)
+  trials <- data[data$screen == "Trial", ]
+  df <- data.frame(Participant = trials$participant_id,
+                   Age = as.numeric(jsonlite::fromJSON(dem[1])$age),
+                   Sex = jsonlite::fromJSON(dem[2])$sex,
+                   Education = jsonlite::fromJSON(dem[2])$education,
+                   Nationality = tools::toTitleCase(jsonlite::fromJSON(dem[1])$nationality),
+                   Ethnicity = tools::toTitleCase(jsonlite::fromJSON(dem[1])$ethnicity),
+                   Date = ifelse(is.null(info$date), NA, info$date),
+                   Time = ifelse(is.null(info$time), NA, info$time),
+                   Duration = as.numeric(data[data$screen == "final_results", "time_elapsed"]) / 1000 / 60,
+                   Break_Duration = as.numeric(data[data$screen == "break" & !is.na(data$screen), "rt"]) / 1000 / 60,
+                   Screen_Resolution = paste0(trials$screen_width, "x", trials$screen_height),
+                   Screen_Refresh = trials$vsync_rate,
+                   Browser = trials$browser,
+                   Browser_Version = trials$browser_version,
+                   Device = ifelse(trials$mobile == TRUE, "Mobile", "Desktop"),
+                   Device_OS = trials$os,
+                   Illusion_Type = trials$type,
+                   Block = ifelse(trials$block_number > 10, 2, 1),
+                   Block_Order = as.numeric(trials$block_number),
+                   Trial = as.numeric(trials$trial_number),
+                   Stimulus = gsub(".png", "", gsub("stimuli/", "", trials$stimulus)),
+                   Illusion_Strength = as.numeric(trials$illusion_strength),
+                   Illusion_Side = as.factor(sign(as.numeric(trials$illusion_difference))),
+                   Illusion_Difference = abs(as.numeric(trials$illusion_difference)),
+                   Answer = trials$response,
+                   Error = as.integer(!as.logical(trials$correct)),
+                   ISI = as.numeric(data[data$screen == "fixation" & !is.na(data$screen), "trial_duration"]),
+                   RT = as.numeric(trials$rt))
 
   # Format names
-  data$Illusion_Type <- ifelse(data$Illusion_Type == "MullerLyer", "Müller-Lyer", data$Illusion_Type)
-  data$Illusion_Type <- ifelse(data$Illusion_Type == "Zollner", "Zöllner", data$Illusion_Type)
-  data$Illusion_Type <- ifelse(data$Illusion_Type == "RodFrame", "Rod-Frame", data$Illusion_Type)
-  data$Illusion_Type <- ifelse(data$Illusion_Type == "VerticalHorizontal", "Vertical-Horizontal", data$Illusion_Type)
+  df$Illusion_Type <- ifelse(df$Illusion_Type == "MullerLyer", "Müller-Lyer", df$Illusion_Type)
+  df$Illusion_Type <- ifelse(df$Illusion_Type == "Zollner", "Zöllner", df$Illusion_Type)
+  df$Illusion_Type <- ifelse(df$Illusion_Type == "RodFrame", "Rod-Frame", df$Illusion_Type)
+  df$Illusion_Type <- ifelse(df$Illusion_Type == "VerticalHorizontal", "Vertical-Horizontal", df$Illusion_Type)
 
-  # data$Stimulus <- trials$stimulus |>
-  #                   stringr::str_remove(pattern="stimuli/") |>
-  #                   stringr::str_remove(pattern=".png")
+  # Format education
+  df$Education <- gsub("University (", "", df$Education, fixed = TRUE)
+  df$Education <- gsub(")", "", df$Education, fixed = TRUE)
+  df$Education <- tools::toTitleCase(df$Education)
 
-  data
+  # Standardize demographics
+  # unique(df$Ethnicity)
+  df$Ethnicity <- ifelse(df$Ethnicity %in% c("Hispanic", "Hisapanic"), "Latino", df$Ethnicity)
+  df$Ethnicity <- ifelse(df$Ethnicity %in% c("White Middle European (Slavic)"), "Caucasian", df$Ethnicity)
+
+  df
 }
+
 
 
 # Run ---------------------------------------------------------------------
 
-# Uncomment the lines below to run it.
 
-# files <- list.files(path="data/", pattern = "\\.json$", full.names = TRUE)
-#
-# # Loop over each file and compute function
-# df <- data.frame()
-# for(file in files) df <- rbind(df, preprocess_IllusionGame(file))
-#
-# # Clean dataframe
-# df
+# This is a local folder containing raw data from unzipped pavlovia
+# It has been added to .gitignore to NOT be published on github
+# (it contains the subject ID of the participants)
+participants <- list.files("rawdata/")
+
+
+df <- data.frame()
+for(ppt in participants) {
+  df <- rbind(df, preprocess_raw(file=paste0("rawdata/", ppt)))
+}
+df$Study <- 1  # Study 1
+
+# Save anonmized data
+write.csv(df, "data/study1.csv", row.names = FALSE)
 
 
 
