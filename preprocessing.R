@@ -83,14 +83,18 @@ preprocess_raw <- function(file) {
 # This is a local folder containing raw data from unzipped pavlovia
 # It has been added to .gitignore to NOT be published on github
 # (it contains the subject ID of the participants)
-participants <- list.files("rawdata/")
+participants <- list.files("rawdata/study1/")
 
 
 df <- data.frame()
 for (ppt in participants) {
-  df <- rbind(df, preprocess_raw(file = paste0("rawdata/", ppt)))
+  df <- rbind(df, preprocess_raw(file = paste0("rawdata/study1/", ppt)))
 }
-df$Study <- 1 # Study 1
+
+
+# Study 1
+df$Study <- 1
+df[df$Illusion_Type == "Delboeuf", "Illusion_Difference"] <- sqrt(df[df$Illusion_Type == "Delboeuf", "Illusion_Difference"])
 
 # Save anonmized data
 write.csv(df, "data/study1.csv", row.names = FALSE)
