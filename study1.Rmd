@@ -8,7 +8,8 @@ editor_options:
 
 
 ```{r, echo = FALSE, warning=FALSE, message=FALSE}
-options(digits = 3)
+options(digits = 3,
+        mc.cores = 2)
 
 cache <- FALSE
 fig.width <- see::golden_ratio(7)
@@ -314,7 +315,7 @@ p9 <- plot_waffle(dfsub, "Device_OS") +
 
 
 
-# Results
+# Results {.tabset}
 
 
 ## Delboeuf
@@ -328,7 +329,20 @@ plot_descriptive <- function(data, side="leftright") {
   if(side == "leftright") {
     x <- data[data$Error == 0 & data$Illusion_Side == 1, ]$Answer[1]
     x <- tools::toTitleCase(gsub("arrow", "", x))
-    if(x == "Left") data$Answer <- ifelse(data$Illusion_Side == 1, "Left", "Right")
+    if(x == "Left") {
+      data$Answer <- ifelse(data$Illusion_Side == 1, "Left", "Right")
+    } else {
+      data$Answer <- ifelse(data$Illusion_Side == 1, "Right", "Left")
+    }
+  } else {
+    x <- data[data$Error == 0 & data$Illusion_Side == 1, ]$Answer[1]
+    x <- tools::toTitleCase(gsub("arrow", "", x))
+    if(x == "Up") {
+      data$Answer <- ifelse(data$Illusion_Side == 1, "Up", "Down")
+    } else {
+      data$Answer <- ifelse(data$Illusion_Side == 1, "Down", "Up")
+    }
+    data$Answer <- fct_rev(data$Answer)
   }
   
   dodge1 <- 0.1 * diff(range(data$Illusion_Difference))
@@ -339,7 +353,7 @@ plot_descriptive <- function(data, side="leftright") {
   p1 <- data |> 
     group_by(Illusion_Difference, Illusion_Strength, Answer) |> 
     summarize(Error = mean(Error)) |> 
-    mutate(Illusion_Strength = as.factor(Illusion_Strength)) |> 
+    mutate(Illusion_Strength = as.factor(round(Illusion_Strength, 2))) |> 
     ggplot(aes(x = Illusion_Difference, y = Error)) +
     geom_bar(aes(fill=Illusion_Strength), position = position_dodge(width=dodge1), stat="identity") +
     geom_line(aes(color = Illusion_Strength), position = position_dodge(width=dodge1)) +
@@ -349,7 +363,8 @@ plot_descriptive <- function(data, side="leftright") {
     scale_fill_manual(values = colors) +
     theme_modern() +
     labs(
-      color = "Illusion Strength", fill = "Illusion Strength",
+      color = "Illusion Strength", 
+      fill = "Illusion Strength",
       y = "Probability of Error",
       x = "Task Difficulty"
     ) +
@@ -362,6 +377,7 @@ plot_descriptive <- function(data, side="leftright") {
     summarize(Error = mean(Error)) |> 
     mutate(Illusion_Difference = as.factor(round(Illusion_Difference, 2))) |> 
     ggplot(aes(x = Illusion_Strength, y = Error)) +
+    geom_vline(xintercept=0, linetype="dotted", alpha=0.6) +
     geom_bar(aes(fill=Illusion_Difference), position = position_dodge(width=dodge2), stat="identity") +
     geom_line(aes(color = Illusion_Difference), position = position_dodge(width=dodge2)) +
     scale_y_continuous(limits = c(0, 1), expand = c(0, 0), labels = scales::percent) +
@@ -370,7 +386,8 @@ plot_descriptive <- function(data, side="leftright") {
     scale_fill_manual(values = colors) +
     theme_modern() +
     labs(
-      color = "Task Difficulty", fill = "Task Difficulty",
+      color = "Task Difficulty", 
+      fill = "Task Difficulty",
       y = "Probability of Error",
       x = "Illusion Strength"
     ) +
@@ -379,7 +396,12 @@ plot_descriptive <- function(data, side="leftright") {
   if(side == "leftright") {
     p <- ((p1 + facet_wrap(~Answer, ncol=2, labeller = "label_both")) /
       (p2 + facet_wrap(~Answer, ncol=2, labeller = "label_both"))) + 
-    plot_annotation(title = "Delboeuf Illusion", 
+    plot_annotation(title = paste(data$Illusion_Type[1], "Illusion"), 
+                    theme = theme(plot.title = element_text(face = "bold", hjust = 0.5)))
+  } else {
+    p <- ((p1 + facet_wrap(~Answer, nrow=2, labeller = "label_both")) |
+      (p2 + facet_wrap(~Answer, nrow=2, labeller = "label_both"))) + 
+    plot_annotation(title = paste(data$Illusion_Type[1], "Illusion"), 
                     theme = theme(plot.title = element_text(face = "bold", hjust = 0.5)))
   }
   p
@@ -392,50 +414,58 @@ plot_descriptive(data)
 
 ### Model Selection
 
-```{r message=FALSE, warning=FALSE, cache=cache}
-models <- list()
-for(i in 1:3) {
-  for(j in 1:3) {
-    m <- glmmTMB::glmmTMB(
-      Error ~ poly(Illusion_Difference, i) * poly(Illusion_Strength, j) + 
-        (1 | Participant),
-      data = data,
-      family = "binomial"
-      )
-    if(performance::check_convergence(m)) {
-      models[[paste0("dif", i, "-str", j)]] <- m
-    }
-    # m <- glmmTMB::glmmTMB(
-    #   Error ~ poly(log(Illusion_Difference), i) * poly(Illusion_Strength, j) + 
-    #     (1 | Participant),
-    #   data = data,
-    #   family = "binomial"
-    #   )
-    # if(performance::check_convergence(m)) {
-    #   models[[paste0("dif(log(", i, "))-str", j)]] <- m
-    # }
-    m <- glmmTMB::glmmTMB(
-      Error ~ Illusion_Side * poly(Illusion_Difference, i) * poly(Illusion_Strength, j) + 
-        (1 | Participant),
-      data = data,
-      family = "binomial"
-      )
-    if(performance::check_convergence(m)) {
-      models[[paste0("side-dif", i, "-str", j)]] <- m
+```{r message=FALSE, warning=FALSE, cache=cache,results='hide'}
+best_models <- function(data) {
+  models <- list()
+  for(i in 1:2) {
+    for(j in 1:2) {
+      for(k1 in c("", "_log")) {  # c("", "_log")
+        for(k2 in c("", "_log")) {  # c("", "_log")
+          for(side in c("", "-side")) {
+            name <- paste0("dif", k1, i, "-", "str", k2, j, side)
+            print(name)
+            f <- paste0("poly(Illusion_Difference", 
+                        k1,
+                        ", ",
+                        i,
+                        ") * poly(Illusion_Strength",
+                        k2, 
+                        ", ",
+                        j, 
+                        ") + (1|Participant)")
+            
+            if(side == "-side") f <- paste0("Illusion_Side * ", f)
+            
+            m <- glmmTMB::glmmTMB(as.formula(paste0("Error ~ ", f)), 
+                                  data = data, family = "binomial")
+            if(performance::check_convergence(m)) {
+              models[[name]] <- m
+            }
+          }
+        }
+      }
     }
   }
+
+  to_keep <- compare_performance(models, metrics = c("BIC")) |> 
+    arrange(BIC) |> 
+    slice(1:10) |> 
+    pull(Name)
+  
+  
+  test <- test_performance(models[to_keep], reference=1)
+  perf <- compare_performance(models[to_keep], metrics = c("BIC", "R2")) 
+  
+  merge(perf, test) |> 
+    arrange(BIC) |> 
+    select(Name, BIC, R2_marginal, BF) |> 
+    mutate(BF = insight::format_bf(BF, name=""))
 }
 
-test <- test_performance(models, reference=3)
-perf <- compare_performance(models, metrics = c("BIC", "R2")) 
-
-merge(perf, test) |> 
-  arrange(BIC) |> 
-  select(Name, BIC, R2_marginal, BF) |> 
-  mutate(BF = insight::format_bf(BF, name=""))
+best_models(data)
 ```
 
-### Model
+### Model Visualization
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
 formula <- brms::bf(
@@ -446,8 +476,8 @@ formula <- brms::bf(
 
 model <- brms::brm(formula,
   data = data,
-  algorithm = "meanfield",
-  refresh = 0
+  algorithm = "sampling",
+  refresh = 200
 )
 ```
 
@@ -459,7 +489,7 @@ plot_model <- function(data, model) {
   n_lines <- 5
   pred <- estimate_relation(model,
                             at = c("Illusion_Strength", "Illusion_Difference"),
-                            length = c(5, n_lines)) |>
+                            length = c(25, n_lines)) |>
     mutate(Illusion_Difference = as.factor(round(Illusion_Difference, 2)))
   
   # Set colors for lines
@@ -512,157 +542,16 @@ plot_model(data, model)
 
 
 
-
-
-
-### Parameter 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-## Manipulation Checks {.tabset}
-
-### Illusion Side
-
-We tested whether at illusion strength = 0, no effect of right / left (no bias of illusion at 0).
-
-```{r message=FALSE, warning=FALSE}
-model <- glmmTMB::glmmTMB(Error ~ Illusion_Type / Illusion_Side + (1 | Participant),
-  data = filter(df, Illusion_Strength == 0),
-  family = "binomial"
-)
-
-parameters(model, effects = "fixed") |>
-  tail(10) |> 
-  arrange(p)
-
-# select(filter(df, Error == 0, Illusion_Type == "Müller-Lyer"), Illusion_Side, Answer)
-# select(filter(df, Error == 0, Illusion_Type == "Vertical-Horizontal"), Illusion_Side, Answer)
-# select(filter(df, Error == 0, Illusion_Type == "Zöllner"), Illusion_Side, Answer)
-```
-
-Müller-Lyer: when no illusion, it is easier to answer that the upper line is longer.
-
-### ISI
-
-```{r message=FALSE, warning=FALSE}
-model <- glmmTMB::glmmTMB(Error ~ Illusion_Type / poly(ISI, 2) + (1 | Participant),
-  data = df,
-  family = "binomial"
-)
-
-parameters(model, effects = "fixed") |>
-  tail(20)
-
-# select(filter(df, Error == 0, Illusion_Type == "Müller-Lyer"), Illusion_Side, Answer)
-# select(filter(df, Error == 0, Illusion_Type == "Vertical-Horizontal"), Illusion_Side, Answer)
-# select(filter(df, Error == 0, Illusion_Type == "Zöllner"), Illusion_Side, Answer)
-```
-
-## Full Models
-
-
-### Errors {.tabset}
-
-
-
-
-##### Ebbinghaus
-
-###### Model Selection
-
+### GAM
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
-data <- filter(df, Illusion_Type == "Delboeuf")
-
-models <- list()
-for(i in 1:3) {
-  for(j in 1:3) {
-    m <- glmmTMB::glmmTMB(
-      Error ~ poly(Illusion_Difference, i) * poly(Illusion_Strength, j) + 
-        (1 | Participant),
-      data = data,
-      family = "binomial"
-      )
-    if(performance::check_convergence(m)) {
-      models[[paste0("dif", i, "-str", j)]] <- m
-    }
-    m <- glmmTMB::glmmTMB(
-      Error ~ poly(log(Illusion_Difference), i) * poly(Illusion_Strength, j) + 
-        (1 | Participant),
-      data = data,
-      family = "binomial"
-      )
-    if(performance::check_convergence(m)) {
-      models[[paste0("dif(log(", i, "))-str", j)]] <- m
-    }
-    m <- glmmTMB::glmmTMB(
-      Error ~ poly(sqrt(Illusion_Difference), i) * poly(Illusion_Strength, j) + 
-        (1 | Participant),
-      data = data,
-      family = "binomial"
-      )
-    if(performance::check_convergence(m)) {
-      models[[paste0("dif(sqrt(", i, "))-str", j)]] <- m
-    }
-  }
-}
-
-compare_performance(models, metrics = c("BIC", "R2")) |> 
-  merge(test_performance(models, reference=6)) |> 
-  arrange(BIC) |> 
-  select(Name, BIC, R2_marginal, BF) |> 
-  mutate(BF = insight::format_bf(BF, name=""))
-```
-
-
-
-```{r message=FALSE, warning=FALSE}
-model_errors <- function(df, illusion = "Delboeuf") {
-  data <- filter(df, Illusion_Type == illusion) |>
-    mutate(.dots_side = ifelse(Error == 1, "bottom", "top"))
-
-  if (illusion == "Müller-Lyer") {
-    formula <- brms::bf(
-      # Error ~ t2(Illusion_Difference, Illusion_Strength, k = 4) + (1 | Participant),
-      # Error ~ s(Illusion_Strength, by=Illusion_Difference, k = 7) + (1 | Participant),
-      Error ~ poly(Illusion_Difference, 3) * poly(Illusion_Strength, 3) * Illusion_Side + 
-        (1 | Participant),
-      family = "bernoulli"
-    )
-  } else {
-    formula <- brms::bf(
-      # Error ~ t2(Illusion_Difference, Illusion_Strength, k = 4) + (1 | Participant),
-      # Error ~ s(Illusion_Strength, by=Illusion_Difference, k = 7) + (1 | Participant),
-      Error ~ poly(Illusion_Difference, 3) * poly(Illusion_Strength, 3) + 
-        (1 | Participant),
-      family = "bernoulli"
-    )
-  }
+make_gam <- function(data) {
+  
+  formula <- brms::bf(
+    Error ~ t2(Illusion_Difference, Illusion_Strength, bs = "cr", k=4) + 
+      ((1 + Illusion_Difference + Illusion_Strength) | Participant),
+    family = "bernoulli"
+  )
 
   model <- brms::brm(formula,
     data = data,
@@ -670,85 +559,594 @@ model_errors <- function(df, illusion = "Delboeuf") {
     refresh = 0
   )
   
-  # model <- glmmTMB::glmmTMB(
-  #   Error ~ Illusion_Difference * Illusion_Strength + (1 | Participant),
-  #   data = data,
-  #   family = "binomial"
-  # )
-  # model <- mgcv::gamm(
-  #   # Error ~ s(Illusion_Difference, by = Illusion_Strength, k = 4),
-  #   Error ~ t2(Illusion_Difference, Illusion_Strength, k = 4),
-  #   random = list(Participant = ~1),
-  #   data = data,
-  #   family = "binomial"
-  # )
-  # model <- glmmTMB::glmmTMB(
-  #   # Error ~ s(Illusion_Difference, by = Illusion_Strength, k = 4),
-  #   Error ~ poly(Illusion_Difference, 2) * poly(Illusion_Strength, 2) * Illusion_Side + (1 | Participant),
-  #   data = data,
-  #   family = "binomial"
-  # )
-
-  n_lines <- 5
-  pred <- estimate_relation(model,
-                            at = c("Illusion_Strength", "Illusion_Difference"),
-                            # at = list(Illusion_Strength = unique(data$Illusion_Strength), Illusion_Difference = unique(data$Illusion_Difference)), 
-                            length = c(5, n_lines)) |>
-    mutate(
-      Illusion_Difference = as.factor(Illusion_Difference),
-      Illusion_Type = illusion
-    )
-  
-  # Set colors for lines
-  colors <- colorRampPalette(c("#F44336", "#FFC107", "#4CAF50"))(n_lines)
-  diffvals <- as.numeric(as.character(unique(sort(pred$Illusion_Difference))))
-  names(colors) <- diffvals
-  
-  # Assign color from the same palette to every observation of data (for geom_dots)
-  data$color <- colors[as.character(diffvals[max.col(-abs(outer(data$Illusion_Difference, diffvals, "-")))])]
-  
-  # Manual jittering
-  xrange <- 0.05*diff(range(data$Illusion_Strength))
-  data$x <- data$Illusion_Strength 
-  data$x[data$x > 0] <- data$x[data$x > 0] - runif(sum(data$x > 0), 0, xrange)
-  data$x[data$x < 0] <- data$x[data$x < 0] + runif(sum(data$x < 0), 0, xrange)
-  data$x[round(data$x, 2) == 0] <- data$x[round(data$x, 2) == 0] + runif(sum(round(data$x, 2) == 0), -xrange/2, xrange/2)
-  
-  
-  p <- pred |>
-    ggplot(aes(x = Illusion_Strength, y = Predicted)) +
-    geom_dots(
-      data = mutate(data, Illusion_Strength = round(Illusion_Strength, 1)),
-      aes(x=x, y = Error, group = Error, side = .dots_side), fill = data$color,
-      color = NA, alpha=0.5) +
-    # geom_dots(
-    #   data = mutate(data, Illusion_Strength = round(Illusion_Strength, 1)),
-    #   aes(y = Error, group = Error, side = .dots_side),
-    #   fill = ifelse(data$Error == 1, "red", "green"), color = NA, alpha=0.2,
-    #   position = position_jitter(width=0.05*diff(range(data$Illusion_Strength)), height=0)
-    # ) +
-    geom_slab(data=data, aes(y = Error)) +
-    geom_ribbon(aes(ymin = CI_low, ymax = CI_high, fill = Illusion_Difference, group = Illusion_Difference), alpha = 0.2) +
-    geom_vline(xintercept = 0, linetype = "dashed") +
-    geom_hline(yintercept = c(0.05, 0.5, 0.95), linetype = "dotted", alpha = 0.5) +
-    geom_line(aes(color = Illusion_Difference, group = Illusion_Difference)) +
-    scale_y_continuous(limits = c(0, 1), expand = c(0, 0), labels = scales::percent) +
-    scale_x_continuous(expand = c(0, 0)) +
-    scale_color_manual(values = colors) +
-    scale_fill_manual(values = colors) +
-    theme_modern() +
-    labs(
-      title = paste0(illusion, " Illusion"),
-      color = "Difficulty", fill = "Difficulty",
-      y = "Probability of Error",
-      x = "Illusion Strength"
-    ) +
-    theme(plot.title = element_text(face = "bold", hjust = 0.5))
-
-
-  list(p = p, model = model, pred = pred)
+  list(p = plot_model(data, model), model = model)
 }
+
+gam <- make_gam(data)
+gam$p
 ```
 
 
-## References
+
+
+### Parameter Standardization
+
+
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+std_params <- function(model, min=0, max=1) {
+  estimate_relation(
+  model,
+    at = list(Illusion_Strength = c(0), 
+              Illusion_Difference = seq(min, max, length.out=500)),
+    ) |> 
+    select(Illusion_Strength, Illusion_Difference, Error = Predicted) |> 
+    slice(c(which.min(abs(Error - 0.005)), 
+            which.min(abs(Error - 0.025)), 
+            which.min(abs(Error - 0.25)))) |> 
+    mutate(Error = insight::format_value(Error, as_percent=TRUE))
+}
+
+range(data$Illusion_Difference)
+range(data$Illusion_Strength)
+
+std_params(model)
+std_params(gam$model)
+```
+
+
+
+
+
+
+
+
+## Ebbinghaus
+
+
+### Descriptive
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+data <- filter(df, Illusion_Type == "Ebbinghaus")
+
+plot_descriptive(data)
+```
+
+
+### Model Selection
+
+```{r message=FALSE, warning=FALSE, cache=cache,results='hide'}
+best_models(data)
+```
+
+
+### Model Visualization
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+formula <- brms::bf(
+  Error ~ Illusion_Difference * poly(Illusion_Strength, 2) + 
+    ((1 + Illusion_Difference + Illusion_Strength) | Participant),
+  family = "bernoulli"
+)
+
+model <- brms::brm(formula,
+  data = data,
+  algorithm = "meanfield",
+  refresh = 0
+)
+```
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+plot_model(data, model)
+```
+
+### GAM
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+gam <- make_gam(data)
+gam$p
+```
+
+### Parameter Standardization
+
+
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+range(data$Illusion_Difference)
+range(data$Illusion_Strength)
+
+std_params(model)
+std_params(gam$model)
+```
+
+
+
+## Rod and Frame
+
+
+### Descriptive
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+data <- filter(df, Illusion_Type == "Rod-Frame")
+
+plot_descriptive(data)
+```
+
+
+### Model Selection
+
+```{r message=FALSE, warning=FALSE, cache=cache,results='hide'}
+best_models(data)
+```
+
+
+### Model Visualization
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+formula <- brms::bf(
+  Error ~ poly(Illusion_Difference, 2) * Illusion_Strength + 
+    ((1 + Illusion_Difference + Illusion_Strength) | Participant),
+  family = "bernoulli"
+)
+
+model <- brms::brm(formula,
+  data = data,
+  algorithm = "meanfield",
+  refresh = 0
+)
+```
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+plot_model(data, model)
+```
+
+
+### GAM
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+gam <- make_gam(data)
+gam$p
+```
+
+
+### Parameter Standardization
+
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+range(data$Illusion_Difference)
+range(data$Illusion_Strength)
+unique(data$Illusion_Strength)
+
+std_params(model, min=0.01, max=12)
+std_params(gam$model, min=0.01, max=12)
+```
+
+
+## Vertical-Horizontal
+
+
+### Descriptive
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+data <- filter(df, Illusion_Type == "Vertical-Horizontal")
+
+plot_descriptive(data)
+```
+
+
+### Model Selection
+
+```{r message=FALSE, warning=FALSE, cache=cache,results='hide'}
+best_models(data)
+```
+
+
+### Model Visualization
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+formula <- brms::bf(
+  Error ~ Illusion_Difference * poly(Illusion_Strength, 2) + 
+    ((1 + Illusion_Difference + Illusion_Strength) | Participant),
+  family = "bernoulli"
+)
+
+model <- brms::brm(formula,
+  data = data,
+  algorithm = "meanfield",
+  refresh = 0
+)
+```
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+plot_model(data, model)
+```
+
+
+### GAM
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+gam <- make_gam(data)
+gam$p
+```
+
+
+### Parameter Standardization
+
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+range(data$Illusion_Difference)
+range(data$Illusion_Strength)
+unique(data$Illusion_Strength)
+
+std_params(model, min=0, max=0.40)
+std_params(gam$model, min=0, max=0.40)
+```
+
+
+
+## Zöllner
+
+
+### Descriptive
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+data <- filter(df, Illusion_Type == "Zöllner")
+
+plot_descriptive(data)
+
+data <- filter(data, abs(Illusion_Strength) < 45)
+
+plot_descriptive(data)
+```
+
+
+### Model Visualization
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+# model <- glmmTMB::glmmTMB(
+#   Error ~ poly(Illusion_Difference, 2) * Illusion_Strength + 
+#     ((1 + Illusion_Difference + Illusion_Strength) | Participant),
+#   family = "binomial",
+#   data=data
+# )
+
+formula <- brms::bf(
+  Error ~ poly(Illusion_Difference, 2) * Illusion_Strength + 
+    ((1 + Illusion_Difference + Illusion_Strength) | Participant),
+  family = "bernoulli"
+)
+
+model <- brms::brm(formula,
+  data = data,
+  algorithm = "meanfield",
+  refresh = 0
+)
+```
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+plot_model(data, model)
+```
+
+
+
+### Parameter Standardization
+
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+range(data$Illusion_Difference)
+range(data$Illusion_Strength)
+
+std_params(model, min=0, max=5)
+```
+
+
+## White
+
+
+### Descriptive
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+data <- filter(df, Illusion_Type == "White")
+
+plot_descriptive(data)
+```
+
+
+### Model Selection
+
+```{r message=FALSE, warning=FALSE, cache=cache,results='hide'}
+best_models(data)
+```
+
+
+### Model Visualization
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+formula <- brms::bf(
+  Error ~ Illusion_Difference * poly(Illusion_Strength, 2) + 
+    ((1 + Illusion_Difference + Illusion_Strength) | Participant),
+  family = "bernoulli"
+)
+
+model <- brms::brm(formula,
+  data = data,
+  algorithm = "meanfield",
+  refresh = 0
+)
+```
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+plot_model(data, model)
+```
+
+
+### GAM
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+gam <- make_gam(data)
+gam$p
+```
+
+
+### Parameter Standardization
+
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+range(data$Illusion_Difference)
+range(data$Illusion_Strength)
+unique(data$Illusion_Strength)
+
+std_params(model, min=0, max=20)
+std_params(gam$model, min=0, max=20)
+```
+
+
+
+## Ponzo
+
+### Descriptive
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+data <- filter(df, Illusion_Type == "Ponzo")
+
+plot_descriptive(data, side = "updown")
+```
+
+
+
+### Model Selection
+
+```{r message=FALSE, warning=FALSE, cache=cache,results='hide'}
+best_models(data)
+```
+
+
+### Model Visualization
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+formula <- brms::bf(
+  Error ~ Illusion_Difference * poly(Illusion_Strength, 2) + 
+    ((1 + Illusion_Difference + Illusion_Strength) | Participant),
+  family = "bernoulli"
+)
+
+model <- brms::brm(formula,
+  data = data,
+  algorithm = "meanfield",
+  refresh = 0
+)
+```
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+plot_model(data, model)
+```
+
+
+### GAM
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+gam <- make_gam(data)
+gam$p
+```
+
+
+### Parameter Standardization
+
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+range(data$Illusion_Difference)
+range(data$Illusion_Strength)
+
+std_params(model, min=0, max=20)
+std_params(gam$model, min=0, max=20)
+```
+
+
+
+## Müller-Lyer
+
+### Descriptive
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+data <- filter(df, Illusion_Type == "Müller-Lyer")
+
+plot_descriptive(data, side = "updown")
+```
+
+
+
+### Model Selection
+
+```{r message=FALSE, warning=FALSE, cache=cache,results='hide'}
+best_models(data)
+```
+
+
+### Model Visualization
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+formula <- brms::bf(
+  Error ~ Illusion_Difference * poly(Illusion_Strength, 2) + 
+    ((1 + Illusion_Difference + Illusion_Strength) | Participant),
+  family = "bernoulli"
+)
+
+model <- brms::brm(formula,
+  data = data,
+  algorithm = "meanfield",
+  refresh = 0
+)
+```
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+plot_model(data, model)
+```
+
+
+### GAM
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+gam <- make_gam(data)
+gam$p
+```
+
+
+### Parameter Standardization
+
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+range(data$Illusion_Difference)
+range(data$Illusion_Strength)
+
+std_params(model, min=0, max=0.6)
+std_params(gam$model, min=0, max=0.6)
+```
+
+
+## Poggendorff
+
+### Descriptive
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+data <- filter(df, Illusion_Type == "Poggendorff")
+
+plot_descriptive(data, side = "updown")
+```
+
+
+
+### Model Selection
+
+```{r message=FALSE, warning=FALSE, cache=cache,results='hide'}
+best_models(data)
+```
+
+
+### Model Visualization
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+formula <- brms::bf(
+  Error ~ Illusion_Side * Illusion_Difference * poly(Illusion_Strength, 2) + 
+    ((1 + Illusion_Side + Illusion_Difference + Illusion_Strength) | Participant),
+  family = "bernoulli"
+)
+
+model <- brms::brm(formula,
+  data = data,
+  algorithm = "meanfield",
+  refresh = 0
+)
+
+parameters::parameters(model)
+```
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+plot_model(data, model)
+```
+
+
+### GAM
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+gam <- make_gam(data)
+gam$p
+```
+
+
+### Parameter Standardization
+
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+range(data$Illusion_Difference)
+range(data$Illusion_Strength)
+
+std_params(model, min=0, max=0.5)
+std_params(gam$model, min=0, max=0.5)
+```
+
+
+
+## Contrast
+
+### Descriptive
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+data <- filter(df, Illusion_Type == "Contrast")
+
+plot_descriptive(data, side = "updown")
+```
+
+
+
+### Model Selection
+
+```{r message=FALSE, warning=FALSE, cache=cache,results='hide'}
+best_models(data)
+```
+
+
+### Model Visualization
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+formula <- brms::bf(
+  Error ~ Illusion_Difference * poly(Illusion_Strength, 2) + 
+    ((1 + Illusion_Difference + Illusion_Strength) | Participant),
+  family = "bernoulli"
+)
+
+model <- brms::brm(formula,
+  data = data,
+  algorithm = "meanfield",
+  refresh = 0
+)
+```
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+plot_model(data, model)
+```
+
+
+### GAM
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+gam <- make_gam(data)
+gam$p
+```
+
+
+### Parameter Standardization
+
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+range(data$Illusion_Difference)
+range(data$Illusion_Strength)
+
+std_params(model, min=0, max=25)
+std_params(gam$model, min=0, max=25)
+```
+
+
+## Discussion
+
+This study allowed to elaborate a more precise prior idea regarding the magnitude of the effects at stake and the type of interaction between them. Crucially, it allowed us to refine the range of task difficulty and illusion strength for the stimuli of the next study to maximize the information gain.
+

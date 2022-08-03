@@ -83,18 +83,30 @@ preprocess_raw <- function(file) {
 # This is a local folder containing raw data from unzipped pavlovia
 # It has been added to .gitignore to NOT be published on github
 # (it contains the subject ID of the participants)
-participants <- list.files("rawdata/study1/")
+participants <- list.files("study1/rawdata/")
 
 
 df <- data.frame()
 for (ppt in participants) {
-  df <- rbind(df, preprocess_raw(file = paste0("rawdata/study1/", ppt)))
+  df <- rbind(df, preprocess_raw(file = paste0("study1/rawdata/", ppt)))
 }
-
 
 # Study 1
 df$Study <- 1
+df$Pyllusion <- "1.1"
 df[df$Illusion_Type == "Delboeuf", "Illusion_Difference"] <- sqrt(df[df$Illusion_Type == "Delboeuf", "Illusion_Difference"])
+df[df$Illusion_Type == "Ebbinghaus", "Illusion_Difference"] <- sqrt(df[df$Illusion_Type == "Ebbinghaus", "Illusion_Difference"])
+df[df$Illusion_Type == "Rod-Frame", "Illusion_Strength"] <- -1 * (df[df$Illusion_Type == "Rod-Frame", "Illusion_Strength"])
+df[df$Illusion_Type == "Zöllner", "Illusion_Strength"] <- -1 * (df[df$Illusion_Type == "Zöllner", "Illusion_Strength"])
+
+
+
+
+
+
+# Transformation
+df$Illusion_Difference_log <- log(1 + df$Illusion_Difference)
+df$Illusion_Strength_log <- sign(df$Illusion_Strength) * log(1 + abs(df$Illusion_Strength))
 
 # Save anonmized data
 write.csv(df, "data/study1.csv", row.names = FALSE)
