@@ -229,6 +229,7 @@ function create_debrief(illusion_name = "Ponzo") {
     var debrief = {
         type: jsPsychHtmlButtonResponse,
         choices: ["Continue"],
+        post_trial_gap: 500,
         on_start: function () {
             ;(document.body.style.cursor = "auto"),
                 (document.querySelector(
@@ -266,7 +267,7 @@ function create_debrief(illusion_name = "Ponzo") {
 }
 
 // Debrief
-function make_trial(instructions, illusion_name, type) {
+function make_trial(stimuli, instructions, illusion_name, type) {
     var timeline = []
 
     // Set stimuli (var stimuli is loaded in stimuli/stimuli.js)
@@ -310,17 +311,159 @@ function make_trial(instructions, illusion_name, type) {
     return timeline
 }
 
-// Get random subset of elements from an array
-function getRandom(arr, n) {
-    var result = new Array(n),
-        len = arr.length,
-        taken = new Array(len);
-    if (n > len)
-        throw new RangeError("getRandom: more elements taken than available");
-    while (n--) {
-        var x = Math.floor(Math.random() * len);
-        result[n] = arr[x in taken ? taken[x] : x];
-        taken[x] = --len in taken ? taken[len] : len;
-    }
-    return result;
+function make_practice(instructions, illusion_name, type) {
+    var timeline = []
+
+    // Set stimuli
+    var stim_list = stimuli_training.filter(
+        (stimuli_training) => stimuli_training.Illusion_Type === illusion_name
+    )
+
+    // Preload images
+    timeline.push({
+        type: jsPsychPreload,
+        images: stim_list.map((a) => a.stimulus),
+    })
+
+    // Instructions
+    timeline.push({
+        type: jsPsychHtmlKeyboardResponse,
+        on_start: function () {
+            ;(document.body.style.cursor = "none"),
+                (document.querySelector(
+                    "#jspsych-progressbar-container"
+                ).style.display = "none")
+        },
+        choices: ["enter"],
+        stimulus: instructions,
+        post_trial_gap: 500,
+    })
+
+    // Define trial
+    var trial = create_trial(illusion_name, (type = type))
+
+    // Create Trials timeline
+    timeline.push({
+        timeline: [fixation, trial],
+        timeline_variables: stim_list,
+        randomize_order: true,
+        repetitions: 1,
+    })
+
+    // Debriefing Information
+    timeline.push({
+        type: jsPsychHtmlButtonResponse,
+        choices: ["Continue"],
+        post_trial_gap: 500,
+        on_start: function () {
+            ;(document.body.style.cursor = "auto"),
+                (document.querySelector(
+                    "#jspsych-progressbar-container"
+                ).style.display = "inline")
+        },
+        stimulus: "<p>Great job!</p>" +
+        "<p>Click NEXT when you're ready for the next illusion practice.</p>",
+        data: { screen: "practice_block" },
+    })
+    return timeline
 }
+
+// Instructions for Illusion Trials
+const delboeuf_instructions =
+        "<p>In this part, two red circles will appear side by side on the screen.</p>" +
+        "<p>Your task is to select which <b>red circle is bigger</b> in size as fast as you can, without making errors.</p>" +
+        "<p>Don't get distracted by the black outlines around the red circles!</p>" +
+        "<p>Press <b>the LEFT or the RIGHT arrow</b> to indicate which is the bigger <b>red circle.</b></p>" +
+        "<div style='float: center'><img src='utils/stimuli_demo/Delboeuf_Demo.png' height='300'></img>" +
+        "<p><img src='utils/answer/answer_leftright_keyboard.PNG' height='150'></img></p>" +
+        "<p class='small'>In this example, the correct answer is the <b>LEFT arrow</b>.</p></div>" +
+        "<p>Are you ready? <b>Press ENTER to start</b></p>"
+
+const mullerlyer_instructions =
+        "<p>In this part, two horizontal red lines will appear one above the other.</p>" +
+        "<p>Your task is to select which <b>line is longer</b> in length as fast as you can, without making errors.</p>" +
+        "<p>Don't get distracted by the surrounding black arrows at the end of the red lines!</p>" +
+        "<p>Press <b>the UP or the DOWN arrow</b> to indicate where is the longer <b>red line.</b></p>" +
+        "<div style='float: center'><img src='utils/stimuli_demo/MullerLyer_Demo.png' height='300'></img>" +
+        "<p><img src='utils/answer/answer_updown_keyboard.PNG' height='150'></img></p>" +
+        "<p class='small'>In this example, the correct answer is the <b>UP arrow</b>.</p></div>" +
+        "<p>Are you ready? <b>Press ENTER to start</b></p>"
+
+const ebbinghaus_instructions =
+        "<p>In this part, two red circles will appear side by side on the screen.</p>" +
+        "<p>Your task is to select which <b>red circle is bigger</b> in size as fast as you can, without making errors.</p>" +
+        "<p>Don't get distracted by the surrounding black circles around the red circles!</p>" +
+        "<p>Press <b>the LEFT or the RIGHT arrow</b> to indicate which is the bigger <b>red circle.</b></p>" +
+        "<div style='float: center'><img src='utils/stimuli_demo/Ebbinghaus_Demo.png' height='300'></img>" +
+        "<p><img src='utils/answer/answer_leftright_keyboard.PNG' height='150'></img></p>" +
+        "<p class='small'>In this example, the correct answer is the <b>LEFT arrow</b>.</p></div>" +
+        "<p>Are you ready? <b>Press ENTER to start</b></p>"
+
+const ponzo_instructions =
+        "<p>In this part, two horizontal red lines will appear one above the other.</p>" +
+        "<p>Your task is to select which <b>line is longer</b> in length as fast as you can, without making errors.</p>" +
+        "<p>Don't get distracted by the surrounding black lines!</p>" +
+        "<p>Press <b>the UP or the DOWN arrow</b> to indicate which is the longer <b>red line.</b></p>" +
+        "<div style='float: center'><img src='utils/stimuli_demo/Ponzo_Demo.png' height='300'></img>" +
+        "<p><img src='utils/answer/answer_updown_keyboard.PNG' height='150'></img></p>" +
+        "<p class='small'>In this example, the correct answer is the <b>UP arrow</b>.</p></div>" +
+        "<p>Are you ready? <b>Press ENTER to start</b></p>"
+
+const zollner_instructions =
+        "<p>In this part, two horizontal red lines will appear one above the other.</p>" +
+        "<p>Your task is to tell <b>the direction</b> towards which the red lines are converging, as fast as you can, and without making errors.</p>" +
+        "<p>Don't get distracted by the black lines!</p>" +
+        "<p>Press <b>the LEFT or the RIGHT arrow</b> to indicate the <b>direction where the red lines are pointing.</b></p>" +
+        "<div style='float: center'><img src='utils/stimuli_demo/Zollner_Demo.png' height='300'></img>" +
+        "<p><img src='utils/answer/answer_leftright_keyboard.PNG' height='150'></img></p>" +
+        "<p class='small'>In this example, the correct answer is the <b>LEFT arrow</b>.</p></div>" +
+        "<p>Are you ready? <b>Press ENTER to start</b></p>"
+
+const contrast_instructions =
+        "<p>In this part, two small grey rectangles will appear one above the other.</p>" +
+        "<p>Your task is to select which rectangle is <b>lighter</b> in colour as fast as you can, without making errors.</p>" +
+        "<p>Don't get distracted by the surrounding background!</p>" +
+        "<p>Press <b>the UP or the DOWN arrow</b> to indicate which is the <b>lighter rectangle.</b></p>" +
+        "<div style='float: center'><img src='utils/stimuli_demo/Contrast_Demo.png' height='300'></img>" +
+        "<p><img src='utils/answer/answer_updown_keyboard.PNG' height='150'></img></p>" +
+        "<p class='small'>In this example, the correct answer is the <b>UP arrow</b>.</p></div>" +
+        "<p>Are you ready? <b>Press ENTER to start</b></p>"
+
+const rodframe_instructions =
+        "<p>In this part, one vertical red line will appear in a square.</p>" +
+        "<p>Your task is to tell <b>which direction</b> the red line is leaning towards, as fast as you can, and without making errors.</p>" +
+        "<p>Don't get distracted by the black square!</p>" +
+        "<p>Press <b>the LEFT or the RIGHT arrow</b> to indicate the <b>direction where the red line is leaning towards.</b></p>" +
+        "<div style='float: center'><img src='utils/stimuli_demo/RodFrame_Demo.png' height='300'></img>" +
+        "<p><img src='utils/answer/answer_leftright_keyboard.PNG' height='150'></img></p>" +
+        "<p class='small'>In this example, the correct answer is the <b>LEFT arrow</b>.</p></div>" +
+        "<p>Are you ready? <b>Press ENTER to start</b></p>"
+
+const poggendorff_instructions =
+        "<p>In this part, two parallel red lines will appear, but they are partially hidden by a grey rectangle.</p>" +
+        "<p>Your task is to tell if the <b>red line to the right</b> of the rectangle is above or below the line to the left. You need to answer as fast as you can, without making errors.</p>" +
+        "<p>Press <b>the UP or the DOWN arrow</b> to indicate whether the <b>right red line is actually above or below the left red line.</b></p>" +
+        "<div style='float: center'><img src='utils/stimuli_demo/Poggendorff_Demo.png' height='300'></img>" +
+        "<p><img src='utils/answer/answer_updown_keyboard.PNG' height='150'></img></p>" +
+        "<p class='small'>In this example, the correct answer is the <b>UP arrow</b>.</p></div>" +
+        "<p>Are you ready? <b>Press ENTER to start</b></p>"
+
+const white_instructions =
+        "<p>In this part, two vertical grey rectangles will appear side by side.</p>" +
+        "<p>Your task is to tell <b>which rectangle is of a lighter color</b>, as fast as you can, and without making errors.</p>" +
+        "<p>Don't get distracted by the background color!</p>" +
+        "<p>Press <b>the LEFT or the RIGHT arrow</b> to indicate which <b>side has the lighter grey rectangle.</b></p>" +
+        "<div style='float: center'><img src='utils/stimuli_demo/White_Demo.png' height='300'></img>" +
+        "<p><img src='utils/answer/answer_leftright_keyboard.PNG' height='150'></img></p>" +
+        "<p class='small'>In this example, the correct answer is the <b>LEFT arrow</b>.</p></div>" +
+        "<p>Are you ready? <b>Press ENTER to start</b></p>"
+
+const verticalhorizontal_instructions =
+        "<p>In this part, two red lines will appear side by side.</p>" +
+        "<p>Your task is to tell <b>which line is longer</b> in length as fast as you can, and without making errors.</p>" +
+        "<p>Don't get distracted by the orientation of the lines!</p>" +
+        "<p>Press <b>the LEFT or the RIGHT arrow</b> to indicate which <b>line is the longer one.</b></p>" +
+        "<div style='float: center'><img src='utils/stimuli_demo/VerticalHorizontal_Demo.png' height='300'></img>" +
+        "<p><img src='utils/answer/answer_leftright_keyboard.PNG' height='150'></img></p>" +
+        "<p class='small'>In this example, the correct answer is the <b>LEFT arrow</b>.</p></div>" +
+        "<p>Are you ready? <b>Press ENTER to start</b></p>"
