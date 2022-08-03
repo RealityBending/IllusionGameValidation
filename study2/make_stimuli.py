@@ -123,7 +123,7 @@ def doublelinspace(mini=0.1, maxi=1, size=6, exp=False):
 # =============================================================================
 # Make Stimuli
 # =============================================================================
-data_example = []
+data_training = []
 data_block1 = []
 data_block2 = []
 
@@ -138,8 +138,8 @@ strengths = np.linspace(-0.7, 0.7, n - 1)
 diff1 = doublelinspace(mini=0.3, maxi=0.9, size=n // 2)
 diff2 = doublelinspace(mini=0.2, maxi=0.8, size=n // 2)
 
-data_example = generate_images(
-    data_example,
+data_training = generate_images(
+    data_training,
     # strengths=strengths[0 : : (n // 2) - 1],
     strengths=strengths[2 : -2 : (n // 2) - 3],
     differences=[-1, 1],
@@ -179,8 +179,8 @@ diff1 = doublelinspace(mini=0.3, maxi=0.9, size=n // 2)
 diff2 = doublelinspace(mini=0.2, maxi=0.8, size=n // 2)
 
 
-data_example = generate_images(
-    data_example,
+data_training = generate_images(
+    data_training,
     # strengths=strengths[0 : : (n // 2) - 1],
     strengths=strengths[2 : -2 : (n // 2) - 3],
     differences=[-0.8, 0.8],
@@ -219,8 +219,8 @@ diff1 = doublelinspace(mini=1.1, maxi=7.1, size=n // 2)
 diff2 = doublelinspace(mini=0.1, maxi=6.1, size=n // 2)
 
 
-data_example = generate_images(
-    data_example,
+data_training = generate_images(
+    data_training,
     # strengths=strengths[0 : : (n // 2) - 1],
     strengths=strengths[2 : -2 : (n // 2) - 3],
     differences=[-12, 12],
@@ -255,8 +255,8 @@ diff1 = doublelinspace(mini=0.06, maxi=0.24, size=n // 2)
 diff2 = doublelinspace(mini=0.03, maxi=0.21, size=n // 2)
 
 
-data_example = generate_images(
-    data_example,
+data_training = generate_images(
+    data_training,
     # strengths=strengths[0 : : (n // 2) - 1],
     strengths=strengths[2 : -2 : (n // 2) - 3],
     differences=[-0.4, 0.4],
@@ -291,8 +291,8 @@ diff1 = doublelinspace(mini=0.7, maxi=4.3, size=n // 2)
 diff2 = doublelinspace(mini=0.1, maxi=3.7, size=n // 2)
 
 
-data_example = generate_images(
-    data_example,
+data_training = generate_images(
+    data_training,
     # strengths=strengths[0 : : (n // 2) - 1],
     strengths=strengths[2 : -2 : (n // 2) - 3],
     differences=[-6, 6],
@@ -328,8 +328,8 @@ diff1 = doublelinspace(mini=5, maxi=17, size=n // 2)
 diff2 = doublelinspace(mini=3, maxi=15, size=n // 2)
 
 
-data_example = generate_images(
-    data_example,
+data_training = generate_images(
+    data_training,
     # strengths=strengths[0 : : (n // 2) - 1],
     strengths=strengths[2 : -2 : (n // 2) - 3],
     differences=[-20, 20],
@@ -366,8 +366,8 @@ diff1 = doublelinspace(mini=0.1, maxi=0.46, size=n // 2)
 diff2 = doublelinspace(mini=0.04, maxi=0.4, size=n // 2)
 
 
-data_example = generate_images(
-    data_example,
+data_training = generate_images(
+    data_training,
     # strengths=strengths[0 : : (n // 2) - 1],
     strengths=strengths[2 : -2 : (n // 2) - 3],
     differences=[-0.6, 0.6],
@@ -404,8 +404,8 @@ diff1 = doublelinspace(mini=0.09, maxi=0.39, size=n // 2)
 diff2 = doublelinspace(mini=0.04, maxi=0.34, size=n // 2)
 
 
-data_example = generate_images(
-    data_example,
+data_training = generate_images(
+    data_training,
     # strengths=strengths[0 : : (n // 2) - 1],
     strengths=strengths[2 : -2 : (n // 2) - 3],
     differences=[-0.6, 0.6],
@@ -442,8 +442,8 @@ diff1 = doublelinspace(mini=0.06, maxi=0.3, size=n // 2)
 diff2 = doublelinspace(mini=0.02, maxi=0.26, size=n // 2)
 
 
-data_example = generate_images(
-    data_example,
+data_training = generate_images(
+    data_training,
     # strengths=strengths[0 : : (n // 2) - 1],
     strengths=strengths[2 : -2 : (n // 2) - 3],
     differences=[-0.4, 0.4],
@@ -480,8 +480,8 @@ diff1 = doublelinspace(mini=5, maxi=20, size=n // 2)
 diff2 = doublelinspace(mini=2.5, maxi=17.5, size=n // 2)
 
 
-data_example = generate_images(
-    data_example,
+data_training = generate_images(
+    data_training,
     # strengths=strengths[0 : : (n // 2) - 1],
     strengths=strengths[2 : -2 : (n // 2) - 3],
     differences=[-25, 25],
@@ -507,6 +507,6 @@ data_block2 = generate_images(
 
 
 # -------------------------- Save data --------------------------
-save_json(data_example, name="stimuli_example")
-save_json(data_example, name="stimuli_part1")
-save_json(data_example, name="stimuli_part2")
+save_json(data_training, name="stimuli_training")
+save_json(data_training, name="stimuli_part1")
+save_json(data_training, name="stimuli_part2")
