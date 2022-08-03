@@ -507,7 +507,9 @@ plot_model <- function(data, model) {
   names(colors) <- diffvals
   
   # Assign color from the same palette to every observation of data (for geom_dots)
-  data$color <- colors[as.character(diffvals[max.col(-abs(outer(data$Illusion_Difference, diffvals, "-")))])]
+  closest <- diffvals[max.col(-abs(outer(data$Illusion_Difference, diffvals, "-")))]
+  data$color <- colors[as.character(closest)]
+  data$color <- fct_reorder(data$color, closest)
   
   # Manual jittering
   xrange <- 0.05*diff(range(data$Illusion_Strength))
@@ -522,7 +524,7 @@ plot_model <- function(data, model) {
     geom_dots(
       data = mutate(data, 
                     Illusion_Strength = round(Illusion_Strength, 1)),
-      aes(x=x, y = Error, group = Error, side = .dots_side), 
+      aes(x=x, y = Error, group = Error, side = .dots_side, order=color), 
       fill = data$color,
       color = NA, 
       alpha=0.5) +
@@ -582,7 +584,7 @@ gam$p
 
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
-std_params <- function(model, min=0, max=1) {
+std_params <- function(model, min=0, max=2) {
   estimate_relation(
   model,
     at = list(Illusion_Strength = c(0), 
@@ -598,8 +600,8 @@ std_params <- function(model, min=0, max=1) {
 # range(data$Illusion_Difference)
 # range(data$Illusion_Strength)
 
-std_params(model)
-std_params(gam$model)
+std_params(model, min=0, max=2)
+std_params(gam$model, min=0, max=2)
 ```
 
 
@@ -664,8 +666,8 @@ gam$p
 # range(data$Illusion_Difference)
 # range(data$Illusion_Strength)
 
-std_params(model)
-std_params(gam$model)
+std_params(model, min=0, max=2)
+std_params(gam$model, min=0, max=2)
 ```
 
 
@@ -792,9 +794,8 @@ gam$p
 
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
-range(data$Illusion_Difference)
-range(data$Illusion_Strength)
-unique(data$Illusion_Strength)
+# range(data$Illusion_Difference)
+# range(data$Illusion_Strength)
 
 std_params(model, min=0, max=0.40)
 std_params(gam$model, min=0, max=0.40)
@@ -974,8 +975,8 @@ gam$p
 
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
-range(data$Illusion_Difference)
-range(data$Illusion_Strength)
+# range(data$Illusion_Difference)
+# range(data$Illusion_Strength)
 
 std_params(model, min=0, max=20)
 std_params(gam$model, min=0, max=20)
@@ -1036,8 +1037,8 @@ gam$p
 
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
-range(data$Illusion_Difference)
-range(data$Illusion_Strength)
+# range(data$Illusion_Difference)
+# range(data$Illusion_Strength)
 
 std_params(model, min=0, max=0.6)
 std_params(gam$model, min=0, max=0.6)
