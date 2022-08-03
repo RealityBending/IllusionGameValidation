@@ -11,8 +11,7 @@ import pyllusion as ill
 # Parameters
 width = 800
 height = 800
-n = 8
-data = []
+n = 16
 
 # Delete all existing stimuli
 for f in glob.glob("stimuli/*"):
@@ -94,149 +93,420 @@ def generate_images(data, strengths, differences, function, name="Delboeuf", **k
     return data
 
 
+def save_json(data, name="stimuli"):
+    file = "stimuli/" + name + ".js"
+    # 1. Save data to a javascript file
+    with open(file, "w") as fp:
+        json.dump(data, fp)
+
+    # 2. Re-read and add "var test_stimuli ="
+    with open(file) as f:
+        updatedfile = "var " + name + " = " + f.read()
+    with open(file, "w") as f:
+        f.write(updatedfile)
+
+
 def sqrtspace(mini=0.1, maxi=1, size=6):
     x = np.linspace(np.sqrt(0), np.sqrt(1), int(size / 2) + 1, endpoint=True) ** 2
     x = nk.rescale(x[1::], [mini, maxi])
     return np.concatenate((-1 * x[::-1], x))
 
 
-def doublelinspace(mini=0.1, maxi=1, size=6):
-    x = np.linspace(mini, maxi, int(size / 2), endpoint=True)
+def doublelinspace(mini=0.1, maxi=1, size=6, exp=False):
+    if exp is False:
+        x = np.linspace(mini, maxi, int(size / 2), endpoint=True)
+    else:
+        x = nk.expspace(mini, maxi, int(size / 2), out=float, base=2)
     return np.concatenate((-1 * x[::-1], x))
 
 
 # =============================================================================
-# STUDY 1
+# Make Stimuli
 # =============================================================================
-
+data_example = []
+data_block1 = []
+data_block2 = []
 
 # Left-right ======================================================================================
 # -------------------------- Delboeuf Illusion --------------------------
-ill.Delboeuf(illusion_strength=0.8, difference=1.2).to_image(width=800, height=600).save(
+ill.Delboeuf(illusion_strength=-0.4, difference=1.20).to_image(width=800, height=600).save(
     "utils/stimuli_demo/Delboeuf_Demo.png"
 )
-data = generate_images(
-    data,
-    strengths=np.linspace(-2.1, 2.1, n - 1),
-    differences=doublelinspace(mini=0.08, maxi=0.8, size=n),
+# ill.Delboeuf(illusion_strength=0, difference=0.1).to_image()
+
+strengths = np.linspace(-0.7, 0.7, n - 1)
+diff1 = doublelinspace(mini=0.3, maxi=0.9, size=n // 2)
+diff2 = doublelinspace(mini=0.2, maxi=0.8, size=n // 2)
+
+data_example = generate_images(
+    data_example,
+    # strengths=strengths[0 : : (n // 2) - 1],
+    strengths=strengths[2 : -2 : (n // 2) - 3],
+    differences=[-1, 1],
     function=ill.Delboeuf,
     name="Delboeuf",
     distance=0.9,  # Distance between circles
 )
 
+data_block1 = generate_images(
+    data_block1,
+    strengths=strengths[1:-1:2],
+    differences=diff1,
+    function=ill.Delboeuf,
+    name="Delboeuf",
+    distance=0.9,  # Distance between circles
+)
+
+
+data_block2 = generate_images(
+    data_block2,
+    strengths=strengths[0::2],
+    differences=diff2,
+    function=ill.Delboeuf,
+    name="Delboeuf",
+    distance=0.9,  # Distance between circles
+)
+
+
 # -------------------------- Ebbinghaus Illusion --------------------------
-ill.Ebbinghaus(illusion_strength=0.1, difference=1.5).to_image(width=800, height=600).save(
+ill.Ebbinghaus(illusion_strength=-0.4, difference=1.2).to_image(width=800, height=600).save(
     "utils/stimuli_demo/Ebbinghaus_Demo.png"
 )
-data = generate_images(
-    data,
-    strengths=np.linspace(-2.1, 2.1, n - 1),
-    differences=doublelinspace(mini=0.08, maxi=0.8, size=n),
+
+
+strengths = np.linspace(-0.7, 0.7, n - 1)
+diff1 = doublelinspace(mini=0.3, maxi=0.9, size=n // 2)
+diff2 = doublelinspace(mini=0.2, maxi=0.8, size=n // 2)
+
+
+data_example = generate_images(
+    data_example,
+    # strengths=strengths[0 : : (n // 2) - 1],
+    strengths=strengths[2 : -2 : (n // 2) - 3],
+    differences=[-0.8, 0.8],
     function=ill.Ebbinghaus,
     name="Ebbinghaus",
     distance=0.9,  # Distance between circles
 )
+
+data_block1 = generate_images(
+    data_block1,
+    strengths=strengths[1:-1:2],
+    differences=diff1,
+    function=ill.Ebbinghaus,
+    name="Ebbinghaus",
+    distance=0.9,  # Distance between circles
+)
+
+data_block2 = generate_images(
+    data_block2,
+    strengths=strengths[0::2],
+    differences=diff2,
+    function=ill.Ebbinghaus,
+    name="Ebbinghaus",
+    distance=0.9,  # Distance between circles
+)
+
 # -------------------------- Rod Frame Illusion --------------------------
-ill.RodFrame(illusion_strength=5, difference=-30).to_image(width=800, height=600).save(
+ill.RodFrame(illusion_strength=-5, difference=30).to_image(width=800, height=600).save(
     "utils/stimuli_demo/RodFrame_Demo.png"
 )
-data = generate_images(
-    data,
-    strengths=np.linspace(-20, 20, num=n - 1),
-    differences=doublelinspace(mini=0.05, maxi=8, size=n),
+
+
+strengths = np.linspace(-15, 15, n - 1)
+doublelinspace(mini=0.1, maxi=7.1, size=n)
+diff1 = doublelinspace(mini=1.1, maxi=7.1, size=n // 2)
+diff2 = doublelinspace(mini=0.1, maxi=6.1, size=n // 2)
+
+
+data_example = generate_images(
+    data_example,
+    # strengths=strengths[0 : : (n // 2) - 1],
+    strengths=strengths[2 : -2 : (n // 2) - 3],
+    differences=[-12, 12],
     function=ill.RodFrame,
     name="RodFrame",
 )
+
+data_block1 = generate_images(
+    data_block1,
+    strengths=strengths[1:-1:2],
+    differences=diff1,
+    function=ill.RodFrame,
+    name="RodFrame",
+)
+
+data_block2 = generate_images(
+    data_block2,
+    strengths=strengths[0::2],
+    differences=diff2,
+    function=ill.RodFrame,
+    name="RodFrame",
+)
+
 # -------------------------- Vertical Horizontal Illusion --------------------------
-ill.VerticalHorizontal(illusion_strength=45, difference=1).to_image(width=800, height=600).save(
+ill.VerticalHorizontal(illusion_strength=-45, difference=1).to_image(width=800, height=600).save(
     "utils/stimuli_demo/VerticalHorizontal_Demo.png"
 )
-data = generate_images(
-    data,
-    strengths=np.linspace(-90, 90, num=n - 1),
-    differences=doublelinspace(mini=0.03, maxi=0.3, size=n),
+
+strengths = np.linspace(-70, 70, n - 1)
+doublelinspace(mini=0.03, maxi=0.24, size=n)
+diff1 = doublelinspace(mini=0.06, maxi=0.24, size=n // 2)
+diff2 = doublelinspace(mini=0.03, maxi=0.21, size=n // 2)
+
+
+data_example = generate_images(
+    data_example,
+    # strengths=strengths[0 : : (n // 2) - 1],
+    strengths=strengths[2 : -2 : (n // 2) - 3],
+    differences=[-0.4, 0.4],
     function=ill.VerticalHorizontal,
     name="VerticalHorizontal",
 )
-# -------------------------- White Illusion --------------------------
-ill.White(illusion_strength=5, difference=50).to_image(width=800, height=600).save(
-    "utils/stimuli_demo/White_Demo.png"
+
+data_block1 = generate_images(
+    data_block1,
+    strengths=strengths[1:-1:2],
+    differences=diff1,
+    function=ill.VerticalHorizontal,
+    name="VerticalHorizontal",
 )
-data = generate_images(
-    data,
-    strengths=np.linspace(-25, 25, num=n - 1),
-    differences=doublelinspace(mini=5, maxi=20, size=n),
-    function=ill.White,
-    name="White",
+
+data_block2 = generate_images(
+    data_block2,
+    strengths=strengths[0::2],
+    differences=diff2,
+    function=ill.VerticalHorizontal,
+    name="VerticalHorizontal",
 )
+
 # -------------------------- Zollner Illusion --------------------------
-ill.Zollner(illusion_strength=-20, difference=-8).to_image(width=800, height=600).save(
+ill.Zollner(illusion_strength=-40, difference=8).to_image(width=800, height=600).save(
     "utils/stimuli_demo/Zollner_Demo.png"
 )
-data = generate_images(
-    data,
-    strengths=np.linspace(-85, 85, num=n - 1),
-    differences=doublelinspace(mini=0.2, maxi=5, size=n),
+
+strengths = np.linspace(-42, 42, n - 1)
+doublelinspace(mini=0.1, maxi=4.3, size=n)
+diff1 = doublelinspace(mini=0.7, maxi=4.3, size=n // 2)
+diff2 = doublelinspace(mini=0.1, maxi=3.7, size=n // 2)
+
+
+data_example = generate_images(
+    data_example,
+    # strengths=strengths[0 : : (n // 2) - 1],
+    strengths=strengths[2 : -2 : (n // 2) - 3],
+    differences=[-6, 6],
     function=ill.Zollner,
     name="Zollner",
 )
 
+data_block1 = generate_images(
+    data_block1,
+    strengths=strengths[1:-1:2],
+    differences=diff1,
+    function=ill.Zollner,
+    name="Zollner",
+)
+
+data_block2 = generate_images(
+    data_block2,
+    strengths=strengths[0::2],
+    differences=diff2,
+    function=ill.Zollner,
+    name="Zollner",
+)
+
+
+# -------------------------- White Illusion --------------------------
+ill.White(illusion_strength=5, difference=50).to_image(width=800, height=600).save(
+    "utils/stimuli_demo/White_Demo.png"
+)
+
+strengths = np.linspace(-14, 14, n - 1)
+doublelinspace(mini=3, maxi=17, size=n)
+diff1 = doublelinspace(mini=5, maxi=17, size=n // 2)
+diff2 = doublelinspace(mini=3, maxi=15, size=n // 2)
+
+
+data_example = generate_images(
+    data_example,
+    # strengths=strengths[0 : : (n // 2) - 1],
+    strengths=strengths[2 : -2 : (n // 2) - 3],
+    differences=[-20, 20],
+    function=ill.White,
+    name="White",
+)
+
+data_block1 = generate_images(
+    data_block1,
+    strengths=strengths[1:-1:2],
+    differences=diff1,
+    function=ill.White,
+    name="White",
+)
+
+data_block2 = generate_images(
+    data_block2,
+    strengths=strengths[0::2],
+    differences=diff2,
+    function=ill.White,
+    name="White",
+)
+
+
 # Up-Down ======================================================================================
 # -------------------------- MullerLyer Illusion --------------------------
-ill.MullerLyer(illusion_strength=10, difference=0.5).to_image(width=800, height=600).save(
+ill.MullerLyer(illusion_strength=-10, difference=0.7).to_image(width=800, height=600).save(
     "utils/stimuli_demo/MullerLyer_Demo.png"
 )
-data = generate_images(
-    data,
-    strengths=np.linspace(-50, 50, num=n - 1),
-    differences=doublelinspace(mini=0.05, maxi=0.5, size=n),
+
+strengths = np.linspace(-49, 49, n - 1)
+doublelinspace(mini=0.04, maxi=0.46, size=n)
+diff1 = doublelinspace(mini=0.1, maxi=0.46, size=n // 2)
+diff2 = doublelinspace(mini=0.04, maxi=0.4, size=n // 2)
+
+
+data_example = generate_images(
+    data_example,
+    # strengths=strengths[0 : : (n // 2) - 1],
+    strengths=strengths[2 : -2 : (n // 2) - 3],
+    differences=[-0.6, 0.6],
+    function=ill.MullerLyer,
+    name="MullerLyer",
+)
+
+data_block1 = generate_images(
+    data_block1,
+    strengths=strengths[1:-1:2],
+    differences=diff1,
+    function=ill.MullerLyer,
+    name="MullerLyer",
+)
+
+data_block2 = generate_images(
+    data_block2,
+    strengths=strengths[0::2],
+    differences=diff2,
     function=ill.MullerLyer,
     name="MullerLyer",
 )
 
 
 # -------------------------- Ponzo Illusion --------------------------
-ill.Ponzo(illusion_strength=5, difference=0.6).to_image(width=800, height=600).save(
+ill.Ponzo(illusion_strength=5, difference=0.7).to_image(width=800, height=600).save(
     "utils/stimuli_demo/Ponzo_Demo.png"
 )
-data = generate_images(
-    data,
-    strengths=np.linspace(-25, 25, num=n - 1),
-    differences=doublelinspace(mini=0.04, maxi=0.4, size=n),
+
+
+strengths = np.linspace(-25.2, 25.2, n - 1)
+doublelinspace(mini=0.04, maxi=0.39, size=n)
+diff1 = doublelinspace(mini=0.09, maxi=0.39, size=n // 2)
+diff2 = doublelinspace(mini=0.04, maxi=0.34, size=n // 2)
+
+
+data_example = generate_images(
+    data_example,
+    # strengths=strengths[0 : : (n // 2) - 1],
+    strengths=strengths[2 : -2 : (n // 2) - 3],
+    differences=[-0.6, 0.6],
     function=ill.Ponzo,
     name="Ponzo",
 )
-# -------------------------- Contrast Illusion --------------------------
-ill.Contrast(illusion_strength=-5, difference=30).to_image(width=800, height=600).save(
-    "utils/stimuli_demo/Contrast_Demo.png"
+
+data_block1 = generate_images(
+    data_block1,
+    strengths=strengths[1:-1:2],
+    differences=diff1,
+    function=ill.Ponzo,
+    name="Ponzo",
 )
-data = generate_images(
-    data,
-    strengths=np.linspace(-36, 36, num=n - 1),
-    differences=doublelinspace(mini=5, maxi=20, size=n),
-    function=ill.Contrast,
-    name="Contrast",
+
+data_block2 = generate_images(
+    data_block2,
+    strengths=strengths[0::2],
+    differences=diff2,
+    function=ill.Ponzo,
+    name="Ponzo",
 )
+
+
 # -------------------------- Poggendorff Illusion --------------------------
-ill.Poggendorff(illusion_strength=20, difference=0.3).to_image(width=800, height=600).save(
+ill.Poggendorff(illusion_strength=-20, difference=0.4).to_image(width=800, height=600).save(
     "utils/stimuli_demo/Poggendorff_Demo.png"
 )
-data = generate_images(
-    data,
-    strengths=np.linspace(-66, 66, num=n - 1),
-    differences=doublelinspace(mini=0.03, maxi=0.3, size=n),
+
+
+strengths = np.linspace(-44.8, 44.8, n - 1)
+doublelinspace(mini=0.02, maxi=0.3, size=n)
+diff1 = doublelinspace(mini=0.06, maxi=0.3, size=n // 2)
+diff2 = doublelinspace(mini=0.02, maxi=0.26, size=n // 2)
+
+
+data_example = generate_images(
+    data_example,
+    # strengths=strengths[0 : : (n // 2) - 1],
+    strengths=strengths[2 : -2 : (n // 2) - 3],
+    differences=[-0.4, 0.4],
+    function=ill.Poggendorff,
+    name="Poggendorff",
+)
+
+data_block1 = generate_images(
+    data_block1,
+    strengths=strengths[1:-1:2],
+    differences=diff1,
+    function=ill.Poggendorff,
+    name="Poggendorff",
+)
+
+data_block2 = generate_images(
+    data_block2,
+    strengths=strengths[0::2],
+    differences=diff2,
     function=ill.Poggendorff,
     name="Poggendorff",
 )
 
 
-# -------------------------- Save data --------------------------
-# 1. Save data to a javascript file
-with open("stimuli/stimuli.js", "w") as fp:
-    json.dump(data, fp)
+# -------------------------- Contrast Illusion --------------------------
+ill.Contrast(illusion_strength=-5, difference=30).to_image(width=800, height=600).save(
+    "utils/stimuli_demo/Contrast_Demo.png"
+)
 
-# 2. Re-read and add "var test_stimuli ="
-with open("stimuli/stimuli.js") as f:
-    updatedfile = "var stimuli = " + f.read()
-with open("stimuli/stimuli.js", "w") as f:
-    f.write(updatedfile)
+
+strengths = np.linspace(-31.5, 31.5, n - 1)
+doublelinspace(mini=2.5, maxi=20, size=n)
+diff1 = doublelinspace(mini=5, maxi=20, size=n // 2)
+diff2 = doublelinspace(mini=2.5, maxi=17.5, size=n // 2)
+
+
+data_example = generate_images(
+    data_example,
+    # strengths=strengths[0 : : (n // 2) - 1],
+    strengths=strengths[2 : -2 : (n // 2) - 3],
+    differences=[-25, 25],
+    function=ill.Contrast,
+    name="Contrast",
+)
+
+data_block1 = generate_images(
+    data_block1,
+    strengths=strengths[1:-1:2],
+    differences=diff1,
+    function=ill.Contrast,
+    name="Contrast",
+)
+
+data_block2 = generate_images(
+    data_block2,
+    strengths=strengths[0::2],
+    differences=diff2,
+    function=ill.Contrast,
+    name="Contrast",
+)
+
+
+# -------------------------- Save data --------------------------
+save_json(data_example, name="stimuli_example")
+save_json(data_example, name="stimuli_part1")
+save_json(data_example, name="stimuli_part2")

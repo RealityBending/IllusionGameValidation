@@ -324,6 +324,23 @@ The analysis of study focused on the probability of errors as the main outcome v
 
 # Results {.tabset}
 
+<!-- ```{r message=FALSE, warning=FALSE, cache=cache} -->
+<!-- model <- glmmTMB::glmmTMB(Error ~ Illusion_Type * poly(ISI, 2) + (1|Participant), -->
+<!--                     data=mutate(df, Illusion_Type = as.factor(Illusion_Type)), -->
+<!--                     family="binomial") -->
+
+<!-- estimate_relation(model, at = c("ISI", "Illusion_Type")) |> -->
+<!--   ggplot(aes(x = ISI, y = Predicted, color="Illusion_Type")) + -->
+<!--   geom_line() -->
+
+<!-- model <- glmmTMB::glmmTMB(RT ~ Illusion_Type * poly(ISI, 2) + (1|Participant), -->
+<!--                     data=mutate(df, Illusion_Type = as.factor(Illusion_Type)) |>  -->
+<!--                       filter(Error == 0)) -->
+
+<!-- estimate_relation(model, at = c("ISI", "Illusion_Type")) |> -->
+<!--   ggplot(aes(x = ISI, y = Predicted, color=Illusion_Type)) + -->
+<!--   geom_line() -->
+<!-- ``` -->
 
 ## Delboeuf
 
@@ -1170,7 +1187,7 @@ std_params(gam$model, min=0, max=25)
 ```
 
 
-## Discussion
+# Discussion
 
 This study allowed to elaborate a more precise prior idea regarding the magnitude of the effects at stake and the type of interaction between them. Crucially, it allowed us to refine the range of task difficulty and illusion strength for the stimuli of the next study to maximize the information gain.
 

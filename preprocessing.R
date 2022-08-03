@@ -47,6 +47,9 @@ preprocess_raw <- function(file) {
     RT = as.numeric(trials$rt)
   )
 
+  # Correct duration
+  df$Duration <- df$Duration - df$Break_Duration
+
   # Format names
   df$Illusion_Type <- ifelse(df$Illusion_Type == "MullerLyer", "Müller-Lyer", df$Illusion_Type)
   df$Illusion_Type <- ifelse(df$Illusion_Type == "Zollner", "Zöllner", df$Illusion_Type)
