@@ -9,7 +9,9 @@ editor_options:
 
 ```{r, echo = FALSE, warning=FALSE, message=FALSE}
 options(digits = 3,
-        mc.cores = 2)
+        mc.cores = 4,
+        brms.algorithm = "sampling",
+        brms.backend = "cmdstanr")
 
 cache <- FALSE
 fig.width <- see::golden_ratio(7)
@@ -28,7 +30,8 @@ knitr::opts_chunk$set(
 
 # Introduction
 
-Behavioural findings regarding the Illusion Game.
+
+The goal of study 1 was to...
 
 # Methods
 
@@ -60,24 +63,24 @@ df <- read.csv("data/study1.csv") |>
 # Dear participant, thank you for participating in our study. Unfortunately, our system detected multiple issues in your data (such as implausibly short responses, and random-like pattern of answers), which make the data unusable for us. We understand that you might have been in a hurry, or had some other issues, and kindly ask you to return your participation. We hope to open-up more slots in the future would you be interested to participate again. 
 
 outliers <- c(
-  # Half of the trials are of very short RT
+  # Half of the trials have very short RT
   # Prolific Status: REJECTED
   "60684f29dbfe1bb2059e5e27_rkqoy",
-  # Error rate of 47.9%
-  # Prolific Status: RETURN REQUESTED
-  "61280140171ec546e87ed8cb_qdlgy",
-  # Error rate of 46.2%
-  # Prolific Status: RETURN REQUESTED
-  "614f36fd81c78b7a125c4262_6ax4g",
-  # Error rate of 42.1% and very large RT SD
-  # Prolific Status: RETURN REQUESTED
-  "5d398380b37ab1000111fac3_2nxxh",
   # Block n2 with very short RTs
   # Prolific Status: RETURNED
   "5e860198a846e30497df5189_6e43s",
   # Error rate of 46.2% and short RTs
+  # Prolific Status: RETURNED
+  "615f319bb341cf2f306d858d_qsaq5",
+  # Error rate of 46.2%
+  # Prolific Status: RETURNED
+  "614f36fd81c78b7a125c4262_6ax4g",
+  # Error rate of 47.9%
   # Prolific Status: RETURN REQUESTED
-  "615f319bb341cf2f306d858d_qsaq5"
+  "61280140171ec546e87ed8cb_qdlgy",
+  # Error rate of 42.1% and very large RT SD
+  # Prolific Status: RETURN REQUESTED
+  "5d398380b37ab1000111fac3_2nxxh"
 )
 ```
 
@@ -313,6 +316,10 @@ p9 <- plot_waffle(dfsub, "Device_OS") +
 (p1 / p2 / p3) | (p4 / p5 / p6) | (p7 / p8 / p9)
 ```
 
+## Data Analysis
+
+The analysis of study focused on the probability of errors as the main outcome variable. For each illusion, we started by visualizing the average effect of task difficulty and illusion strength to gain some insight on the underlying generative model. Next, we tested the performance of various models differing in their specifications, such as: with or without a log-transform on the task difficulty, with or without a 2nd order polynomial term of the illusion strength, and with or without the illusion side (up *vs.* down or left *vs.* right) as an additional predictor. We then fitted the best performing model under a Bayesian model, and compared its predicted links with that of a General Additive Model (GAM), which has an increased ability of mapping underlying potentially non-linear relationships at the expense of model simplicity. Finally, we used these models to estimate different values of task difficulty that would lead to similar error rates (2.5, 5 and 25%) when the illusion strength is null.
+
 
 
 # Results {.tabset}
@@ -331,7 +338,7 @@ plot_descriptive <- function(data, side="leftright") {
     x <- tools::toTitleCase(gsub("arrow", "", x))
     if(x == "Left") {
       data$Answer <- ifelse(data$Illusion_Side == 1, "Left", "Right")
-    } else {
+    } else if(x == "Right") {
       data$Answer <- ifelse(data$Illusion_Side == 1, "Right", "Left")
     }
   } else {
@@ -339,7 +346,7 @@ plot_descriptive <- function(data, side="leftright") {
     x <- tools::toTitleCase(gsub("arrow", "", x))
     if(x == "Up") {
       data$Answer <- ifelse(data$Illusion_Side == 1, "Up", "Down")
-    } else {
+    } else if(x == "Down") {
       data$Answer <- ifelse(data$Illusion_Side == 1, "Down", "Up")
     }
     data$Answer <- fct_rev(data$Answer)
@@ -417,10 +424,10 @@ plot_descriptive(data)
 ```{r message=FALSE, warning=FALSE, cache=cache,results='hide'}
 best_models <- function(data) {
   models <- list()
-  for(i in 1:2) {
+  for(i in 1:1) {
     for(j in 1:2) {
-      for(k1 in c("", "_log")) {  # c("", "_log")
-        for(k2 in c("", "_log")) {  # c("", "_log")
+      for(k1 in c("", "_log")) { 
+        for(k2 in c("")) {  
           for(side in c("", "-side")) {
             name <- paste0("dif", k1, i, "-", "str", k2, j, side)
             print(name)
@@ -469,7 +476,7 @@ best_models(data)
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
 formula <- brms::bf(
-  Error ~ Illusion_Difference * poly(Illusion_Strength, 2) + 
+  Error ~ log(Illusion_Difference) * poly(Illusion_Strength, 2) + 
     (1 | Participant),
   family = "bernoulli"
 )
@@ -477,8 +484,10 @@ formula <- brms::bf(
 model <- brms::brm(formula,
   data = data,
   algorithm = "sampling",
-  refresh = 200
+  refresh = 0
 )
+
+parameters::parameters(model)
 ```
 
 
@@ -549,13 +558,12 @@ make_gam <- function(data) {
   
   formula <- brms::bf(
     Error ~ t2(Illusion_Difference, Illusion_Strength, bs = "cr", k=4) + 
-      ((1 + Illusion_Difference + Illusion_Strength) | Participant),
+      (1 | Participant),
     family = "bernoulli"
   )
 
   model <- brms::brm(formula,
     data = data,
-    algorithm = "meanfield",
     refresh = 0
   )
   
@@ -587,8 +595,8 @@ std_params <- function(model, min=0, max=1) {
     mutate(Error = insight::format_value(Error, as_percent=TRUE))
 }
 
-range(data$Illusion_Difference)
-range(data$Illusion_Strength)
+# range(data$Illusion_Difference)
+# range(data$Illusion_Strength)
 
 std_params(model)
 std_params(gam$model)
@@ -624,16 +632,17 @@ best_models(data)
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
 formula <- brms::bf(
-  Error ~ Illusion_Difference * poly(Illusion_Strength, 2) + 
-    ((1 + Illusion_Difference + Illusion_Strength) | Participant),
+  Error ~ log(Illusion_Difference) * poly(Illusion_Strength, 2) + 
+    (1 | Participant),
   family = "bernoulli"
 )
 
 model <- brms::brm(formula,
   data = data,
-  algorithm = "meanfield",
   refresh = 0
 )
+
+parameters::parameters(model)
 ```
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
@@ -652,8 +661,8 @@ gam$p
 
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
-range(data$Illusion_Difference)
-range(data$Illusion_Strength)
+# range(data$Illusion_Difference)
+# range(data$Illusion_Strength)
 
 std_params(model)
 std_params(gam$model)
@@ -670,6 +679,10 @@ std_params(gam$model)
 data <- filter(df, Illusion_Type == "Rod-Frame")
 
 plot_descriptive(data)
+
+data <- filter(data, abs(Illusion_Strength) < 15)
+
+plot_descriptive(data)
 ```
 
 
@@ -684,16 +697,17 @@ best_models(data)
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
 formula <- brms::bf(
-  Error ~ poly(Illusion_Difference, 2) * Illusion_Strength + 
-    ((1 + Illusion_Difference + Illusion_Strength) | Participant),
+  Error ~ log(Illusion_Difference) * Illusion_Strength + 
+    (1 | Participant),
   family = "bernoulli"
 )
 
 model <- brms::brm(formula,
   data = data,
-  algorithm = "meanfield",
   refresh = 0
 )
+
+parameters::parameters(model)
 ```
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
@@ -713,9 +727,8 @@ gam$p
 
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
-range(data$Illusion_Difference)
-range(data$Illusion_Strength)
-unique(data$Illusion_Strength)
+# range(data$Illusion_Difference)
+# range(data$Illusion_Strength)
 
 std_params(model, min=0.01, max=12)
 std_params(gam$model, min=0.01, max=12)
@@ -729,6 +742,10 @@ std_params(gam$model, min=0.01, max=12)
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
 data <- filter(df, Illusion_Type == "Vertical-Horizontal")
+
+plot_descriptive(data)
+
+data <- filter(data, abs(Illusion_Strength) < 90)
 
 plot_descriptive(data)
 ```
@@ -745,16 +762,17 @@ best_models(data)
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
 formula <- brms::bf(
-  Error ~ Illusion_Difference * poly(Illusion_Strength, 2) + 
-    ((1 + Illusion_Difference + Illusion_Strength) | Participant),
+  Error ~ log(Illusion_Difference) * poly(Illusion_Strength, 2) + 
+    (1 | Participant),
   family = "bernoulli"
 )
 
 model <- brms::brm(formula,
   data = data,
-  algorithm = "meanfield",
   refresh = 0
 )
+
+parameters::parameters(model)
 ```
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
@@ -799,28 +817,28 @@ data <- filter(data, abs(Illusion_Strength) < 45)
 plot_descriptive(data)
 ```
 
+### Model Selection
+
+```{r message=FALSE, warning=FALSE, cache=cache,results='hide'}
+best_models(data)
+```
+
 
 ### Model Visualization
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
-# model <- glmmTMB::glmmTMB(
-#   Error ~ poly(Illusion_Difference, 2) * Illusion_Strength + 
-#     ((1 + Illusion_Difference + Illusion_Strength) | Participant),
-#   family = "binomial",
-#   data=data
-# )
-
 formula <- brms::bf(
-  Error ~ poly(Illusion_Difference, 2) * Illusion_Strength + 
-    ((1 + Illusion_Difference + Illusion_Strength) | Participant),
+  Error ~ log(Illusion_Difference) * Illusion_Strength + 
+    (1 | Participant),
   family = "bernoulli"
 )
 
 model <- brms::brm(formula,
   data = data,
-  algorithm = "meanfield",
   refresh = 0
 )
+
+parameters::parameters(model)
 ```
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
@@ -833,8 +851,8 @@ plot_model(data, model)
 
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
-range(data$Illusion_Difference)
-range(data$Illusion_Strength)
+# range(data$Illusion_Difference)
+# range(data$Illusion_Strength)
 
 std_params(model, min=0, max=5)
 ```
@@ -863,16 +881,17 @@ best_models(data)
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
 formula <- brms::bf(
-  Error ~ Illusion_Difference * poly(Illusion_Strength, 2) + 
-    ((1 + Illusion_Difference + Illusion_Strength) | Participant),
+  Error ~ log(Illusion_Difference) * poly(Illusion_Strength, 2) + 
+    (1 | Participant),
   family = "bernoulli"
 )
 
 model <- brms::brm(formula,
   data = data,
-  algorithm = "meanfield",
   refresh = 0
 )
+
+parameters::parameters(model)
 ```
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
@@ -892,9 +911,9 @@ gam$p
 
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
-range(data$Illusion_Difference)
-range(data$Illusion_Strength)
-unique(data$Illusion_Strength)
+# range(data$Illusion_Difference)
+# range(data$Illusion_Strength)
+# unique(data$Illusion_Strength)
 
 std_params(model, min=0, max=20)
 std_params(gam$model, min=0, max=20)
@@ -925,16 +944,17 @@ best_models(data)
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
 formula <- brms::bf(
-  Error ~ Illusion_Difference * poly(Illusion_Strength, 2) + 
-    ((1 + Illusion_Difference + Illusion_Strength) | Participant),
+  Error ~ log(Illusion_Difference) * poly(Illusion_Strength, 2) + 
+    (1 | Participant),
   family = "bernoulli"
 )
 
 model <- brms::brm(formula,
   data = data,
-  algorithm = "meanfield",
   refresh = 0
 )
+
+parameters::parameters(model)
 ```
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
@@ -977,7 +997,7 @@ plot_descriptive(data, side = "updown")
 
 ### Model Selection
 
-```{r message=FALSE, warning=FALSE, cache=cache,results='hide'}
+```{r message=FALSE, warning=FALSE, cache=cache}
 best_models(data)
 ```
 
@@ -986,16 +1006,17 @@ best_models(data)
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
 formula <- brms::bf(
-  Error ~ Illusion_Difference * poly(Illusion_Strength, 2) + 
-    ((1 + Illusion_Difference + Illusion_Strength) | Participant),
+  Error ~ log(Illusion_Difference) * poly(Illusion_Strength, 2) + 
+    (1 | Participant),
   family = "bernoulli"
 )
 
 model <- brms::brm(formula,
   data = data,
-  algorithm = "meanfield",
   refresh = 0
 )
+
+parameters::parameters(model)
 ```
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
@@ -1031,6 +1052,10 @@ std_params(gam$model, min=0, max=0.6)
 data <- filter(df, Illusion_Type == "Poggendorff")
 
 plot_descriptive(data, side = "updown")
+
+data <- filter(data, abs(Illusion_Strength) < 45)
+
+plot_descriptive(data, side = "updown")
 ```
 
 
@@ -1046,14 +1071,13 @@ best_models(data)
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
 formula <- brms::bf(
-  Error ~ Illusion_Side * Illusion_Difference * poly(Illusion_Strength, 2) + 
-    ((1 + Illusion_Side + Illusion_Difference + Illusion_Strength) | Participant),
+  Error ~ log(Illusion_Difference) * poly(Illusion_Strength, 2) + 
+    (1 | Participant),
   family = "bernoulli"
 )
 
 model <- brms::brm(formula,
   data = data,
-  algorithm = "meanfield",
   refresh = 0
 )
 
@@ -1077,8 +1101,8 @@ gam$p
 
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
-range(data$Illusion_Difference)
-range(data$Illusion_Strength)
+# range(data$Illusion_Difference)
+# range(data$Illusion_Strength)
 
 std_params(model, min=0, max=0.5)
 std_params(gam$model, min=0, max=0.5)
@@ -1110,13 +1134,12 @@ best_models(data)
 ```{r message=FALSE, warning=FALSE, cache=cache}
 formula <- brms::bf(
   Error ~ Illusion_Difference * poly(Illusion_Strength, 2) + 
-    ((1 + Illusion_Difference + Illusion_Strength) | Participant),
+    (1 | Participant),
   family = "bernoulli"
 )
 
 model <- brms::brm(formula,
   data = data,
-  algorithm = "meanfield",
   refresh = 0
 )
 ```
@@ -1138,8 +1161,8 @@ gam$p
 
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
-range(data$Illusion_Difference)
-range(data$Illusion_Strength)
+# range(data$Illusion_Difference)
+# range(data$Illusion_Strength)
 
 std_params(model, min=0, max=25)
 std_params(gam$model, min=0, max=25)

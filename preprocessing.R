@@ -97,7 +97,7 @@ df$Pyllusion <- "1.1"
 df[df$Illusion_Type == "Delboeuf", "Illusion_Difference"] <- sqrt(df[df$Illusion_Type == "Delboeuf", "Illusion_Difference"])
 df[df$Illusion_Type == "Ebbinghaus", "Illusion_Difference"] <- sqrt(df[df$Illusion_Type == "Ebbinghaus", "Illusion_Difference"])
 df[df$Illusion_Type == "Rod-Frame", "Illusion_Strength"] <- -1 * (df[df$Illusion_Type == "Rod-Frame", "Illusion_Strength"])
-df[df$Illusion_Type == "Zöllner", "Illusion_Strength"] <- -1 * (df[df$Illusion_Type == "Zöllner", "Illusion_Strength"])
+df[df$Illusion_Type == "Zöllner", "Illusion_Strength"] <- -1 * round(df[df$Illusion_Type == "Zöllner", "Illusion_Strength"], 1)
 
 
 
