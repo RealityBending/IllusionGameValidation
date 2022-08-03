@@ -224,7 +224,8 @@
     /* ============================================================== */
 
     /* ----------------------Delboeuf Practice----------------------------*/
-    var delboeuf_practice = make_practice(
+    var delboeuf_practice = make_trial(
+        (stimuli=stimuli_training),
         (instructions = "<p><b>Practice</b></p>" + delboeuf_instructions),
         (illusion_name = "Delboeuf"),
         (type = 'leftright'))
@@ -233,7 +234,8 @@
 
     /* ----------------------Ebbinghaus Practice----------------------------*/
     // Ebbinghaus Practice
-    var ebbinghaus_practice = make_practice(
+    var ebbinghaus_practice = make_trial(
+        (stimuli=stimuli_training),
         (instructions = "<p><b>Practice</b></p>" + ebbinghaus_instructions),
         (illusion_name = "Ebbinghaus"),
         (type = 'leftright'))
@@ -241,7 +243,8 @@
     timeline.push({timeline: ebbinghaus_practice})
 
     /* ----------------------Muller-Lyer Practice----------------------------*/
-    var mullerlyer_practice = make_practice(
+    var mullerlyer_practice =  make_trial(
+        (stimuli=stimuli_training),
         (instructions = "<p><b>Practice</b></p>" + mullerlyer_instructions),
         (illusion_name = "MullerLyer"),
         (type = 'updown'))
@@ -249,7 +252,8 @@
     timeline.push({timeline: mullerlyer_practice})
 
     /* ----------------------Poggendorff Practice----------------------------*/
-    var poggendorff_practice = make_practice(
+    var poggendorff_practice =  make_trial(
+        (stimuli=stimuli_training),
         (instructions = "<p><b>Practice</b></p>" + poggendorff_instructions),
         (illusion_name = "Poggendorff"),
         (type = 'updown'))
@@ -257,7 +261,8 @@
     timeline.push({timeline: poggendorff_practice})
 
     /* ----------------------Ponzo Practice----------------------------*/
-    var ponzo_practice = make_practice(
+    var ponzo_practice = make_trial(
+        (stimuli=stimuli_training),
         (instructions = "<p><b>Practice</b></p>" + ponzo_instructions),
         (illusion_name = "Ponzo"),
         (type = 'updown'))
@@ -265,7 +270,8 @@
     timeline.push({timeline: ponzo_practice})
 
     /* ----------------------Rod Frame Practice----------------------------*/
-    var rodframe_practice = make_practice(
+    var rodframe_practice =  make_trial(
+        (stimuli=stimuli_training),
         (instructions = "<p><b>Practice</b></p>" + rodframe_instructions),
         (illusion_name = "RodFrame"),
         (type = 'leftright'))
@@ -273,22 +279,25 @@
     timeline.push({timeline: rodframe_practice})
 
     /* ----------------------Vertical Horizaontal Practice----------------------------*/
-    var verticalhorizontal_practice = make_practice(
+    var verticalhorizontal_practice =  make_trial(
+        (stimuli=stimuli_training),
         (instructions = "<p><b>Practice</b></p>" + verticalhorizontal_instructions), (illusion_name = "VerticalHorizontal"),
         (type = 'leftright'))
 
     timeline.push({timeline: verticalhorizontal_practice})
 
     /* ----------------------White Practice----------------------------*/
-    var white_practice = make_practice(
-        (instructions = "<p><b>Practice</b></p>" + white_instructions), 
+    var white_practice =  make_trial(
+        (stimuli=stimuli_training),
+        (instructions = "<p><b>Practice</b></p>" + white_instructions),
         (illusion_name = "White"),
         (type = 'leftright'))
 
     timeline.push({timeline: white_practice})
 
     /* ----------------------Zollner Practice----------------------------*/
-    var zollner_practice = make_practice(
+    var zollner_practice =  make_trial(
+        (stimuli=stimuli_training),
         (instructions = "<p><b>Practice</b></p>" + zollner_instructions),
         (illusion_name = "Zollner"),
         (type = 'leftright'))
@@ -296,7 +305,8 @@
     timeline.push({timeline: zollner_practice})
 
     /* ----------------------Contrast Practice----------------------------*/
-    var contrast_practice = make_practice(
+    var contrast_practice =  make_trial(
+        (stimuli=stimuli_training),
         (instructions = "<p><b>Practice</b></p>" + contrast_instructions),
         (illusion_name = "Contrast"),
         (type = 'updown'))
@@ -309,25 +319,12 @@
     var end_practice = {
         type: jsPsychHtmlButtonResponse,
         choices: ["Let's Play!"],
-        stimulus: function () {
-            var results = get_results(
-                1000, // population_scores["Total"]["IES_Mean"][0],
-                400 // population_scores["Total"]["IES_SD"][0]
-            )
-            var show_screen = get_debrief_display(results, "Final")
-            return (
-                //show_screen.display_score +
-                // "<hr>" +
-                // show_screen.display_comparison +
-                //"<hr>" +
-                "<p>You have completed the practice trials for all the illusions!</p>" +
+        stimulus: "<p>You have completed the practice trials for all the illusions!</p>" +
                 "<p>You are now ready for the real game?</p>" +
                 "<p>In the following trials, we will show you examples of each illusion before each block.</p>" +
                 "<p>Each illusion block will be repeated two times (so that you have an opportunity to improve your score!), but the order of the blocks is random.</p>" +
                 "<p>Remember, your goal is to be as <b>fast</b> and <b>accurate</b> as possible.</p>" +
-                "<p>Good luck!</p><br>"
-            )
-        },
+                "<p>Good luck!</p><br>",
         data: {screen: "practice_debrief"},
     }
     timeline.push(end_practice)
@@ -351,7 +348,7 @@
         /* ============================================================== */
         /* ---------------------- DELBOEUF ILLUSION --------------------- */
         /* ============================================================== */
-        var timeline_delboeuf = make_trial(stimuli_part1,
+        var timeline_delboeuf = make_trial(stimuli,
             (instructions = function () {
                 return "<p><b>Part " +
                     block_number +

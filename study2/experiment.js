@@ -74,7 +74,7 @@ var fixation = {
     choices: "NO_KEYS" /* no responses will be accepted as a valid response */,
     //trial_duration: 0, // (for testing)
     trial_duration: function () {
-        return randomInteger(250, 1000) // Function from RealityBending/JSmisc
+        return randomInteger(500, 1000) // Function from RealityBending/JSmisc
     },
     save_trial_parameters: {
         trial_duration: true,
@@ -229,7 +229,6 @@ function create_debrief(illusion_name = "Ponzo") {
     var debrief = {
         type: jsPsychHtmlButtonResponse,
         choices: ["Continue"],
-        post_trial_gap: 500,
         on_start: function () {
             ;(document.body.style.cursor = "auto"),
                 (document.querySelector(
@@ -307,66 +306,28 @@ function make_trial(stimuli, instructions, illusion_name, type) {
     })
 
     // Debriefing Information
-    timeline.push(create_debrief((illusion_name = illusion_name)))
+    if (stimuli != stimuli_training){
+        timeline.push(create_debrief(illusion_name= illusion_name))
+    }
+    else if (stimuli=stimuli_training){
+        timeline.push({
+            type: jsPsychHtmlButtonResponse,
+            choices: ["Continue"],
+            post_trial_gap: 500,
+            on_start: function () {
+                ;(document.body.style.cursor = "auto"),
+                    (document.querySelector(
+                        "#jspsych-progressbar-container"
+                    ).style.display = "inline")
+            },
+            stimulus: "<p>Great job!</p>" +
+            "<p>Click NEXT when you're ready for the next illusion practice.</p>",
+            data: { screen: "practice_block" }
+                })
+    }
     return timeline
 }
 
-function make_practice(instructions, illusion_name, type) {
-    var timeline = []
-
-    // Set stimuli
-    var stim_list = stimuli_training.filter(
-        (stimuli_training) => stimuli_training.Illusion_Type === illusion_name
-    )
-
-    // Preload images
-    timeline.push({
-        type: jsPsychPreload,
-        images: stim_list.map((a) => a.stimulus),
-    })
-
-    // Instructions
-    timeline.push({
-        type: jsPsychHtmlKeyboardResponse,
-        on_start: function () {
-            ;(document.body.style.cursor = "none"),
-                (document.querySelector(
-                    "#jspsych-progressbar-container"
-                ).style.display = "none")
-        },
-        choices: ["enter"],
-        stimulus: instructions,
-        post_trial_gap: 500,
-    })
-
-    // Define trial
-    var trial = create_trial(illusion_name, (type = type))
-
-    // Create Trials timeline
-    timeline.push({
-        timeline: [fixation, trial],
-        timeline_variables: stim_list,
-        randomize_order: true,
-        repetitions: 1,
-    })
-
-    // Debriefing Information
-    timeline.push({
-        type: jsPsychHtmlButtonResponse,
-        choices: ["Continue"],
-        post_trial_gap: 500,
-        on_start: function () {
-            ;(document.body.style.cursor = "auto"),
-                (document.querySelector(
-                    "#jspsych-progressbar-container"
-                ).style.display = "inline")
-        },
-        stimulus: "<p>Great job!</p>" +
-        "<p>Click NEXT when you're ready for the next illusion practice.</p>",
-        data: { screen: "practice_block" },
-    })
-    return timeline
-}
 
 // Instructions for Illusion Trials
 const delboeuf_instructions =
