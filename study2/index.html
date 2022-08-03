@@ -79,7 +79,7 @@
                     `${jsPsych.data.get().values()[0]["participant_id"]
                     }_IllusionGame.json`
                 )
-            window.location = "https://app.prolific.co/submissions/complete?cc=CUWXHNY5" /* redirect to prolific when experiment is finished */
+            // window.location = "https://app.prolific.co/submissions/complete?cc=XXX" /* redirect to prolific when experiment is finished */
         },
     })
 
@@ -230,21 +230,138 @@
     // General Instructions
     var general_instructions = {
         type: jsPsychHtmlButtonResponse,
-        choices: ["Let's play!"],
+        choices: ["Next"],
         stimulus:
             "<p><b>The Illusion Game</b></p>" +
             "<p>In this game of speed and reflex, you will need to make <b>visual judgments</b> (for instance, which circle is the biggest, or which line is the longest), as fast and as correctly as possible, while <b>resisting different visual illusions</b>.</p>" +
+            "<p> After each illusion block, a score (out of 100) will be calculated based on your <b>accuracy</b> (number of correct answers) and your <b>speed</b> (time it took to answer).</p>" +
+            "<p>The faster and more accurate you are, the higher your scores will be!</p>" +
             "<p>It can be challenging at times, so you want to rely on your intuition and gut feeling to answer as fast as you can, without making errors.</p>" +
-            "<p>A score will be computed based on your speed and accuracy and will be displayed after each illusion block.</p><br>" +
-            "<p>Don't worry, we will show you examples of each illusion before each block. Each illusion block will be repeated two times (so that you have an opportunity to improve your score!), but the order of the blocks is random.</p>" +
-            "<p>Remember, your goal is to be as <b>fast</b> and <b>accurate</b> as possible. Good luck!</p>",
+            "<p>Don't worry, you will get a chance to practice before you begin the real game when you press NEXT.</p><br>",
         data: {screen: "general_instructions"},
     }
     timeline.push(general_instructions)
 
-    // Practice Block
-    
+    /* Practice Block ----------------------------------------------------*/
+    // Preload Practice Stimuli
+    var delboeuf_stimuli = stimuli.filter(
+        (stimuli) => stimuli.Illusion_Type === 'Delboeuf')
 
+    timeline.push({
+        type: jsPsychPreload,
+        images: delboeuf_stimuli.map((a) => a.stimulus),
+    })
+
+    // Add Practice Trial Instructions
+    var practice_instructions = {
+        type: jsPsychHtmlKeyboardResponse,
+        choices: ["enter"],
+        stimulus: "<p><b>Let's practice!</b></p>" +
+            "<p>In this practice trial, two red circles will appear side by side on the screen.</p>" +
+            "<p>Your task is to select which <b>red circle is bigger</b> in size as fast as you can, without making errors.</p>" +
+            "<p>Don't get distracted by the black outlines around the red circles!</p>" +
+            "<p>Press <b>the LEFT or the RIGHT arrow</b> to indicate which is the bigger <b>red circle.</b></p>" +
+            "<div style='float: center'><img src='utils/stimuli_demo/Delboeuf_Demo.png' height='300'></img>" +
+            "<p><img src='utils/answer/answer_leftright_keyboard.PNG' height='150'></img></p>" +
+            "<p class='small'>In this example, the correct answer is the <b>LEFT arrow</b>.</p></div>" +
+            "<p>Are you ready? <b>Press ENTER to start</b></p>",
+        on_start: function () {
+            ; (document.body.style.cursor = "none"),
+                (document.querySelector(
+                    "#jspsych-progressbar-container"
+                ).style.display = "none")
+        },
+        post_trial_gap: 1000,
+        data: {screen: "practice_instructions"},
+    }
+    timeline.push(practice_instructions)
+
+    // Get random subset of stimuli for practice block
+    var practice_stimuli = getRandom(delboeuf_stimuli, 10)
+
+    // Set test trials
+    var practice_delboeuf = {
+        type: jsPsychImageKeyboardResponse,
+        stimulus: jsPsych.timelineVariable('stimulus'),
+        choices: ['arrowleft', 'arrowright'],
+        data: jsPsych.timelineVariable('data'),
+        on_finish: function (data) {
+            data.prestimulus_duration =
+                jsPsych.data.get().last(2).values()[0].time_elapsed -
+                jsPsych.data.get().last(3).values()[0].time_elapsed
+            // Score the response as correct or incorrect.
+            if (data.response != -1) {
+                if (
+                    jsPsych.pluginAPI.compareKeys(
+                        data.response,
+                        data.correct_response
+                    )
+                ) {
+                    data.correct = true
+                } else {
+                    data.correct = false
+                }
+            } else {
+                // code mouse clicks as correct or wrong
+                if (data.click_x < window.innerWidth / 2) {
+                    // use window.innerHeight for up vs down presses
+                    data.response = "arrowleft"
+                } else {
+                    data.response = "arrowright"
+                }
+                if (
+                    jsPsych.pluginAPI.compareKeys(
+                        data.response,
+                        data.correct_response
+                    )
+                ) {
+                    data.correct = true
+                } else {
+                    data.correct = false
+                }
+            }
+            data.type = illusion_name
+            data.illusion_strength =
+                jsPsych.timelineVariable("Illusion_Strength")
+            data.illusion_difference =
+                jsPsych.timelineVariable("Difference")
+        },
+    }
+
+    // Set practice block timeline
+    var practice_block = {
+        timeline: [fixation, practice_delboeuf],
+        timeline_variables: practice_stimuli,
+        randomize_order: true,
+        repetitions: 1
+    }
+
+    // Debrief for Practice Trials
+    var practice_debrief = {
+        type: jsPsychHtmlButtonResponse,
+        choices: ["Let's Play!"],
+        on_start: function () {
+            ; (document.body.style.cursor = "auto"),
+                (document.querySelector(
+                    "#jspsych-progressbar-container"
+                ).style.display = "inline")
+        },
+        stimulus: function () {
+            var results = get_results(1000, 400)
+            var show_screen = get_debrief_display(results)
+            return show_screen.display_score +
+                "<hr><p>Can you do better in the real game?</p>" +
+                "<p>In the following trials, we will show you examples of each illusion before each block.</p>" +
+                "<p>Each illusion block will be repeated two times (so that you have an opportunity to improve your score!), but the order of the blocks is random.</p>" +
+                "<p>Remember, your goal is to be as <b>fast</b> and <b>accurate</b> as possible.</p>" +
+                "<p>Good luck!</p><br>"
+        },
+        data: {screen: 'practice_results'}
+    }
+
+    timeline.push(practice_block, practice_debrief)
+
+    /* Experiment Test Block ---------------------------------------------------------------------*/
     // Set experiment variables
     var trial_number = 1 // trial indexing variable starts at 1 for convenience
     var block_number = 1 // block indexing variable

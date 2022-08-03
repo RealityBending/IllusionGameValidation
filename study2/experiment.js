@@ -87,10 +87,10 @@ var make_break = {
     type: jsPsychHtmlButtonResponse,
     choices: ["I am ready to continue!"],
     stimulus:
-        "<p><b>BREAK</b></p>" +
-        "<p>You have reached the middle of the game.</p>" +
-        "<p>In the second part, you will see all the illusions once again. <b>Try to beat your previous score!</b></p>" +
-        "<p>We know it's long and challenging, so take a moment to rest. When you are ready, press the button below.</p>",
+        "<p><b>CONGRATULATIONS!</b></p>" +
+        "<p>You have finished one block of visual illusions.</p>" +
+        "<p>In the second part, you will see all the illusions once again. <b>Try to beat your previous score!</b></p>" ,
+        // "<p>We know it's long and challenging, so take a moment to rest. When you are ready, press the button below.</p>",
     save_trial_parameters: {
         trial_duration: true,
     },
@@ -308,4 +308,19 @@ function make_trial(instructions, illusion_name, type) {
     // Debriefing Information
     timeline.push(create_debrief((illusion_name = illusion_name)))
     return timeline
+}
+
+// Get random subset of elements from an array
+function getRandom(arr, n) {
+    var result = new Array(n),
+        len = arr.length,
+        taken = new Array(len);
+    if (n > len)
+        throw new RangeError("getRandom: more elements taken than available");
+    while (n--) {
+        var x = Math.floor(Math.random() * len);
+        result[n] = arr[x in taken ? taken[x] : x];
+        taken[x] = --len in taken ? taken[len] : len;
+    }
+    return result;
 }
