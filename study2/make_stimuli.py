@@ -508,5 +508,5 @@ data_block2 = generate_images(
 
 # -------------------------- Save data --------------------------
 save_json(data_training, name="stimuli_training")
-save_json(data_training, name="stimuli_part1")
-save_json(data_training, name="stimuli_part2")
+save_json(data_block1, name="stimuli_part1")
+save_json(data_block2, name="stimuli_part2")
