@@ -11,7 +11,7 @@ import pyllusion as ill
 # Parameters
 width = 800
 height = 800
-n = 64
+n = 4
 
 # Delete all existing stimuli
 for f in glob.glob("stimuli/*"):
