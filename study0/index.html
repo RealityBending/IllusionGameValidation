@@ -73,7 +73,7 @@
                 .localSave(
                     "json",
                     `${jsPsych.data.get().values()[0]["participant_id"]
-                    }_IllusionGame.json`
+                    }_IllusionGameV0.json`
                 )
             // window.location = "https://app.prolific.co/submissions/complete?cc=XXX" /* redirect to prolific when experiment is finished */
         },
@@ -318,8 +318,8 @@
             )
             var show_screen = get_debrief_display(results, "Final")
             return (
-                //show_screen.display_score +
-                // "<hr>" +
+                show_screen.display_score +
+                "<hr>" +
                 // show_screen.display_comparison +
                 //"<hr>" +
                 "<p>Thank you for participating!</p>"
