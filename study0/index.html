@@ -113,11 +113,11 @@
         choices: ["Let's play!"],
         stimulus:
             "<p><b>The Illusion Game</b></p>" +
-            "<p>In this game of speed and reflex, you will need to make <b>visual judgments</b> of different targets (for instance, which circle is the biggest, or which line is the longest), as <b>quickly</b> and as <b>accurately</b> as possible.</p>" +
-            "<p>It can be challenging at times, so you want to rely on your intuition and gut feeling to answer as fast as you can, without making errors.</p>" +
-            "<p>A score will be computed based on your speed and accuracy and will be displayed after each block.</p><br>" +
+            "<p>In this game of speed and reflex, you will need to make <b>visual judgments</b> of different targets (for instance, which circle is the biggest, or which line is the longest), as <b>quickly</b> as possible.</p>" +
+            "<p>It can be challenging at times, so you want to rely on your intuition and gut feeling to answer as <b>fast</b> as you can.</p>" +
+            // "<p>A score will be computed based on your speed and accuracy and will be displayed after each block.</p><br>" +
             "<p>Don't worry, we will show you examples of each target before each block.</p>" +
-            "<p>Remember, your goal is to be as <b>fast</b> and <b>accurate</b> as possible. Good luck!</p>",
+            "<p>Remember, your goal is to be as <b>fast</b> as possible. Good luck!</p>",
         data: {screen: "general_instructions"},
     }
     timeline.push(general_instructions)
@@ -318,8 +318,8 @@
             )
             var show_screen = get_debrief_display(results, "Final")
             return (
-                show_screen.display_score +
-                "<hr>" +
+                //show_screen.display_score +
+                //"<hr>" +
                 // show_screen.display_comparison +
                 //"<hr>" +
                 "<p>Thank you for participating!</p>"
