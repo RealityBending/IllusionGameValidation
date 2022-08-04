@@ -8,7 +8,7 @@ preprocess <- function(file){
     return(data.frame())
   }
 
-  data <- data[~is.na(data$screen)]
+  data <- data[!is.na(data$screen), ]
   trials <- data[data$screen == 'Trial', ]
 
   df <- data.frame(
@@ -36,25 +36,12 @@ preprocess <- function(file){
   df
 }
 
-  # Run ---------------------------------------------------------------------
-  participants <- list.files("study0/data/")
+# Run ---------------------------------------------------------------------
+participants <- list.files("data/")
 
 
-  df <- data.frame()
-  for (ppt in participants) {
-    df <- rbind(df, preprocess_raw(file = paste0("study0/data/", ppt)))
-  }
-
-  # Study 0
-  df$Study <- 0
-  df$Pyllusion <- "1.2"
-
-
-  # Transformation
-  df$Illusion_Difference_log <- log(1 + df$Illusion_Difference)
-  df$Illusion_Difference_sqrt <- sqrt(df$Illusion_Difference)
-  df$Illusion_Difference_cbrt <- df$Illusion_Difference**(1/3)
-
-  # Save anonmized data
-  write.csv(df, "data/study0.csv", row.names = FALSE)
-
+df <- data.frame()
+for (ppt in participants) {
+  df <- rbind(df, preprocess(file = paste0("data/", ppt)))
+}
+df$Illusion_Side <- as.factor(df$Illusion_Side)

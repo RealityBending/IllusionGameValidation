@@ -1,0 +1,176 @@
+---
+title: "Illusion Game Validation (Study 1)"
+output: html_document
+date: "`r Sys.Date()`"
+editor_options: 
+  chunk_output_type: console
+---
+
+
+```{r, echo = FALSE, warning=FALSE, message=FALSE}
+options(digits = 3,
+        mc.cores = 4,
+        brms.algorithm = "meanfield",
+        brms.backend = "cmdstanr")
+
+cache <- FALSE
+fig.width <- see::golden_ratio(7)
+fig.height <- 7
+
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  dpi = 450,
+  fig.path = "./figures/",
+  fig.width = fig.width,
+  fig.height = fig.height
+)
+```
+
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+library(ggdist)
+library(ggside)
+library(easystats)
+library(patchwork)
+library(brms)
+
+source("preprocessing.R")
+
+cbrt <- function(x) x^(1/3)
+
+df$Illusion_Difference_log <- log(1 + df$Illusion_Difference)
+df$Illusion_Difference_sqrt <- sqrt(df$Illusion_Difference)
+df$Illusion_Difference_cbrt <- cbrt(df$Illusion_Difference)
+
+df <- filter(df, RT < 1000)
+```
+
+## Results {.tabset}
+
+### Delboeuf
+
+```{r message=FALSE, warning=FALSE}
+data <- dplyr::filter(df, Illusion_Type == "Delboeuf")
+```
+
+```{r message=FALSE, warning=FALSE}
+best_models <- function(data) {
+  models_err <- list()
+  models_rt <- list()
+  for(k1 in c("", "_log", "_sqrt", "_cbrt")) { 
+    for(side in c("", "-side")) {
+      name <- paste0("dif", k1, side)
+      print(name)
+      f <- paste0("Illusion_Difference", 
+                  k1,
+                  " + (1|Participant)"
+                  )
+      
+      if(side == "-side") f <- paste0("Illusion_Side * ", f)
+      
+      m <- glmmTMB::glmmTMB(as.formula(paste0("Error ~ ", f)), 
+                            data = data, family = "binomial")
+      if(performance::check_convergence(m)) {
+        models_err[[name]] <- m
+      }
+      m <- glmmTMB::glmmTMB(as.formula(paste0("RT ~ ", f)), 
+                            data = data)
+      if(performance::check_convergence(m)) {
+        models_rt[[name]] <- m
+      }
+    }
+  }
+
+  to_keep <- compare_performance(models_err, metrics = c("BIC")) |> 
+    arrange(BIC) |> 
+    slice(1:5) |> 
+    pull(Name)
+  
+  test <- test_performance(models_err[to_keep], reference=1)
+  perf <- compare_performance(models_err[to_keep], metrics = c("BIC", "R2")) 
+  
+  rez <- merge(perf, test) |> 
+    arrange(BIC) |> 
+    select(Name, BIC, R2_marginal, BF) |> 
+    mutate(BF = insight::format_bf(BF, name=""),
+           Model = "Error")
+  
+  to_keep <- compare_performance(models_rt, metrics = c("BIC")) |> 
+    arrange(BIC) |> 
+    slice(1:5) |> 
+    pull(Name)
+  
+  test <- test_performance(models_rt[to_keep], reference=1)
+  perf <- compare_performance(models_rt[to_keep], metrics = c("BIC", "R2")) 
+  
+  merge(perf, test) |> 
+    arrange(BIC) |> 
+    select(Name, BIC, R2_marginal, BF) |> 
+    mutate(BF = insight::format_bf(BF, name=""),
+           Model = "RT") |> 
+    rbind(rez)
+}
+
+best_models(data)
+```
+
+
+```{r message=FALSE, warning=FALSE}
+visualize <- function(data, model_err, model_rt) {
+  model <- mgcv::gam(Error ~ s(Illusion_Difference, by = Illusion_Side),
+                     data = data,
+                     family = "binomial")
+  
+  p1 <- data |> 
+    group_by(Illusion_Difference, Illusion_Side) |> 
+    summarize(Error = mean(Error)) |> 
+    ggplot(aes(x = Illusion_Difference, y = Error)) +
+    geom_bar(stat="identity") +
+    geom_line(data=estimate_relation(model), aes(y=Predicted), color="blue") +
+    geom_line(data=estimate_relation(model_err), aes(y=Predicted), color="red") +
+    scale_y_continuous(limits = c(0, 1), expand = c(0, 0), labels = scales::percent) +
+    scale_x_continuous(expand = c(0, 0)) +
+    theme_modern() +
+    labs(
+      color = "Illusion Strength", 
+      fill = "Illusion Strength",
+      y = "Probability of Error",
+      x = "Task Difficulty"
+    ) +
+    theme(plot.title = element_text(face = "bold", hjust = 0.5)) + 
+    facet_wrap(~Illusion_Side, ncol=2, labeller = "label_both")
+  
+  
+  model <- mgcv::gam(RT ~ s(Illusion_Difference, by = Illusion_Side),
+                     data = filter(data, Error == 0, RT < 1000))
+  
+  p2 <- data |> 
+    filter(RT < 1000) |> 
+    ggplot(aes(x = Illusion_Difference, y = RT)) +
+    geom_point() +
+    geom_line(data=estimate_relation(model), aes(y=Predicted), color="blue") +
+    geom_line(data=estimate_relation(model_rt), aes(y=Predicted), color="red") +
+    scale_y_continuous(expand = c(0, 0)) +
+    scale_x_continuous(expand = c(0, 0)) +
+    theme_modern() +
+    labs(
+      color = "Illusion Strength", 
+      fill = "Illusion Strength",
+      y = "RT",
+      x = "Task Difficulty"
+    ) +
+    theme(plot.title = element_text(face = "bold", hjust = 0.5)) + 
+    facet_wrap(~Illusion_Side, ncol=2, labeller = "label_both")
+  
+  p1 / p2
+}
+
+
+model_err <- glmmTMB::glmmTMB(Error ~ log(Illusion_Difference) + (1|Participant),  
+                              data = data, family = "binomial")
+model_rt <- glmmTMB::glmmTMB(RT ~ log(Illusion_Difference) + (1|Participant),  
+                              data = data)
+
+visualize(data, model_err, model_rt)
+```

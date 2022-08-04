@@ -11,7 +11,7 @@ import pyllusion as ill
 # Parameters
 width = 800
 height = 800
-n = 64
+n = 80
 
 # Delete all existing stimuli
 for f in glob.glob("stimuli/*"):
@@ -156,7 +156,7 @@ ill.Zollner(illusion_strength=-40, difference=8).to_image(
 data = generate_images(
     data,
     strengths=[0],
-    differences=doublelinspace(mini=0.001, maxi=5, size=n),
+    differences=doublelinspace(mini=0.001, maxi=8, size=n),
     function=ill.Zollner,
     name="Zollner",
 )
