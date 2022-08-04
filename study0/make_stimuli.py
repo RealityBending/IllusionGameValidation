@@ -11,7 +11,7 @@ import pyllusion as ill
 # Parameters
 width = 800
 height = 800
-n = 32
+n = 64
 
 # Delete all existing stimuli
 for f in glob.glob("stimuli/*"):
@@ -29,9 +29,9 @@ def generate_images(data, strengths, differences, function, name="Delboeuf", **k
             path = (
                 name
                 + "_str"
-                + str(np.round(strength, 5))
+                + str(np.round(strength, 6))
                 + "_diff"
-                + str(np.round(difference, 5))
+                + str(np.round(difference, 6))
                 + ".png"
             )
             img.save("stimuli/" + path)

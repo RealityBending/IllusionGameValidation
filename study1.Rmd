@@ -467,12 +467,17 @@ plot_descriptive(data)
 ### Model Selection
 
 ```{r message=FALSE, warning=FALSE, cache=cache,results='hide'}
+# plot(seq(0, 1, length.out=100), seq(0, 1, length.out=100)**(1/3), "l", col="green")
+# lines(seq(0, 1, length.out=100), sqrt(seq(0, 1, length.out=100)), "l", col="red")
+# lines(seq(0, 1, length.out=100), log(1+seq(0, 1, length.out=100)), "l", col="blue")
+# lines(seq(0, 1, length.out=100), seq(0, 1, length.out=100), "l", col="black")
+
 best_models <- function(data) {
   models <- list()
   for(i in 1:1) {
-    for(j in 1:2) {
-      for(k1 in c("", "_log")) { 
-        for(k2 in c("")) {  
+    for(j in 1:1) {
+      for(k1 in c("", "_log", "_sqrt", "_cbrt")) { 
+        for(k2 in c("", "_log", "_sqrt", "_cbrt")) {  
           for(side in c("", "-side")) {
             name <- paste0("dif", k1, i, "-", "str", k2, j, side)
             print(name)
@@ -521,14 +526,13 @@ best_models(data)
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
 formula <- brms::bf(
-  Error ~ log(Illusion_Difference) * poly(Illusion_Strength, 2) + 
+  Error ~ Illusion_Difference_cbrt * Illusion_Strength + 
     (1 | Participant),
   family = "bernoulli"
 )
 
 model <- brms::brm(formula,
   data = data,
-  algorithm = "sampling",
   refresh = 0
 )
 
@@ -540,11 +544,13 @@ parameters::parameters(model)
 plot_model <- function(data, model) {
   data <- mutate(data, .dots_side = ifelse(Error == 1, "bottom", "top"))
   
-  n_lines <- 5
+  
+  vars <- insight::find_predictors(model)$conditional
+  n_lines <- length(unique(data[[vars[1]]]))
   pred <- estimate_relation(model,
-                            at = c("Illusion_Strength", "Illusion_Difference"),
-                            length = c(25, n_lines)) |>
-    mutate(Illusion_Difference = as.factor(round(Illusion_Difference, 2)))
+                            at = vars,
+                            length = c(NA, 25))
+  pred$Illusion_Difference <- as.factor(round(pred[[vars[1]]], 2))
   
   # Set colors for lines
   colors <- colorRampPalette(c("#F44336", "#FFC107", "#4CAF50"))(n_lines)
@@ -552,7 +558,7 @@ plot_model <- function(data, model) {
   names(colors) <- diffvals
   
   # Assign color from the same palette to every observation of data (for geom_dots)
-  closest <- diffvals[max.col(-abs(outer(data$Illusion_Difference, diffvals, "-")))]
+  closest <- diffvals[max.col(-abs(outer(data[[vars[1]]], diffvals, "-")))]
   data$color <- colors[as.character(closest)]
   data$color <- fct_reorder(data$color, closest)
   
@@ -679,7 +685,7 @@ best_models(data)
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
 formula <- brms::bf(
-  Error ~ log(Illusion_Difference) * poly(Illusion_Strength, 2) + 
+  Error ~ Illusion_Difference_cbrt * Illusion_Strength + 
     (1 | Participant),
   family = "bernoulli"
 )

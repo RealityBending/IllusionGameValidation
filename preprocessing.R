@@ -97,8 +97,8 @@ for (ppt in participants) {
 # Study 1
 df$Study <- 1
 df$Pyllusion <- "1.1"
-df[df$Illusion_Type == "Delboeuf", "Illusion_Difference"] <- sqrt(df[df$Illusion_Type == "Delboeuf", "Illusion_Difference"])
-df[df$Illusion_Type == "Ebbinghaus", "Illusion_Difference"] <- sqrt(df[df$Illusion_Type == "Ebbinghaus", "Illusion_Difference"])
+# df[df$Illusion_Type == "Delboeuf", "Illusion_Difference"] <- sqrt(df[df$Illusion_Type == "Delboeuf", "Illusion_Difference"])
+# df[df$Illusion_Type == "Ebbinghaus", "Illusion_Difference"] <- sqrt(df[df$Illusion_Type == "Ebbinghaus", "Illusion_Difference"])
 df[df$Illusion_Type == "Rod-Frame", "Illusion_Strength"] <- -1 * (df[df$Illusion_Type == "Rod-Frame", "Illusion_Strength"])
 df[df$Illusion_Type == "Zöllner", "Illusion_Strength"] <- -1 * round(df[df$Illusion_Type == "Zöllner", "Illusion_Strength"], 1)
 
@@ -109,7 +109,11 @@ df[df$Illusion_Type == "Zöllner", "Illusion_Strength"] <- -1 * round(df[df$Illu
 
 # Transformation
 df$Illusion_Difference_log <- log(1 + df$Illusion_Difference)
+df$Illusion_Difference_sqrt <- sqrt(df$Illusion_Difference)
+df$Illusion_Difference_cbrt <- df$Illusion_Difference**(1/3)
 df$Illusion_Strength_log <- sign(df$Illusion_Strength) * log(1 + abs(df$Illusion_Strength))
+df$Illusion_Strength_sqrt <- sign(df$Illusion_Strength) * sqrt(abs(df$Illusion_Strength))
+df$Illusion_Strength_cbrt <- sign(df$Illusion_Strength) * (abs(df$Illusion_Strength)**(1/3))
 
 # Save anonmized data
 write.csv(df, "data/study1.csv", row.names = FALSE)
