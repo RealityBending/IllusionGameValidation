@@ -324,23 +324,51 @@ The analysis of study focused on the probability of errors as the main outcome v
 
 # Results {.tabset}
 
-<!-- ```{r message=FALSE, warning=FALSE, cache=cache} -->
-<!-- model <- glmmTMB::glmmTMB(Error ~ Illusion_Type * poly(ISI, 2) + (1|Participant), -->
-<!--                     data=mutate(df, Illusion_Type = as.factor(Illusion_Type)), -->
-<!--                     family="binomial") -->
 
-<!-- estimate_relation(model, at = c("ISI", "Illusion_Type")) |> -->
-<!--   ggplot(aes(x = ISI, y = Predicted, color="Illusion_Type")) + -->
-<!--   geom_line() -->
+```{r eval=FALSE, message=FALSE, warning=FALSE, cache=FALSE, include=FALSE}
+# Exploratory 
+# ============
 
-<!-- model <- glmmTMB::glmmTMB(RT ~ Illusion_Type * poly(ISI, 2) + (1|Participant), -->
-<!--                     data=mutate(df, Illusion_Type = as.factor(Illusion_Type)) |>  -->
-<!--                       filter(Error == 0)) -->
+# ISI
+model <- glmmTMB::glmmTMB(Error ~ Illusion_Type * poly(ISI, 2) + (1|Participant),
+                    data=mutate(df, Illusion_Type = as.factor(Illusion_Type)),
+                    family="binomial")
 
-<!-- estimate_relation(model, at = c("ISI", "Illusion_Type")) |> -->
-<!--   ggplot(aes(x = ISI, y = Predicted, color=Illusion_Type)) + -->
-<!--   geom_line() -->
-<!-- ``` -->
+estimate_relation(model, at = c("ISI", "Illusion_Type")) |>
+  ggplot(aes(x = ISI, y = Predicted, color="Illusion_Type")) +
+  geom_line()
+
+model <- glmmTMB::glmmTMB(RT ~ Illusion_Type * poly(ISI, 2) + (1|Participant),
+                    data=mutate(df, Illusion_Type = as.factor(Illusion_Type)) |>
+                      filter(Error == 0))
+
+estimate_relation(model, at = c("ISI", "Illusion_Type")) |>
+  ggplot(aes(x = ISI, y = Predicted, color=Illusion_Type)) +
+  geom_line()
+
+
+# Difficulty - Link type
+ps <- list()
+for(illusion in c("Delboeuf", "Ebbinghaus", "Rod-Frame", "Poggendorff", 
+"Vertical-Horizontal", "Zöllner", "Müller-Lyer", "Ponzo", 
+"Contrast", "White")) {
+  data <- filter(df, Illusion_Type == illusion, Illusion_Strength == 0)
+  model <- mgcv::gamm(Error ~ s(Illusion_Difference, k=4),
+                      random = list(Participant = ~1),
+                      data=data,
+                      family="binomial")
+
+  ps[[illusion]] <- estimate_relation(model, 
+                                     at = list(Illusion_Difference = unique(data$Illusion_Difference))) |>
+    ggplot(aes(x = Illusion_Difference, y = Predicted)) +
+    geom_bar(stat="identity", alpha=0.3) +
+    geom_line() +
+    ggtitle(illusion)
+}
+
+see::plots(ps)
+
+```
 
 ## Delboeuf
 
@@ -1185,6 +1213,7 @@ gam$p
 std_params(model, min=0, max=25)
 std_params(gam$model, min=0, max=25)
 ```
+
 
 
 # Discussion
