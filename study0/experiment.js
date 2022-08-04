@@ -252,7 +252,7 @@ function create_debrief(illusion_name = "Ponzo") {
                 // "<hr>" +
                 // //
                 // show_screen.display_comparison +
-                "<hr><p>Can you do better in the next illusion?</p>"
+                "<hr><p>Can you do better in the next block?</p>"
             )
         },
         data: { screen: "block_results" },
