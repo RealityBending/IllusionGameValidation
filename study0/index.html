@@ -1,0 +1,363 @@
+<head>
+    <!-- Customize the title! -->
+    <title>Illusion Game v0.0</title>
+    <!-- jsPsych Scripts -->
+    <script src="utils/jspsych/jspsych.js"></script>
+    <script src="utils/jspsych/plugin-html-keyboard-response.js"></script>
+    <script src="utils/jspsych/plugin-html-button-response.js"></script>
+    <script src="utils/jspsych/plugin-fullscreen.js"></script>
+    <script src="utils/jspsych/plugin-survey-text.js"></script>
+    <script src="utils/jspsych/plugin-preload.js"></script>
+    <script src="utils/jspsych/plugin-image-keyboard-response.js"></script>
+    <script src="utils/jspsych/plugin-survey-multi-choice.js"></script>
+    <script src="utils/jspsych/plugin-browser-check.js"></script>
+    <!-- Other modules -->
+    <script src="https://realitybending.github.io/JSmisc/misc/utils.js"></script>
+    <!--<script src = "utils/jspsych/plugin-jsPsychPavlovia.js"></script>-->
+    <!--<script src = "utils/jspsych/plugin-jspsych-pavlovia-2021.js"></script>-->
+    <!-- Load stimuli -->
+    <script src="stimuli/stimuli.js"></script>
+    <script src="experiment.js"></script>
+    <!-- CSS -->
+    <link href="utils/jspsych/jspsych.css" rel="stylesheet" type="text/css" />
+    <!--<script type="text/javascript" src="lib/vendors/jquery-2.2.0.min.js"></script>-->
+    <!--<script type="text/javascript" src="lib/jspsych-7-pavlovia-2022.1.1.js"></script>-->
+
+    <style>
+        /* set canvas to be full screen */
+        .jspsych-content {
+            max-width: 100%;
+        }
+
+        /*Hide scrollbar while keeping it functional */
+        body {
+            overflow-y: scroll;
+            overflow-x: flow;
+        }
+
+        Body::-webkit-scrollbar {
+            display: none
+        }
+    </style>
+</head>
+
+<body></body>
+
+<script>
+    /* ----------------- Initialize experiment ----------------- */
+     var timeline = []
+
+
+    // /* Initialize connection to Pavlovia ----*/
+    // var pavlovia_init = {
+    //     type: jsPsychPavlovia,
+    //     command: "init",
+    //     setPavloviaInfo: function (info) {
+    //         console.log(info);
+    //         pavloviaInfo = info;
+    //     }
+    // }
+
+
+    // timeline.push(pavlovia_init);
+
+    var jsPsych = initJsPsych({
+        show_progress_bar: true,
+        message_progress_bar: "Completion",
+        // exclusions: { min_width: 800, min_height: 600 }, /* exclude browsers that are not at least 800x600 pix */
+        //  on_interaction_data_update: function (data) {console.log(JSON.stringify(data))}, /* record browser interactions */
+        on_finish: function () {
+            jsPsych.data.displayData("json")
+            jsPsych.data
+                .get()
+                .localSave(
+                    "json",
+                    `${jsPsych.data.get().values()[0]["participant_id"]
+                    }_IllusionGame.json`
+                )
+            // window.location = "https://app.prolific.co/submissions/complete?cc=XXX" /* redirect to prolific when experiment is finished */
+        },
+    })
+
+    // Fullscreen mode
+    timeline.push({
+        type: jsPsychFullscreen,
+        fullscreen_mode: true,
+        delay_after: 0,
+    })
+
+    // Participant ID
+    var participant_id = jsPsych.randomization.randomID(10)
+
+    jsPsych.data.addProperties({ participant_id: participant_id})
+
+    // Preload Instructions Stimuli
+    timeline.push({
+        type: jsPsychPreload,
+        images: [
+            "utils/stimuli_demo/Contrast_Demo.png",
+            "utils/stimuli_demo/Delboeuf_Demo.png",
+            "utils/stimuli_demo/MullerLyer_Demo.png",
+            "utils/stimuli_demo/Poggendorff_Demo.png",
+            "utils/stimuli_demo/RodFrame_Demo.png",
+            "utils/stimuli_demo/VerticalHorizontal_Demo.png",
+            "utils/stimuli_demo/White_Demo.png",
+            "utils/stimuli_demo/Zollner_Demo.png",
+        ],
+    })
+
+
+    // General Instructions
+    var general_instructions = {
+        type: jsPsychHtmlButtonResponse,
+        choices: ["Let's play!"],
+        stimulus:
+            "<p><b>The Illusion Game</b></p>" +
+            "<p>In this game of speed and reflex, you will need to make <b>visual judgments</b> (for instance, which circle is the biggest, or which line is the longest), as fast and as correctly as possible, while <b>resisting different visual illusions</b>.</p>" +
+            "<p>It can be challenging at times, so you want to rely on your intuition and gut feeling to answer as fast as you can, without making errors.</p>" +
+            "<p>A score will be computed based on your speed and accuracy and will be displayed after each illusion block.</p><br>" +
+            "<p>Don't worry, we will show you examples of each illusion before each block. Each illusion block will be repeated two times (so that you have an opportunity to improve your score!), but the order of the blocks is random.</p>" +
+            "<p>Remember, your goal is to be as <b>fast</b> and <b>accurate</b> as possible. Good luck!</p>",
+        data: {screen: "general_instructions"},
+    }
+    timeline.push(general_instructions)
+
+    // Set experiment variables
+    var trial_number = 1 // trial indexing variable starts at 1 for convenience
+    var block_number = 1 // block indexing variable
+
+    /* ============================================================== */
+    /* ---------------------- DELBOEUF ILLUSION --------------------- */
+    /* ============================================================== */
+    var timeline_delboeuf = make_trial(
+        (instructions = function () {
+            return "<p><b>Part " +
+                block_number +
+                "</b></p>" +
+                "<p>In this part, two red circles will appear side by side on the screen.</p>" +
+                "<p>Your task is to select which <b>red circle is bigger</b> in size as fast as you can, without making errors.</p>" +
+                "<p>Don't get distracted by the black outlines around the red circles!</p>" +
+                "<p>Press <b>the LEFT or the RIGHT arrow</b> to indicate which is the bigger <b>red circle.</b></p>" +
+                "<div style='float: center'><img src='utils/stimuli_demo/Delboeuf_Demo.png' height='300'></img>" +
+                "<p><img src='utils/answer/answer_leftright_keyboard.PNG' height='150'></img></p>" +
+                "<p class='small'>In this example, the correct answer is the <b>LEFT arrow</b>.</p></div>" +
+                "<p>Are you ready? <b>Press ENTER to start</b></p>"
+        }),
+        (illusion_name = "Delboeuf"),
+        (type = "leftright")
+    )
+
+    timeline.push({timeline: timeline_delboeuf})
+
+    /* ================================================================ */
+    /* ---------------------- MULLERLYER ILLUSION --------------------- */
+    /* ================================================================ */
+    var timeline_mullerlyer = make_trial(
+        (instructions = function () {
+            return "<p><b>Part " +
+                block_number +
+                "</b></p>" +
+                "<p>In this part, two horizontal red lines will appear one above the other.</p>" +
+                "<p>Your task is to select which <b>line is longer</b> in length as fast as you can, without making errors.</p>" +
+                "<p>Don't get distracted by the surrounding black arrows at the end of the red lines!</p>" +
+                "<p>Press <b>the UP or the DOWN arrow</b> to indicate where is the longer <b>red line.</b></p>" +
+                "<div style='float: center'><img src='utils/stimuli_demo/MullerLyer_Demo.png' height='300'></img>" +
+                "<p><img src='utils/answer/answer_updown_keyboard.PNG' height='150'></img></p>" +
+                "<p class='small'>In this example, the correct answer is the <b>UP arrow</b>.</p></div>" +
+                "<p>Are you ready? <b>Press ENTER to start</b></p>"
+        }),
+        (illusion_name = "MullerLyer"),
+        (type = "updown")
+    )
+
+    timeline.push({timeline: timeline_mullerlyer})
+
+
+    /* ================================================================ */
+    /* ----------------------- ZOLLNER ILLUSION ----------------------- */
+    /* ================================================================ */
+    var timeline_zollner = make_trial(
+        (instructions = function () {
+            return "<p><b>Part " +
+                block_number +
+                "</b></p>" +
+                "<p>In this part, two horizontal red lines will appear one above the other.</p>" +
+                "<p>Your task is to tell <b>the direction</b> towards which the red lines are converging, as fast as you can, and without making errors.</p>" +
+                "<p>Don't get distracted by the black lines!</p>" +
+                "<p>Press <b>the LEFT or the RIGHT arrow</b> to indicate the <b>direction where the red lines are pointing.</b></p>" +
+                "<div style='float: center'><img src='utils/stimuli_demo/Zollner_Demo.png' height='300'></img>" +
+                "<p><img src='utils/answer/answer_leftright_keyboard.PNG' height='150'></img></p>" +
+                "<p class='small'>In this example, the correct answer is the <b>LEFT arrow</b>.</p></div>" +
+                "<p>Are you ready? <b>Press ENTER to start</b></p>"
+        }),
+        (illusion_name = "Zollner"),
+        (type = "leftright")
+    )
+
+    timeline.push({timeline: timeline_zollner})
+
+    /* ================================================================ */
+    /* ---------------------- CONTRAST ILLUSION ----------------------- */
+    /* ================================================================ */
+    var timeline_contrast = make_trial(
+        (instructions = function () {
+            return "<p><b>Part " +
+                block_number +
+                "</b></p>" +
+                "<p>In this part, two small grey rectangles will appear one above the other.</p>" +
+                "<p>Your task is to select which rectangle is <b>lighter</b> in colour as fast as you can, without making errors.</p>" +
+                "<p>Don't get distracted by the surrounding background!</p>" +
+                "<p>Press <b>the UP or the DOWN arrow</b> to indicate which is the <b>lighter rectangle.</b></p>" +
+                "<div style='float: center'><img src='utils/stimuli_demo/Contrast_Demo.png' height='300'></img>" +
+                "<p><img src='utils/answer/answer_updown_keyboard.PNG' height='150'></img></p>" +
+                "<p class='small'>In this example, the correct answer is the <b>UP arrow</b>.</p></div>" +
+                "<p>Are you ready? <b>Press ENTER to start</b></p>"
+        }),
+        (illusion_name = "Contrast"),
+        (type = "updown")
+    )
+
+    timeline.push({timeline: timeline_contrast})
+
+
+    /* ================================================================ */
+    /* ---------------------- RODFRAME ILLUSION ----------------------- */
+    /* ================================================================ */
+    var timeline_rodframe = make_trial(
+        (instructions = function () {
+            return "<p><b>Part " +
+                block_number +
+                "</b></p>" +
+                "<p>In this part, one vertical red line will appear in a square.</p>" +
+                "<p>Your task is to tell <b>which direction</b> the red line is leaning towards, as fast as you can, and without making errors.</p>" +
+                "<p>Don't get distracted by the black square!</p>" +
+                "<p>Press <b>the LEFT or the RIGHT arrow</b> to indicate the <b>direction where the red line is leaning towards.</b></p>" +
+                "<div style='float: center'><img src='utils/stimuli_demo/RodFrame_Demo.png' height='300'></img>" +
+                "<p><img src='utils/answer/answer_leftright_keyboard.PNG' height='150'></img></p>" +
+                "<p class='small'>In this example, the correct answer is the <b>LEFT arrow</b>.</p></div>" +
+                "<p>Are you ready? <b>Press ENTER to start</b></p>"
+        }),
+        (illusion_name = "RodFrame"),
+        (type = "leftright")
+    )
+
+    timeline.push({timeline: timeline_rodframe})
+
+    /* ================================================================ */
+    /* --------------------- POGGENDORFF ILLUSION --------------------- */
+    /* ================================================================ */
+    var timeline_poggendorff = make_trial(
+        (instructions = function () {
+            return "<p><b>Part " +
+                block_number +
+                "</b></p>" +
+                "<p>In this part, two parallel red lines will appear, but they are partially hidden by a grey rectangle.</p>" +
+                "<p>Your task is to tell if the <b>red line to the right</b> of the rectangle is above or below the line to the left. You need to answer as fast as you can, without making errors.</p>" +
+                "<p>Press <b>the UP or the DOWN arrow</b> to indicate whether the <b>right red line is actually above or below the left red line.</b></p>" +
+                "<div style='float: center'><img src='utils/stimuli_demo/Poggendorff_Demo.png' height='300'></img>" +
+                "<p><img src='utils/answer/answer_updown_keyboard.PNG' height='150'></img></p>" +
+                "<p class='small'>In this example, the correct answer is the <b>UP arrow</b>.</p></div>" +
+                "<p>Are you ready? <b>Press ENTER to start</b></p>"
+        }),
+        (illusion_name = "Poggendorff"),
+        (type = "updown")
+    )
+
+    timeline.push({timeline: timeline_poggendorff})
+
+    /* ================================================================ */
+    /* ----------------- VERTICAL-HORIZONTAL ILLUSION ----------------- */
+    /* ================================================================ */
+    var timeline_verticalhorizontal = make_trial(
+        (instructions = function () {
+            return "<p><b>Part " +
+                block_number +
+                "</b></p>" +
+                "<p>In this part, two red lines will appear side by side.</p>" +
+                "<p>Your task is to tell <b>which line is longer</b> in length as fast as you can, and without making errors.</p>" +
+                "<p>Don't get distracted by the orientation of the lines!</p>" +
+                "<p>Press <b>the LEFT or the RIGHT arrow</b> to indicate which <b>line is the longer one.</b></p>" +
+                "<div style='float: center'><img src='utils/stimuli_demo/VerticalHorizontal_Demo.png' height='300'></img>" +
+                "<p><img src='utils/answer/answer_leftright_keyboard.PNG' height='150'></img></p>" +
+                "<p class='small'>In this example, the correct answer is the <b>LEFT arrow</b>.</p></div>" +
+                "<p>Are you ready? <b>Press ENTER to start</b></p>"
+        }),
+        (illusion_name = "VerticalHorizontal"),
+        (type = "leftright")
+    )
+
+    timeline.push({timeline: timeline_verticalhorizontal})
+
+    /* ================================================================ */
+    /* ------------------------- WHITE ILLUSION ----------------------- */
+    /* ================================================================ */
+    var timeline_white = make_trial(
+        (instructions = function () {
+            return "<p><b>Part " +
+                block_number +
+                "</b></p>" +
+                "<p>In this part, two vertical grey rectangles will appear side by side.</p>" +
+                "<p>Your task is to tell <b>which rectangle is of a lighter color</b>, as fast as you can, and without making errors.</p>" +
+                "<p>Don't get distracted by the background color!</p>" +
+                "<p>Press <b>the LEFT or the RIGHT arrow</b> to indicate which <b>side has the lighter grey rectangle.</b></p>" +
+                "<div style='float: center'><img src='utils/stimuli_demo/White_Demo.png' height='300'></img>" +
+                "<p><img src='utils/answer/answer_leftright_keyboard.PNG' height='150'></img></p>" +
+                "<p class='small'>In this example, the correct answer is the <b>LEFT arrow</b>.</p></div>" +
+                "<p>Are you ready? <b>Press ENTER to start</b></p>"
+        }),
+        (illusion_name = "White"),
+        (type = "leftright")
+    )
+
+    timeline.push({timeline: timeline_white})
+
+    /* ================================================================ */
+    /*                           End Experiment
+    /* ================================================================ */
+    // Debriefing Information
+    var end_experiment = {
+        type: jsPsychHtmlButtonResponse,
+        choices: ["End"],
+        stimulus: function () {
+            var results = get_results(
+                1000, // population_scores["Total"]["IES_Mean"][0],
+                400 // population_scores["Total"]["IES_SD"][0]
+            )
+            var show_screen = get_debrief_display(results, "Final")
+            return (
+                //show_screen.display_score +
+                // "<hr>" +
+                // show_screen.display_comparison +
+                //"<hr>" +
+                "<p>Thank you for participating!</p>"
+               // "<p>You will now be redirected to Prolific to be reimbursed.</p>" +
+               // "<p>Please click 'OK' when asked to leave the site.</p>"
+            )
+        },
+        data: {screen: "final_results"},
+    }
+    timeline.push(end_experiment)
+
+    // Fullscreen mode
+    timeline.push({
+        type: jsPsychFullscreen,
+        fullscreen_mode: false,
+    })
+
+
+    // /* Close connection to Pavlovia---*/
+    // var pavlovia_finish = {
+    //         type: jsPsychPavlovia,
+    //         command: "finish",
+    //         participantId: participant_id,
+    //         completedCallback: function (){
+    //             window.location.replace('https://app.prolific.co/submissions/complete?cc=CUWXHNY5');
+    //     }
+    // }
+
+
+    jsPsych.run(timeline)
+
+
+</script>
+</html>
