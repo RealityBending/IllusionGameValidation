@@ -45,7 +45,7 @@
 
 <script>
     /* ----------------- Initialize experiment ----------------- */
-     var timeline = []
+    var timeline = []
 
 
     // /* Initialize connection to Pavlovia ----*/
@@ -89,7 +89,7 @@
     // Participant ID
     var participant_id = jsPsych.randomization.randomID(10)
 
-    jsPsych.data.addProperties({ participant_id: participant_id})
+    jsPsych.data.addProperties({participant_id: participant_id})
 
     // Preload Instructions Stimuli
     timeline.push({
@@ -330,8 +330,8 @@
                 // show_screen.display_comparison +
                 //"<hr>" +
                 "<p>Thank you for participating!</p>"
-               // "<p>You will now be redirected to Prolific to be reimbursed.</p>" +
-               // "<p>Please click 'OK' when asked to leave the site.</p>"
+                // "<p>You will now be redirected to Prolific to be reimbursed.</p>" +
+                // "<p>Please click 'OK' when asked to leave the site.</p>"
             )
         },
         data: {screen: "final_results"},
@@ -360,4 +360,5 @@
 
 
 </script>
+
 </html>
