@@ -107,12 +107,6 @@ def save_json(data, name="stimuli"):
         f.write(updatedfile)
 
 
-def sqrtspace(mini=0.1, maxi=1, size=6):
-    x = np.linspace(np.sqrt(0), np.sqrt(1), int(size / 2) + 1, endpoint=True) ** 2
-    x = nk.rescale(x[1::], [mini, maxi])
-    return np.concatenate((-1 * x[::-1], x))
-
-
 def doublelinspace(mini=0.1, maxi=1, size=6, transformation="lin", show=True):
     lin = np.linspace(mini, maxi, int(size / 2), endpoint=True)
     exp = nk.expspace(mini, maxi, int(size / 2), out=float)
@@ -380,7 +374,7 @@ ill.MullerLyer(illusion_strength=-10, difference=0.7).to_image(width=800, height
 )
 
 strengths = np.linspace(-49, 49, n - 1)
-diffs = doublelinspace(mini=0.04, maxi=0.46, size=n, transformation="square")
+diffs = doublelinspace(mini=0.04, maxi=0.46, size=n, transformation="cube")
 diff1 = np.concatenate((diffs[0 : n // 2 : 2], diffs[n // 2 + 1 :: 2]))
 diff2 = np.concatenate((diffs[1 : n // 2 : 2], diffs[n // 2 :: 2]))
 
@@ -418,7 +412,7 @@ ill.Ponzo(illusion_strength=5, difference=0.7).to_image(width=800, height=600).s
 
 
 strengths = np.linspace(-25.2, 25.2, n - 1)
-diffs = doublelinspace(mini=0.04, maxi=0.46, size=n, transformation="square")
+diffs = doublelinspace(mini=0.04, maxi=0.46, size=n, transformation="cube")
 diff1 = np.concatenate((diffs[0 : n // 2 : 2], diffs[n // 2 + 1 :: 2]))
 diff2 = np.concatenate((diffs[1 : n // 2 : 2], diffs[n // 2 :: 2]))
 
