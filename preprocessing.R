@@ -50,6 +50,14 @@ preprocess_raw <- function(file) {
   # Correct duration
   df$Duration <- df$Duration - df$Break_Duration
 
+  # Transformation
+  df$Illusion_Difference_log <- log(1 + df$Illusion_Difference)
+  df$Illusion_Difference_sqrt <- sqrt(df$Illusion_Difference)
+  df$Illusion_Difference_cbrt <- round(df$Illusion_Difference**(1/3), 4)
+  df$Illusion_Strength_log <- sign(df$Illusion_Strength) * log(1 + abs(df$Illusion_Strength))
+  df$Illusion_Strength_sqrt <- sign(df$Illusion_Strength) * sqrt(abs(df$Illusion_Strength))
+  df$Illusion_Strength_cbrt <- sign(df$Illusion_Strength) * (abs(df$Illusion_Strength)**(1/3))
+
   # Format names
   df$Illusion_Type <- ifelse(df$Illusion_Type == "MullerLyer", "Müller-Lyer", df$Illusion_Type)
   df$Illusion_Type <- ifelse(df$Illusion_Type == "Zollner", "Zöllner", df$Illusion_Type)
@@ -80,39 +88,4 @@ preprocess_raw <- function(file) {
 
 
 
-# Run ---------------------------------------------------------------------
 
-
-# This is a local folder containing raw data from unzipped pavlovia
-# It has been added to .gitignore to NOT be published on github
-# (it contains the subject ID of the participants)
-participants <- list.files("study1/rawdata/")
-
-
-df <- data.frame()
-for (ppt in participants) {
-  df <- rbind(df, preprocess_raw(file = paste0("study1/rawdata/", ppt)))
-}
-
-# Study 1
-df$Study <- 1
-df$Pyllusion <- "1.1"
-# df[df$Illusion_Type == "Delboeuf", "Illusion_Difference"] <- sqrt(df[df$Illusion_Type == "Delboeuf", "Illusion_Difference"])
-# df[df$Illusion_Type == "Ebbinghaus", "Illusion_Difference"] <- sqrt(df[df$Illusion_Type == "Ebbinghaus", "Illusion_Difference"])
-df[df$Illusion_Type == "Rod-Frame", "Illusion_Strength"] <- -1 * (df[df$Illusion_Type == "Rod-Frame", "Illusion_Strength"])
-df[df$Illusion_Type == "Zöllner", "Illusion_Strength"] <- -1 * round(df[df$Illusion_Type == "Zöllner", "Illusion_Strength"], 1)
-
-
-
-
-
-# Transformation
-df$Illusion_Difference_log <- log(1 + df$Illusion_Difference)
-df$Illusion_Difference_sqrt <- sqrt(df$Illusion_Difference)
-df$Illusion_Difference_cbrt <- round(df$Illusion_Difference**(1/3), 4)
-df$Illusion_Strength_log <- sign(df$Illusion_Strength) * log(1 + abs(df$Illusion_Strength))
-df$Illusion_Strength_sqrt <- sign(df$Illusion_Strength) * sqrt(abs(df$Illusion_Strength))
-df$Illusion_Strength_cbrt <- sign(df$Illusion_Strength) * (abs(df$Illusion_Strength)**(1/3))
-
-# Save anonmized data
-write.csv(df, "data/study1.csv", row.names = FALSE)

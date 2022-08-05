@@ -27,7 +27,8 @@ share/python-wheels/
 *.egg
 MANIFEST
 
-study1/rawdata/*
+study1/data/*
+study2/data/*
 study1_cache/*
 study2_cache/*
 

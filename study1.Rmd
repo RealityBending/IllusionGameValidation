@@ -36,6 +36,30 @@ The goal of study 1 was to...
 # Methods
 
 
+```{r eval=FALSE, message=FALSE, warning=FALSE, include=FALSE}
+# PREPROCESSING ================================================================
+source("preprocessing.R")
+
+# This is a local folder containing raw data from unzipped pavlovia
+# It has been added to .gitignore to NOT be published on github
+# (it contains the subject ID of the participants)
+participants <- list.files("study1/data/")
+
+df <- data.frame()
+for (ppt in participants) {
+  df <- rbind(df, preprocess_raw(file = paste0("study1/rawdata/", ppt)))
+}
+
+
+df$Pyllusion <- "1.1"
+df[df$Illusion_Type == "Rod-Frame", "Illusion_Strength"] <- -1 * (df[df$Illusion_Type == "Rod-Frame", "Illusion_Strength"])
+df[df$Illusion_Type == "Zöllner", "Illusion_Strength"] <- -1 * round(df[df$Illusion_Type == "Zöllner", "Illusion_Strength"], 1)
+
+# Save anonymized data
+write.csv(df, "data/study1.csv", row.names = FALSE)
+```
+
+
 ```{r message=FALSE, warning=FALSE}
 library(tidyverse)
 library(ggdist)
@@ -60,7 +84,9 @@ df <- read.csv("data/study1.csv") |>
 ```{r message=FALSE, warning=FALSE}
 # plot(estimate_density(dfraw[dfraw$Participant == "60684f29dbfe1bb2059e5e27_rkqoy", "RT"]))
 
-# Dear participant, thank you for participating in our study. Unfortunately, our system detected multiple issues in your data (such as implausibly short responses, and random-like pattern of answers), which make the data unusable for us. We understand that you might have been in a hurry, or had some other issues, and kindly ask you to return your participation. We hope to open-up more slots in the future would you be interested to participate again. 
+# Dear participant, thank you for participating in our study. Unfortunately, our system detected multiple issues in your data (such as implausibly short responses, and random-like pattern of answers), which makes your data unusable. We understand that you might have been in a hurry or had some other issues, and kindly ask you to return your participation. We hope to open-up more slots in the future would you be interested to participate again. 
+
+# Dear participant, thank you for participating in our study. Unfortunately, our system detected multiple issues in your data (such as implausibly short responses, and random-like pattern of answers), which makes it unusable. We understand that you might have been in a hurry or had some other issues; we hope to open-up more slots in the future would you be interested to participate again.
 
 outliers <- c(
   # Half of the trials have very short RT
@@ -76,10 +102,10 @@ outliers <- c(
   # Prolific Status: RETURNED
   "614f36fd81c78b7a125c4262_6ax4g",
   # Error rate of 47.9%
-  # Prolific Status: RETURN REQUESTED
+  # Prolific Status: REJECTED
   "61280140171ec546e87ed8cb_qdlgy",
   # Error rate of 42.1% and very large RT SD
-  # Prolific Status: RETURN REQUESTED
+  # Prolific Status: REJECTED
   "5d398380b37ab1000111fac3_2nxxh"
 )
 ```
