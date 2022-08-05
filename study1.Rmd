@@ -368,6 +368,21 @@ for(illusion in c("Delboeuf", "Ebbinghaus", "Rod-Frame", "Poggendorff",
 
 see::plots(ps)
 
+# IES
+df |> 
+  group_by(Participant, Illusion_Type) |>
+  summarize(Correct = 1-mean(Error)) |> 
+  ungroup() |> 
+  estimate_density(select="Correct") |> 
+  plot()
+  
+df |> 
+  filter(Error == 0) |> 
+  group_by(Participant, Illusion_Type) |>
+  summarize(RT = mean(RT)) |> 
+  ungroup() |> 
+  estimate_density(select="RT") |> 
+  plot()
 ```
 
 ## Delboeuf
@@ -1226,5 +1241,7 @@ std_params(gam$model, min=0, max=25)
 # Discussion
 
 This study allowed to elaborate a more precise prior idea regarding the magnitude of the effects at stake and the type of interaction between them. Crucially, it allowed us to refine the range of task difficulty and illusion strength for the stimuli of the next study to maximize the information gain.
+
+One thing that stood out was Zöller, which seems to exhibit a non-linear relationship of illusion effect. Next study, by generating a wider range of illusion strength, will attempt at clarifying this point.
 
 Perceptual decisions often exhibit a non-linear relationship with the objective physical values (e.g., a logarithmic relationship. In order to spread the difficulty levels based on the behavioral performance (to maximize the diversity of the stimuli in regards to perceptual processes), we generated, for study 2, stimuli with the difficulty levels spaced non-linearly, depending on the best underlying model (i.e., with an exponential, square or cubic spacing if the best model was *log*, *square root* or *cube root*). For instance, a linear space of [0.1, 0.3, 0.5, 0.7] can be transformed to an exponential space of [0.1, 0.27, 0.47, 0.7].

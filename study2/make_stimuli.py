@@ -63,7 +63,14 @@ def generate_images(data, strengths, differences, function, name="Delboeuf", **k
             img.save("stimuli/" + path)
 
             # Compute expected response
-            if name in ["Delboeuf", "Ebbinghaus", "VerticalHorizontal", "White"]:
+            if name in [
+                "Delboeuf",
+                "Ebbinghaus",
+                "VerticalHorizontal",
+                "White",
+                "Zollner",
+                "RodFrame",
+            ]:
                 if difference > 0:
                     correct = "arrowleft"
                 else:
@@ -73,11 +80,6 @@ def generate_images(data, strengths, differences, function, name="Delboeuf", **k
                     correct = "arrowup"
                 else:
                     correct = "arrowdown"
-            elif name in ["Zollner", "RodFrame"]:
-                if difference < 0:
-                    correct = "arrowleft"
-                else:
-                    correct = "arrowright"
 
             # Save parameters for Delboeuf Illusion
             data.append(
@@ -294,12 +296,12 @@ data_block2 = generate_images(
 )
 
 # -------------------------- Zollner Illusion --------------------------
-ill.Zollner(illusion_strength=-40, difference=8).to_image(width=800, height=600).save(
+ill.Zollner(illusion_strength=-45, difference=8).to_image(width=800, height=600).save(
     "utils/stimuli_demo/Zollner_Demo.png"
 )
 
-strengths = np.linspace(-42, 42, n - 1)
-diffs = doublelinspace(mini=0.15, maxi=5, size=n, transformation="cube")
+strengths = np.linspace(-77, 77, n - 1)
+diffs = doublelinspace(mini=0.15, maxi=4.15, size=n, transformation="cube")
 diff1 = np.concatenate((diffs[0 : n // 2 : 2], diffs[n // 2 + 1 :: 2]))
 diff2 = np.concatenate((diffs[1 : n // 2 : 2], diffs[n // 2 :: 2]))
 
