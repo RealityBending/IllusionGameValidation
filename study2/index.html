@@ -142,14 +142,17 @@
             {
                 prompt: "Please enter your age (in years, e.g., '31')",
                 name: "age",
+                required: true,
             },
             {
                 prompt: "Please enter your country of birth (e.g., 'France')",
                 name: "nationality",
+                required: true,
             },
             {
                 prompt: "Please enter your ethnicity (e.g., 'Caucasian')",
-                name: "ethnicity"
+                name: "ethnicity",
+                required: true,
             }
         ],
         on_finish: function () {
@@ -171,11 +174,13 @@
                 prompt: 'What is your gender?',
                 options: ["Male", "Female", "Other", "Prefer not to say"],
                 name: "sex",
+                required: true,
             },
             {
                 prompt: "What is your highest completed education level?",
                 options: ["University (doctorate)", "University (master)", "University (bachelor)", "High school", "Other", "Prefer not to say"],
                 name: "education",
+                required: true,
             }
         ],
         data: {
@@ -317,8 +322,8 @@
         type: jsPsychHtmlButtonResponse,
         choices: ["Let's Play!"],
         stimulus: "<p><b>TRAINING COMPLETED</b></p>" +
-            "<p>Are you ready for the real game?</p>" +
-            "<p>This time, after each illusion block, a <b>score</b> will be calculated based on speed (time you took to answer) and accuracy (number of errors).</p>" +
+            "<p><i>Are you ready for the real game?</i></p>" +
+            "<p>This time, there will be more trials, and some might be harder too. Moreover, after each illusion block, a <b>score</b> will be calculated based on speed (time you took to answer) and accuracy (number of errors).</p>" +
             "<p>Try to keep up a high score (max = 100)!</p><br>" +
             "<p>Note that it can be <i>really</i> challenging at times, so you will need to rely on your <b>intuition</b> and gut feeling to answer as fast as you can without making errors.</p>" +
             "<p>Each illusion block will be repeated two times (so that you have the opportunity to improve your score!), but the order of the blocks is random.</p>" +

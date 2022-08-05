@@ -318,9 +318,7 @@ function make_trial(stimuli, instructions, illusion_name, type) {
                         "#jspsych-progressbar-container"
                     ).style.display = "inline")
             },
-            stimulus:
-                "<p>Great job!</p>" +
-                "<p>Click NEXT when you're ready for the next illusion practice.</p>",
+            stimulus: "<p><b>Great job!</b></p>",
             data: { screen: "practice_block" },
         })
     }
@@ -401,7 +399,7 @@ const rodframe_instructions =
 const poggendorff_instructions =
     "<p>In this part, two parallel red lines will appear, but they are partially hidden by a grey rectangle.</p>" +
     "<p>Your task is to tell if the <b>red line to the right</b> of the rectangle is above or below the line to the left. You need to answer as fast as you can, without making errors.</p>" +
-    "<p>Press <b>the UP or the DOWN arrow</b> to indicate whether the <b>right red line is actually above or below the left red line.</b></p>" +
+    "<p>Press <b>the UP or the DOWN arrow</b> to indicate whether the <b>right red line</b> is actually <b>above or below the left red line.</b></p>" +
     "<div style='float: center'><img src='utils/stimuli_demo/Poggendorff_Demo.png' height='300'></img>" +
     "<p><img src='utils/answer/answer_updown_keyboard.PNG' height='150'></img></p>" +
     "<p class='small'>In this example, the correct answer is the <b>UP arrow</b>.</p></div>" +
