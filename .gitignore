@@ -28,6 +28,9 @@ share/python-wheels/
 MANIFEST
 
 study1/rawdata/*
+study1_cache/*
+study2_cache/*
+
 
 # PyInstaller
 #  Usually these files are written by a python script from a template

@@ -106,11 +106,10 @@ df[df$Illusion_Type == "Zöllner", "Illusion_Strength"] <- -1 * round(df[df$Illu
 
 
 
-
 # Transformation
 df$Illusion_Difference_log <- log(1 + df$Illusion_Difference)
 df$Illusion_Difference_sqrt <- sqrt(df$Illusion_Difference)
-df$Illusion_Difference_cbrt <- df$Illusion_Difference**(1/3)
+df$Illusion_Difference_cbrt <- round(df$Illusion_Difference**(1/3), 4)
 df$Illusion_Strength_log <- sign(df$Illusion_Strength) * log(1 + abs(df$Illusion_Strength))
 df$Illusion_Strength_sqrt <- sign(df$Illusion_Strength) * sqrt(abs(df$Illusion_Strength))
 df$Illusion_Strength_cbrt <- sign(df$Illusion_Strength) * (abs(df$Illusion_Strength)**(1/3))

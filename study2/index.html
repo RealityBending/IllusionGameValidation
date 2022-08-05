@@ -206,14 +206,11 @@
     // General Instructions
     var general_instructions = {
         type: jsPsychHtmlButtonResponse,
-        choices: ["Let's Practice!"],
+        choices: ["Start the practice!"],
         stimulus:
             "<p><b>The Illusion Game</b></p>" +
             "<p>In this game of speed and reflex, you will need to make <b>visual judgments</b> (for instance, which circle is the biggest, or which line is the longest), as fast and as correctly as possible, while <b>resisting different visual illusions</b>.</p>" +
-            "<p> After each illusion block, a score (out of 100) will be calculated based on your <b>accuracy</b> (number of correct answers) and your <b>speed</b> (time it took to answer).</p>" +
-            "<p>The faster and more accurate you are, the higher your scores will be!</p>" +
-            "<p>It can be challenging at times, so you want to rely on your intuition and gut feeling to answer as fast as you can, without making errors.</p>" +
-            "<p>Don't worry, you will get a chance to practice before you begin the real game.</p><br>",
+            "<p>We are going to start with some examples of all the illusions you will encounter in the game.</p>",
         data: {screen: "general_instructions"},
     }
     timeline.push(general_instructions)
@@ -319,10 +316,12 @@
     var end_practice = {
         type: jsPsychHtmlButtonResponse,
         choices: ["Let's Play!"],
-        stimulus: "<p>You have completed the practice trials for all the illusions!</p>" +
-                "<p>You are now ready for the real game?</p>" +
-                "<p>In the following trials, we will show you examples of each illusion before each block.</p>" +
-                "<p>Each illusion block will be repeated two times (so that you have an opportunity to improve your score!), but the order of the blocks is random.</p>" +
+        stimulus: "<p><b>TRAINING COMPLETED</b></p>" +
+                "<p>Are ready for the real game?</p>" +
+                "<p>This time, after each illusion block, a <b>score</b> will be calculated based on speed (time you took to answer) and accuracy (number of errors).</p>" +
+                "<p>Try to keep-up a high score (max = 100)!</p><br>" +
+                "<p>Note that it can be <i>really</i> challenging at times, so you will need to rely on your <b>intuition</b> and gut feeling to answer as fast as you can without making errors.</p>" +
+                "<p>Each illusion block will be repeated two times (so that you have the opportunity to improve your score!), but the order of the blocks is random.</p>" +
                 "<p>Remember, your goal is to be as <b>fast</b> and <b>accurate</b> as possible.</p>" +
                 "<p>Good luck!</p><br>",
         data: {screen: "practice_debrief"},

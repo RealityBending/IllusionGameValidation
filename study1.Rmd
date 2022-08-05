@@ -13,7 +13,7 @@ options(digits = 3,
         brms.algorithm = "meanfield",
         brms.backend = "cmdstanr")
 
-cache <- TRUE
+cache <- FALSE
 fig.width <- see::golden_ratio(7)
 fig.height <- 7
 
@@ -467,17 +467,12 @@ plot_descriptive(data)
 ### Model Selection
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
-# plot(seq(0, 1, length.out=100), seq(0, 1, length.out=100)**(1/3), "l", col="green")
-# lines(seq(0, 1, length.out=100), sqrt(seq(0, 1, length.out=100)), "l", col="red")
-# lines(seq(0, 1, length.out=100), log(1+seq(0, 1, length.out=100)), "l", col="blue")
-# lines(seq(0, 1, length.out=100), seq(0, 1, length.out=100), "l", col="black")
-
 best_models <- function(data) {
   models <- list()
   for(i in 1:1) {
     for(j in 1:1) {
       for(k1 in c("", "_log", "_sqrt", "_cbrt")) { 
-        for(k2 in c("", "_log", "_sqrt", "_cbrt")) {  
+        for(k2 in c("")) {  
           for(side in c("", "-side")) {
             name <- paste0("dif", k1, i, "-", "str", k2, j, side)
             # print(name)
@@ -525,10 +520,10 @@ best_models(data)
 ### Model Visualization
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
-cbrt <- function(x) sign(x) * abs(x)^(1/3)
+cbrt <- function(x) sign(x) * abs(x)**(1/3)
 
 formula <- brms::bf(
-  Error ~ poly(Illusion_Difference, 2) * Illusion_Strength + 
+  Error ~ cbrt(Illusion_Difference) * Illusion_Strength + 
     (1 | Participant),
   family = "bernoulli"
 )
@@ -551,15 +546,15 @@ plot_model <- function(data, model) {
   vardiff <- vars[1]
   varstrength <- vars[2]
   
-  n_lines <- length(unique(data[[vardiff]]))
+  # Get predicted
   pred <- estimate_relation(model,
                             at = vars,
                             length = c(NA, 25))
-  pred$Illusion_Difference <- as.factor(round(pred[[vardiff]], 2))
+  pred[[vardiff]] <- as.factor(pred[[vardiff]])
   
   # Set colors for lines
-  colors <- colorRampPalette(c("#F44336", "#FFC107", "#4CAF50"))(n_lines)
-  diffvals <- as.numeric(as.character(unique(sort(pred$Illusion_Difference))))
+  colors <- colorRampPalette(c("#F44336", "#FFC107", "#4CAF50"))(length(unique(data[[vardiff]])))
+  diffvals <- as.numeric(as.character(unique(sort(pred[[vardiff]]))))
   names(colors) <- diffvals
   
   # Assign color from the same palette to every observation of data (for geom_dots)
@@ -568,32 +563,31 @@ plot_model <- function(data, model) {
   data$color <- fct_reorder(data$color, closest)
   
   # Manual jittering
-  xrange <- 0.05*diff(range(data$Illusion_Strength))
-  data$x <- data$Illusion_Strength 
+  xrange <- 0.05*diff(range(data[[varstrength]]))
+  data$x <- data[[varstrength]]
   data$x[data$x > 0] <- data$x[data$x > 0] - runif(sum(data$x > 0), 0, xrange)
   data$x[data$x < 0] <- data$x[data$x < 0] + runif(sum(data$x < 0), 0, xrange)
   data$x[round(data$x, 2) == 0] <- data$x[round(data$x, 2) == 0] + runif(sum(round(data$x, 2) == 0), -xrange/2, xrange/2)
   
   
   pred |>
-    ggplot(aes(x = Illusion_Strength, y = Predicted)) +
+    ggplot(aes_string(x = varstrength, y = "Predicted")) +
     geom_dots(
-      data = mutate(data, 
-                    Illusion_Strength = round(Illusion_Strength, 1)),
+      data = data,
       aes(x=x, y = Error, group = Error, side = .dots_side, order=color), 
       fill = data$color,
       color = NA, 
       alpha=0.5) +
     geom_slab(data=data, aes(y = Error)) +
-    geom_ribbon(aes(ymin = CI_low, ymax = CI_high, fill = Illusion_Difference, group = Illusion_Difference), alpha = 0.2) +
+    geom_ribbon(aes_string(ymin = "CI_low", ymax = "CI_high", fill = vardiff, group = vardiff), alpha = 0.2) +
     geom_vline(xintercept = 0, linetype = "dashed") +
     geom_hline(yintercept = c(0.05, 0.5, 0.95), linetype = "dotted", alpha = 0.5) +
-    geom_line(aes(color = Illusion_Difference, group = Illusion_Difference)) +
+    geom_line(aes_string(color = vardiff, group = vardiff)) +
     scale_y_continuous(limits = c(0, 1), expand = c(0, 0), labels = scales::percent) +
     scale_x_continuous(expand = c(0, 0)) +
     scale_color_manual(values = colors) +
     scale_fill_manual(values = colors) +
-    coord_cartesian(xlim=c(min(data$Illusion_Strength), max(data$Illusion_Strength))) +
+    coord_cartesian(xlim=c(min(data[[varstrength]]), max(data[[varstrength]]))) +
     theme_modern() +
     labs(
       title = paste0(data$Illusion_Type[1], " Illusion"),
@@ -690,7 +684,7 @@ best_models(data)
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
 formula <- brms::bf(
-  Error ~ poly(Illusion_Difference, 2) * Illusion_Strength + 
+  Error ~ cbrt(Illusion_Difference) * Illusion_Strength + 
     (1 | Participant),
   family = "bernoulli"
 )
@@ -978,6 +972,68 @@ std_params(gam$model, min=0, max=20)
 
 
 
+
+## Müller-Lyer
+
+### Descriptive
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+data <- filter(df, Illusion_Type == "Müller-Lyer")
+
+plot_descriptive(data, side = "updown")
+```
+
+
+
+### Model Selection
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+best_models(data)
+```
+
+
+### Model Visualization
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+formula <- brms::bf(
+  Error ~ log(Illusion_Difference) * poly(Illusion_Strength, 2) + 
+    (1 | Participant),
+  family = "bernoulli"
+)
+
+model <- brms::brm(formula,
+  data = data,
+  refresh = 0
+)
+
+# parameters::parameters(model)
+```
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+plot_model(data, model)
+```
+
+
+### GAM
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+gam <- make_gam(data)
+gam$p
+```
+
+
+### Parameter Standardization
+
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+# range(data$Illusion_Difference)
+# range(data$Illusion_Strength)
+
+std_params(model, min=0, max=0.6)
+std_params(gam$model, min=0, max=0.6)
+```
+
+
 ## Ponzo
 
 ### Descriptive
@@ -1039,66 +1095,6 @@ std_params(gam$model, min=0, max=20)
 ```
 
 
-
-## Müller-Lyer
-
-### Descriptive
-
-```{r message=FALSE, warning=FALSE, cache=cache}
-data <- filter(df, Illusion_Type == "Müller-Lyer")
-
-plot_descriptive(data, side = "updown")
-```
-
-
-
-### Model Selection
-
-```{r message=FALSE, warning=FALSE, cache=cache}
-best_models(data)
-```
-
-
-### Model Visualization
-
-```{r message=FALSE, warning=FALSE, cache=cache}
-formula <- brms::bf(
-  Error ~ log(Illusion_Difference) * poly(Illusion_Strength, 2) + 
-    (1 | Participant),
-  family = "bernoulli"
-)
-
-model <- brms::brm(formula,
-  data = data,
-  refresh = 0
-)
-
-# parameters::parameters(model)
-```
-
-```{r message=FALSE, warning=FALSE, cache=cache}
-plot_model(data, model)
-```
-
-
-### GAM
-
-```{r message=FALSE, warning=FALSE, cache=cache}
-gam <- make_gam(data)
-gam$p
-```
-
-
-### Parameter Standardization
-
-
-```{r message=FALSE, warning=FALSE, cache=cache}
-# range(data$Illusion_Difference)
-# range(data$Illusion_Strength)
-
-std_params(model, min=0, max=0.6)
-std_params(gam$model, min=0, max=0.6)
-```
 
 
 ## Poggendorff

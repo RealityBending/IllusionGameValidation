@@ -3,6 +3,7 @@ import glob
 import json
 import os
 
+import matplotlib.pyplot as plt
 import neurokit2 as nk
 import numpy as np
 import pandas as pd
@@ -54,9 +55,9 @@ def generate_images(data, strengths, differences, function, name="Delboeuf", **k
             path = (
                 name
                 + "_str"
-                + str(np.round(strength, 2))
+                + str(np.round(strength, 4))
                 + "_diff"
-                + str(np.round(difference, 2))
+                + str(np.round(difference, 4))
                 + ".png"
             )
             img.save("stimuli/" + path)
@@ -112,12 +113,29 @@ def sqrtspace(mini=0.1, maxi=1, size=6):
     return np.concatenate((-1 * x[::-1], x))
 
 
-def doublelinspace(mini=0.1, maxi=1, size=6, exp=False):
-    if exp is False:
-        x = np.linspace(mini, maxi, int(size / 2), endpoint=True)
-    else:
-        x = nk.expspace(mini, maxi, int(size / 2), out=float, base=2)
-    return np.concatenate((-1 * x[::-1], x))
+def doublelinspace(mini=0.1, maxi=1, size=6, transformation="lin", show=True):
+    lin = np.linspace(mini, maxi, int(size / 2), endpoint=True)
+    exp = nk.expspace(mini, maxi, int(size / 2), out=float)
+    sq = (np.linspace(mini ** (1 / 2), maxi ** (1 / 2), int(size / 2), endpoint=True)) ** 2
+    cb = (np.linspace(mini ** (1 / 3), maxi ** (1 / 3), int(size / 2), endpoint=True)) ** 3
+
+    if show is True:
+        plt.plot(lin, [0] * len(lin), "o", label="linear")
+        plt.plot(exp, [0.2] * len(lin), "o", label="exp")
+        plt.plot(sq, [0.4] * len(lin), "o", label="square")
+        plt.plot(cb, [0.6] * len(lin), "o", label="cube")
+        plt.legend()
+
+    if transformation == "lin":
+        x = lin
+    elif transformation == "exp":
+        x = exp
+    elif transformation == "square":
+        x = sq
+    elif transformation == "cube":
+        x = cb
+
+    return np.round(np.concatenate((-1 * x[::-1], x)), 5)
 
 
 # =============================================================================
@@ -129,14 +147,15 @@ data_block2 = []
 
 # Left-right ======================================================================================
 # -------------------------- Delboeuf Illusion --------------------------
-ill.Delboeuf(illusion_strength=-0.4, difference=1.20).to_image(width=800, height=600).save(
+ill.Delboeuf(illusion_strength=-1.8, difference=1.40).to_image(width=800, height=600).save(
     "utils/stimuli_demo/Delboeuf_Demo.png"
 )
 # ill.Delboeuf(illusion_strength=0, difference=0.1).to_image()
 
-strengths = np.linspace(-0.7, 0.7, n - 1)
-diff1 = doublelinspace(mini=0.3, maxi=0.9, size=n // 2)
-diff2 = doublelinspace(mini=0.2, maxi=0.8, size=n // 2)
+strengths = np.linspace(-2.17, 2.17, n - 1)
+diffs = doublelinspace(mini=0.07, maxi=0.7, size=n, transformation="cube")
+diff1 = np.concatenate((diffs[0 : n // 2 : 2], diffs[n // 2 + 1 :: 2]))
+diff2 = np.concatenate((diffs[1 : n // 2 : 2], diffs[n // 2 :: 2]))
 
 data_training = generate_images(
     data_training,
@@ -169,14 +188,15 @@ data_block2 = generate_images(
 
 
 # -------------------------- Ebbinghaus Illusion --------------------------
-ill.Ebbinghaus(illusion_strength=-0.4, difference=1.2).to_image(width=800, height=600).save(
+ill.Ebbinghaus(illusion_strength=-1.4, difference=1.4).to_image(width=800, height=600).save(
     "utils/stimuli_demo/Ebbinghaus_Demo.png"
 )
 
 
-strengths = np.linspace(-0.7, 0.7, n - 1)
-diff1 = doublelinspace(mini=0.3, maxi=0.9, size=n // 2)
-diff2 = doublelinspace(mini=0.2, maxi=0.8, size=n // 2)
+strengths = np.linspace(-2.03, 2.03, n - 1)
+diffs = doublelinspace(mini=0.07, maxi=0.7, size=n, transformation="cube")
+diff1 = np.concatenate((diffs[0 : n // 2 : 2], diffs[n // 2 + 1 :: 2]))
+diff2 = np.concatenate((diffs[1 : n // 2 : 2], diffs[n // 2 :: 2]))
 
 
 data_training = generate_images(
@@ -213,10 +233,10 @@ ill.RodFrame(illusion_strength=-5, difference=30).to_image(width=800, height=600
 )
 
 
-strengths = np.linspace(-15, 15, n - 1)
-doublelinspace(mini=0.1, maxi=7.1, size=n)
-diff1 = doublelinspace(mini=1.1, maxi=7.1, size=n // 2)
-diff2 = doublelinspace(mini=0.1, maxi=6.1, size=n // 2)
+strengths = np.linspace(-14, 14, n - 1)
+diffs = doublelinspace(mini=0.06, maxi=7.1, size=n, transformation="square")
+diff1 = np.concatenate((diffs[0 : n // 2 : 2], diffs[n // 2 + 1 :: 2]))
+diff2 = np.concatenate((diffs[1 : n // 2 : 2], diffs[n // 2 :: 2]))
 
 
 data_training = generate_images(
@@ -249,11 +269,10 @@ ill.VerticalHorizontal(illusion_strength=-45, difference=1).to_image(width=800, 
     "utils/stimuli_demo/VerticalHorizontal_Demo.png"
 )
 
-strengths = np.linspace(-70, 70, n - 1)
-doublelinspace(mini=0.03, maxi=0.24, size=n)
-diff1 = doublelinspace(mini=0.06, maxi=0.24, size=n // 2)
-diff2 = doublelinspace(mini=0.03, maxi=0.21, size=n // 2)
-
+strengths = np.linspace(-66.5, 66.5, n - 1)
+diffs = doublelinspace(mini=0.03, maxi=0.24, size=n, transformation="square")
+diff1 = np.concatenate((diffs[0 : n // 2 : 2], diffs[n // 2 + 1 :: 2]))
+diff2 = np.concatenate((diffs[1 : n // 2 : 2], diffs[n // 2 :: 2]))
 
 data_training = generate_images(
     data_training,
@@ -286,9 +305,9 @@ ill.Zollner(illusion_strength=-40, difference=8).to_image(width=800, height=600)
 )
 
 strengths = np.linspace(-42, 42, n - 1)
-doublelinspace(mini=0.1, maxi=4.3, size=n)
-diff1 = doublelinspace(mini=0.7, maxi=4.3, size=n // 2)
-diff2 = doublelinspace(mini=0.1, maxi=3.7, size=n // 2)
+diffs = doublelinspace(mini=0.15, maxi=5, size=n, transformation="cube")
+diff1 = np.concatenate((diffs[0 : n // 2 : 2], diffs[n // 2 + 1 :: 2]))
+diff2 = np.concatenate((diffs[1 : n // 2 : 2], diffs[n // 2 :: 2]))
 
 
 data_training = generate_images(
@@ -322,10 +341,10 @@ ill.White(illusion_strength=5, difference=50).to_image(width=800, height=600).sa
     "utils/stimuli_demo/White_Demo.png"
 )
 
-strengths = np.linspace(-14, 14, n - 1)
-doublelinspace(mini=3, maxi=17, size=n)
-diff1 = doublelinspace(mini=5, maxi=17, size=n // 2)
-diff2 = doublelinspace(mini=3, maxi=15, size=n // 2)
+strengths = np.linspace(-17.5, 17.5, n - 1)
+diffs = doublelinspace(mini=3, maxi=17.5, size=n, transformation="square")
+diff1 = np.concatenate((diffs[0 : n // 2 : 2], diffs[n // 2 + 1 :: 2]))
+diff2 = np.concatenate((diffs[1 : n // 2 : 2], diffs[n // 2 :: 2]))
 
 
 data_training = generate_images(
@@ -361,9 +380,9 @@ ill.MullerLyer(illusion_strength=-10, difference=0.7).to_image(width=800, height
 )
 
 strengths = np.linspace(-49, 49, n - 1)
-doublelinspace(mini=0.04, maxi=0.46, size=n)
-diff1 = doublelinspace(mini=0.1, maxi=0.46, size=n // 2)
-diff2 = doublelinspace(mini=0.04, maxi=0.4, size=n // 2)
+diffs = doublelinspace(mini=0.04, maxi=0.46, size=n, transformation="square")
+diff1 = np.concatenate((diffs[0 : n // 2 : 2], diffs[n // 2 + 1 :: 2]))
+diff2 = np.concatenate((diffs[1 : n // 2 : 2], diffs[n // 2 :: 2]))
 
 
 data_training = generate_images(
@@ -399,9 +418,9 @@ ill.Ponzo(illusion_strength=5, difference=0.7).to_image(width=800, height=600).s
 
 
 strengths = np.linspace(-25.2, 25.2, n - 1)
-doublelinspace(mini=0.04, maxi=0.39, size=n)
-diff1 = doublelinspace(mini=0.09, maxi=0.39, size=n // 2)
-diff2 = doublelinspace(mini=0.04, maxi=0.34, size=n // 2)
+diffs = doublelinspace(mini=0.04, maxi=0.46, size=n, transformation="square")
+diff1 = np.concatenate((diffs[0 : n // 2 : 2], diffs[n // 2 + 1 :: 2]))
+diff2 = np.concatenate((diffs[1 : n // 2 : 2], diffs[n // 2 :: 2]))
 
 
 data_training = generate_images(
@@ -437,9 +456,9 @@ ill.Poggendorff(illusion_strength=-20, difference=0.4).to_image(width=800, heigh
 
 
 strengths = np.linspace(-44.8, 44.8, n - 1)
-doublelinspace(mini=0.02, maxi=0.3, size=n)
-diff1 = doublelinspace(mini=0.06, maxi=0.3, size=n // 2)
-diff2 = doublelinspace(mini=0.02, maxi=0.26, size=n // 2)
+diffs = doublelinspace(mini=0.02, maxi=0.3, size=n, transformation="cube")
+diff1 = np.concatenate((diffs[0 : n // 2 : 2], diffs[n // 2 + 1 :: 2]))
+diff2 = np.concatenate((diffs[1 : n // 2 : 2], diffs[n // 2 :: 2]))
 
 
 data_training = generate_images(
@@ -475,9 +494,9 @@ ill.Contrast(illusion_strength=-5, difference=30).to_image(width=800, height=600
 
 
 strengths = np.linspace(-31.5, 31.5, n - 1)
-doublelinspace(mini=2.5, maxi=20, size=n)
-diff1 = doublelinspace(mini=5, maxi=20, size=n // 2)
-diff2 = doublelinspace(mini=2.5, maxi=17.5, size=n // 2)
+diffs = doublelinspace(mini=3, maxi=17.5, size=n, transformation="square")
+diff1 = np.concatenate((diffs[0 : n // 2 : 2], diffs[n // 2 + 1 :: 2]))
+diff2 = np.concatenate((diffs[1 : n // 2 : 2], diffs[n // 2 :: 2]))
 
 
 data_training = generate_images(

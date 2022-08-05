@@ -43,7 +43,7 @@ df$Illusion_Difference_log <- log(1 + df$Illusion_Difference)
 df$Illusion_Difference_sqrt <- sqrt(df$Illusion_Difference)
 df$Illusion_Difference_cbrt <- cbrt(df$Illusion_Difference)
 
-df <- filter(df, RT < 1000)
+df <- filter(df, RT < 900)
 ```
 
 ## Results {.tabset}
@@ -118,17 +118,27 @@ best_models(data)
 
 ```{r message=FALSE, warning=FALSE}
 visualize <- function(data, model_err, model_rt) {
-  model <- mgcv::gam(Error ~ s(Illusion_Difference, by = Illusion_Side),
-                     data = data,
-                     family = "binomial")
+  
+  at <- list(Illusion_Difference=seq(0, max(data$Illusion_Difference), length.out=30),
+             Illusion_Side = levels(unique(data$Illusion_Side)))
+  
+  model <- mgcv::gamm(Error ~ s(Illusion_Difference, by = Illusion_Side),
+                      random = list(Participant = ~1) ,
+                      data = data,
+                      family = "binomial")
+  model_lin <- glmmTMB::glmmTMB(Error ~ Illusion_Difference + (1|Participant) ,
+                      data = data,
+                      family = "binomial")
   
   p1 <- data |> 
     group_by(Illusion_Difference, Illusion_Side) |> 
     summarize(Error = mean(Error)) |> 
     ggplot(aes(x = Illusion_Difference, y = Error)) +
     geom_bar(stat="identity") +
-    geom_line(data=estimate_relation(model), aes(y=Predicted), color="blue") +
-    geom_line(data=estimate_relation(model_err), aes(y=Predicted), color="red") +
+    geom_hline(yintercept=0.5, linetype="dotted") +
+    geom_line(data=estimate_relation(model_lin, at=at[1]), aes(y=Predicted), color="black") +
+    geom_line(data=estimate_relation(model, at=at), aes(y=Predicted), color="blue") +
+    geom_line(data=estimate_relation(model_err, at=at[1]), aes(y=Predicted), color="red") +
     scale_y_continuous(limits = c(0, 1), expand = c(0, 0), labels = scales::percent) +
     scale_x_continuous(expand = c(0, 0)) +
     theme_modern() +
@@ -142,15 +152,21 @@ visualize <- function(data, model_err, model_rt) {
     facet_wrap(~Illusion_Side, ncol=2, labeller = "label_both")
   
   
-  model <- mgcv::gam(RT ~ s(Illusion_Difference, by = Illusion_Side),
+  model <- mgcv::gamm(RT ~ s(Illusion_Difference, by = Illusion_Side),
+                     random = list(Participant = ~1) ,
                      data = filter(data, Error == 0, RT < 1000))
+    model_lin <- glmmTMB::glmmTMB(RT ~ Illusion_Difference + (1|Participant) ,
+                      data = data)
   
   p2 <- data |> 
     filter(RT < 1000) |> 
+    # group_by(Illusion_Difference, Illusion_Side) |> 
+    # summarize(RT = mean(RT)) |> 
     ggplot(aes(x = Illusion_Difference, y = RT)) +
-    geom_point() +
-    geom_line(data=estimate_relation(model), aes(y=Predicted), color="blue") +
-    geom_line(data=estimate_relation(model_rt), aes(y=Predicted), color="red") +
+    ggdist::stat_pointinterval(aes(group=Illusion_Difference)) +
+    geom_line(data=estimate_relation(model_lin, at=at[1]), aes(y=Predicted), color="black") +
+    geom_line(data=estimate_relation(model, at=at), aes(y=Predicted), color="blue") +
+    geom_line(data=estimate_relation(model_rt, at=at[1]), aes(y=Predicted), color="red") +
     scale_y_continuous(expand = c(0, 0)) +
     scale_x_continuous(expand = c(0, 0)) +
     theme_modern() +
@@ -167,6 +183,102 @@ visualize <- function(data, model_err, model_rt) {
 }
 
 
+model_err <- glmmTMB::glmmTMB(Error ~ log(1+Illusion_Difference) + (1|Participant),  
+                              data = data, family = "binomial")
+model_rt <- glmmTMB::glmmTMB(RT ~ log(1+Illusion_Difference) + (1|Participant),  
+                              data = data)
+
+visualize(data, model_err, model_rt)
+```
+
+```{r message=FALSE, warning=FALSE}
+optimal <- function(model_err) {
+  pred <- estimate_relation(model_err, length=500) 
+
+  bounds <- pred |> 
+      slice(c(which.min(abs(Predicted - 0.25)), 
+              which.min(abs(Predicted - 0.025)))) 
+  
+  rez <- bounds |> 
+    transmute(Illusion_Difference_log = Illusion_Difference_log,
+              Illusion_Difference = exp(Illusion_Difference_log) - 1,
+              Error = insight::format_value(Predicted, as_percent=TRUE))
+    
+  p <- pred |> 
+    ggplot(aes(y = Predicted, x = Illusion_Difference_log)) +
+    geom_line() +
+    geom_hline(yintercept = c(0.25, 0.025), linetype="dotted", color=c("red", "green")) +
+    geom_vline(xintercept = bounds$Illusion_Difference_log, linetype="dotted", color=c("red", "green")) +
+    theme_modern()
+  list(rez=rez, p=p)
+}
+
+model_err <- glmmTMB::glmmTMB(Error ~ Illusion_Difference_log + (1|Participant),  
+                              data = data, family = "binomial")
+
+rez <- optimal(model_err)
+rez$rez
+rez$p
+```
+
+### Müller-Lyer
+
+```{r message=FALSE, warning=FALSE}
+data <- dplyr::filter(df, Illusion_Type == "Müller-Lyer")
+```
+
+```{r message=FALSE, warning=FALSE}
+best_models(data)
+```
+
+```{r message=FALSE, warning=FALSE}
+model_err <- glmmTMB::glmmTMB(Error ~ log(1+Illusion_Difference) + (1|Participant),  
+                              data = data, family = "binomial")
+model_rt <- glmmTMB::glmmTMB(RT ~ log(1+Illusion_Difference) + (1|Participant),  
+                              data = data)
+
+visualize(data, model_err, model_rt)
+```
+
+```{r message=FALSE, warning=FALSE}
+model_err <- glmmTMB::glmmTMB(Error ~ Illusion_Difference_log + (1|Participant),  
+                              data = data, family = "binomial")
+
+rez <- optimal(model_err)
+rez$rez
+rez$p
+```
+
+### Vertical-Horizontal
+
+```{r message=FALSE, warning=FALSE}
+data <- dplyr::filter(df, Illusion_Type == "Vertical-Horizontal")
+```
+
+```{r message=FALSE, warning=FALSE}
+best_models(data)
+```
+
+```{r message=FALSE, warning=FALSE}
+model_err <- glmmTMB::glmmTMB(Error ~ sqrt(Illusion_Difference) + (1|Participant),  
+                              data = data, family = "binomial")
+model_rt <- glmmTMB::glmmTMB(RT ~ sqrt(Illusion_Difference) + (1|Participant),  
+                              data = data)
+
+visualize(data, model_err, model_rt)
+```
+
+### Poggendorff
+
+```{r message=FALSE, warning=FALSE}
+data <- dplyr::filter(df, Illusion_Type == "Poggendorff")
+```
+
+```{r message=FALSE, warning=FALSE}
+best_models(data)
+```
+
+```{r message=FALSE, warning=FALSE}
 model_err <- glmmTMB::glmmTMB(Error ~ log(Illusion_Difference) + (1|Participant),  
                               data = data, family = "binomial")
 model_rt <- glmmTMB::glmmTMB(RT ~ log(Illusion_Difference) + (1|Participant),  
@@ -174,3 +286,84 @@ model_rt <- glmmTMB::glmmTMB(RT ~ log(Illusion_Difference) + (1|Participant),
 
 visualize(data, model_err, model_rt)
 ```
+
+
+### Zöllner
+
+```{r message=FALSE, warning=FALSE}
+data <- dplyr::filter(df, Illusion_Type == "Zöllner")
+```
+
+```{r message=FALSE, warning=FALSE}
+best_models(data)
+```
+
+```{r message=FALSE, warning=FALSE}
+model_err <- glmmTMB::glmmTMB(Error ~ log(Illusion_Difference) + (1|Participant),  
+                              data = data, family = "binomial")
+model_rt <- glmmTMB::glmmTMB(RT ~ log(Illusion_Difference) + (1|Participant),  
+                              data = data)
+
+visualize(data, model_err, model_rt)
+```
+
+### Rod-Frame
+
+```{r message=FALSE, warning=FALSE}
+data <- dplyr::filter(df, Illusion_Type == "Rod-Frame")
+```
+
+```{r message=FALSE, warning=FALSE}
+best_models(data)
+```
+
+```{r message=FALSE, warning=FALSE}
+model_err <- glmmTMB::glmmTMB(Error ~ log(Illusion_Difference) + (1|Participant),  
+                              data = data, family = "binomial")
+model_rt <- glmmTMB::glmmTMB(RT ~ log(Illusion_Difference) + (1|Participant),  
+                              data = data)
+
+visualize(data, model_err, model_rt)
+```
+
+### Contrast
+
+```{r message=FALSE, warning=FALSE}
+data <- dplyr::filter(df, Illusion_Type == "Contrast")
+```
+
+```{r message=FALSE, warning=FALSE}
+best_models(data)
+```
+
+```{r message=FALSE, warning=FALSE}
+model_err <- glmmTMB::glmmTMB(Error ~ log(1+Illusion_Difference) + (1|Participant),  
+                              data = data, family = "binomial")
+model_rt <- glmmTMB::glmmTMB(RT ~ log(1+Illusion_Difference) + (1|Participant),  
+                              data = data)
+
+visualize(data, model_err, model_rt)
+```
+
+
+
+### White
+
+```{r message=FALSE, warning=FALSE}
+data <- dplyr::filter(df, Illusion_Type == "White")
+```
+
+```{r message=FALSE, warning=FALSE}
+best_models(data)
+```
+
+```{r message=FALSE, warning=FALSE}
+model_err <- glmmTMB::glmmTMB(Error ~ log(1+Illusion_Difference) + (1|Participant),  
+                              data = data, family = "binomial")
+model_rt <- glmmTMB::glmmTMB(RT ~ log(1+Illusion_Difference) + (1|Participant),  
+                              data = data)
+
+visualize(data, model_err, model_rt)
+```
+
+
