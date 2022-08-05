@@ -88,7 +88,7 @@ var make_break = {
     choices: ["I am ready to continue!"],
     stimulus:
         "<p><b>CONGRATULATIONS!</b></p>" +
-        "<p>You have finished half of the game. We know it's long and challenging, so we thank you in advance for staying focused 'til the end!</p>" +
+        "<p>You have finished half of the game. We know it's long and challenging, so we appreciate you staying focused until the end!</p>" +
         "<p>You will now see all the illusions once again. <b>Try to beat your previous score!</b></p>",
     save_trial_parameters: {
         trial_duration: true,
