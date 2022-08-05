@@ -41,7 +41,7 @@ function get_debrief_display(results, type = "Block") {
         var score =
             "<p>Your score for this illusion is " +
             '<p style="color: black; font-size: 48px; font-weight: bold;">' +
-            Math.round(results.score) +
+            Math.round(results.score*10)/10 +
             " %</p>"
     } else if (type === "Final") {
         // Final debriefing at end of game
