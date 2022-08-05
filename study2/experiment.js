@@ -13,7 +13,10 @@ function get_results(illusion_mean, illusion_sd, illusion_type) {
     if (correct_trials.count() > 0) {
         var rt_mean_correct = correct_trials.select("rt").mean()
         var ies = rt_mean_correct / proportion_correct // compute inverse efficiency score
-        var score_to_display = 100 - ies / 50 // change max score to 100 instead of 5000
+        var score_to_display = 100 - ies / 50
+        if (score_to_display < 0) {
+            score_to_display = 0
+        }
         var percentile =
             100 - cumulative_probability(ies, illusion_mean, illusion_sd) * 100
     } else {
@@ -39,7 +42,7 @@ function get_debrief_display(results, type = "Block") {
             "<p>Your score for this illusion is " +
             '<p style="color: black; font-size: 48px; font-weight: bold;">' +
             Math.round(results.score) +
-            "</p>"
+            " %</p>"
     } else if (type === "Final") {
         // Final debriefing at end of game
         var score =
