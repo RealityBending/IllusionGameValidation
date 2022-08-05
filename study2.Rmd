@@ -1,14 +1,16 @@
 ---
-title: "Illusion Game Validation"
+title: "Illusion Game Validation (Study 2)"
 output: html_document
 date: "`r Sys.Date()`"
 editor_options: 
   chunk_output_type: console
 ---
 
-
 ```{r, echo = FALSE, warning=FALSE, message=FALSE}
-options(digits = 3)
+options(digits = 3,
+        mc.cores = 4,
+        brms.algorithm = "sampling",
+        brms.backend = "cmdstanr")
 
 cache <- FALSE
 fig.width <- see::golden_ratio(7)
@@ -24,11 +26,10 @@ knitr::opts_chunk$set(
 ```
 
 
-
 # Introduction
 
 
-The goal of study 1 was to...
+The goal of study 2 was to...
 
 # Methods
 
@@ -47,8 +48,18 @@ for (ppt in participants) {
   df <- rbind(df, preprocess_raw(file = paste0("study2/data/", ppt)))
 }
 
-
 df$Pyllusion <- "1.2"
+
+# Fix 
+df[df$Illusion_Type == "Rod-Frame" & df$Date == "05/08/2022", "Illusion_Strength"] <- -1 * (df[df$Illusion_Type == "Rod-Frame" & df$Date == "05/08/2022", "Illusion_Strength"])
+
+# Transformation
+df$Illusion_Difference_log <- log(1 + df$Illusion_Difference)
+df$Illusion_Difference_sqrt <- sqrt(df$Illusion_Difference)
+df$Illusion_Difference_cbrt <- round(df$Illusion_Difference**(1/3), 4)
+df$Illusion_Strength_log <- sign(df$Illusion_Strength) * log(1 + abs(df$Illusion_Strength))
+df$Illusion_Strength_sqrt <- sign(df$Illusion_Strength) * sqrt(abs(df$Illusion_Strength))
+df$Illusion_Strength_cbrt <- sign(df$Illusion_Strength) * (abs(df$Illusion_Strength)**(1/3))
 
 # Save anonymized data
 write.csv(df, "data/study2.csv", row.names = FALSE)
@@ -75,17 +86,18 @@ df <- read.csv("data/study2.csv") |>
 ```
 
 
-
 ## Exclusions {.tabset}
 
 ```{r message=FALSE, warning=FALSE}
 # plot(estimate_density(dfraw[dfraw$Participant == "60684f29dbfe1bb2059e5e27_rkqoy", "RT"]))
 
-# Dear participant, thank you for participating in our study. Unfortunately, our system detected multiple issues in your data (such as implausibly short responses, and random-like pattern of answers), which makes your data unusable. We understand that you might have been in a hurry or had some other issues, and kindly ask you to return your participation. We hope to open-up more slots in the future would you be interested to participate again. 
-
 # Dear participant, thank you for participating in our study. Unfortunately, our system detected multiple issues in your data (such as implausibly short responses, and random-like pattern of answers), which makes it unusable. We understand that you might have been in a hurry or had some other issues; we hope to open-up more slots in the future would you be interested to participate again.
 
-outliers <- c()
+outliers <- c(
+  # Error rate of 48.8% Very short RT
+  # Prolific Status: NA
+  "5e66ed53de7896486f9a71f8_p8ckk"
+  )
 ```
 
 We removed `r length(outliers)` participants upon inspection of the average error rage (when close to 50%, suggesting random answers) and/or when the reaction time distribution was implausibly fast. 
@@ -106,63 +118,8 @@ dfsub <- df |>
   ungroup() |>
   arrange(desc(Error))
 
-knitr::kable(dfsub) |> 
-  kableExtra::row_spec(which(dfsub$Participant %in% outliers), background  = "#EF9A9A")
-```
-
-
-### Error Rate per Illusion Block
-
-```{r message=FALSE, warning=FALSE}
-temp <- df |>
-  group_by(Participant, Illusion_Type, Block) |>
-  summarize(ErrorRate_per_block = sum(Error) / n()) |>
-  ungroup() |> 
-  arrange(desc(ErrorRate_per_block))
-
-temp2 <- temp |> 
-  filter(ErrorRate_per_block >= 0.5) |> 
-  group_by(Illusion_Type, Block) |> 
-  summarize(n = n()) |> 
-  arrange(desc(n), Illusion_Type) |> 
-  ungroup() |> 
-  mutate(n_trials = cumsum(n * 56),
-         p_trials = n_trials / nrow(df))
-
-# knitr::kable(temp2)
-
-p1 <- temp |>
-  estimate_density(at = c("Illusion_Type", "Block")) |>
-  ggplot(aes(x = x, y = y)) +
-  geom_line(aes(color = Illusion_Type, linetype = Block)) + 
-  geom_vline(xintercept = 0.5, linetype = "dashed") +
-  scale_x_continuous(expand = c(0, 0)) +
-  scale_y_continuous(expand = c(0, 0)) +
-  labs(y = "Distribution", x = "Error Rate") +
-  theme_modern()
-
-p2 <- temp2 |> 
-  mutate(Block = fct_rev(Block)) |> 
-  ggplot(aes(x = Illusion_Type, y = p_trials)) +
-  geom_bar(stat="identity", aes(fill = Block)) +
-  scale_x_discrete(expand = c(0, 0)) +
-  scale_y_continuous(labels = scales::percent, expand = c(0, 0)) +
-  labs(y = "Percentage of Trials Removed", x = "Illusion Type") +
-  theme_modern() +
-  theme(axis.text.x = element_text(angle=45, hjust = 1))
-
-p1 | p2
-
-
-# Drop
-df <- df |>
-  group_by(Participant, Illusion_Type, Block) |>
-  mutate(ErrorRate_per_block = sum(Error) / n()) |>
-  ungroup() |> 
-  filter(ErrorRate_per_block < 0.5) |>
-  select(-ErrorRate_per_block)
-
-rm(temp, temp2)
+knitr::kable(dfsub) |>
+  kableExtra::row_spec(which(dfsub$Participant %in% outliers), background = "#EF9A9A")
 ```
 
 
@@ -179,8 +136,8 @@ p <- estimate_density(df, select = "RT", at = c("Participant", "Block")) |>
   ggplot(aes(x = x, y = y)) +
   geom_area(data = normalize(estimate_density(df, select = "RT"), select = "y"), alpha = 0.2) +
   geom_line(aes(color = color, group = interaction(Participant, Block), linetype = Block)) +
-  geom_vline(xintercept = 2500, linetype = "dashed", color = "red") +
-  scale_color_manual(values=c("red"="red", "blue"="blue"), guide = "none") +
+  geom_vline(xintercept = 150, linetype = "dashed", color = "red") +
+  scale_color_manual(values = c("red" = "red", "blue" = "blue"), guide = "none") +
   scale_x_continuous(expand = c(0, 0)) +
   scale_y_continuous(expand = c(0, 0)) +
   coord_cartesian(xlim = c(0, 3000)) +
@@ -188,35 +145,101 @@ p <- estimate_density(df, select = "RT", at = c("Participant", "Block")) |>
   theme(axis.text.y = element_blank()) +
   facet_wrap(~Participant) +
   labs(y = "", x = "Reaction Time (ms)")
-p
+# p
 # ggsave("figures/outliers.png", p, width=20, height=15)
 
 # Filter out
 df <- filter(df, !Participant %in% outliers)
 ```
 
+
+### Error Rate per Illusion Block
+
+```{r message=FALSE, warning=FALSE}
+temp <- df |>
+  group_by(Participant, Illusion_Type, Block) |>
+  summarize(ErrorRate_per_block = sum(Error) / n()) |>
+  ungroup() |>
+  arrange(desc(ErrorRate_per_block))
+
+temp2 <- temp |>
+  filter(ErrorRate_per_block >= 0.5) |>
+  group_by(Illusion_Type, Block) |>
+  summarize(n = n()) |>
+  arrange(desc(n), Illusion_Type) |>
+  ungroup() |>
+  mutate(
+    n_trials = cumsum(n * 56),
+    p_trials = n_trials / nrow(df)
+  )
+
+# knitr::kable(temp2)
+
+p1 <- temp |>
+  estimate_density(at = c("Illusion_Type", "Block")) |>
+  ggplot(aes(x = x, y = y)) +
+  geom_line(aes(color = Illusion_Type, linetype = Block)) +
+  geom_vline(xintercept = 0.5, linetype = "dashed") +
+  scale_x_continuous(expand = c(0, 0)) +
+  scale_y_continuous(expand = c(0, 0)) +
+  labs(y = "Distribution", x = "Error Rate") +
+  theme_modern()
+
+p2 <- temp2 |>
+  mutate(Block = fct_rev(Block)) |>
+  ggplot(aes(x = Illusion_Type, y = p_trials)) +
+  geom_bar(stat = "identity", aes(fill = Block)) +
+  scale_x_discrete(expand = c(0, 0)) +
+  scale_y_continuous(labels = scales::percent, expand = c(0, 0)) +
+  labs(y = "Percentage of Trials Removed", x = "Illusion Type") +
+  theme_modern() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+p1 | p2
+
+
+# Drop
+df <- df |>
+  group_by(Participant, Illusion_Type, Block) |>
+  mutate(ErrorRate_per_block = sum(Error) / n()) |>
+  ungroup() |>
+  filter(ErrorRate_per_block < 0.5) |>
+  select(-ErrorRate_per_block)
+
+rm(temp, temp2)
+```
+
+
 ### Reaction Time per Trial
 
 ```{r message=FALSE, warning=FALSE}
+df <- df |> 
+  group_by(Participant, Error) |> 
+  mutate(Outlier = ifelse(Error == 0 & (RT < 150 | standardize(RT) > 4), TRUE, FALSE)) |> 
+  ungroup() 
+
 p1 <- estimate_density(df, select = "RT", at = "Participant") |>
   group_by(Participant) |>
   normalize(select = "y") |>
   ungroup() |>
+  merge(df |> 
+    filter(Error == 0) |> 
+    group_by(Participant) |> 
+    summarize(Outlier = mean(RT) + 4 * sd(RT))) |> 
+  mutate(Outlier = ifelse(x >= Outlier, TRUE, FALSE)) |> 
   ggplot(aes(x = x, y = y)) +
   geom_area(data = normalize(estimate_density(df, select = "RT"), select = "y"), alpha = 0.2) +
-  geom_line(aes(color = Participant, group = Participant)) +
-  geom_vline(xintercept = c(150, 3000), linetype = "dashed", color = "red") +
+  geom_line(aes(color = Participant, linetype=Outlier)) +
+  geom_vline(xintercept = c(150), linetype = "dashed", color = "red") +
   scale_color_material_d("rainbow", guide = "none") +
   scale_x_continuous(expand = c(0, 0)) +
   scale_y_continuous(expand = c(0, 0)) +
-  coord_cartesian(xlim = c(0, 3500)) +
+  guides(linetype = "none") +
+  coord_cartesian(xlim = c(0, 4000)) +
   theme_modern() +
   theme(axis.text.y = element_blank()) +
-  # facet_wrap(~Participant) +
   labs(y = "", x = "Reaction Time (ms)")
 
-
-df$Outlier <- df$RT < 150 | df$RT > 3000
 
 p2 <- df |>
   group_by(Participant) |>
@@ -233,7 +256,7 @@ p2 <- df |>
 p1 | p2
 ```
 
-We removed `r sum(df$Outlier)` (`r insight::format_value(sum(df$Outlier) / nrow(df), as_percent=TRUE)`) outlier trials (150 ms < RT < 3000 ms).
+We removed `r sum(df$Outlier)` (`r insight::format_value(sum(df$Outlier) / nrow(df), as_percent=TRUE)`) outlier trials (150 ms < RT < 4 SD above mean).
 
 ```{r message=FALSE, warning=FALSE}
 df <- filter(df, Outlier == FALSE)
@@ -241,3 +264,818 @@ df <- filter(df, Outlier == FALSE)
 
 
 
+
+## Participants
+
+
+
+```{r message=FALSE, warning=FALSE}
+dfsub <- df |>
+  group_by(Participant) |>
+  select(Participant, Age, Sex, Education, Nationality, Ethnicity, Duration, Break_Duration, Screen_Resolution, Screen_Refresh, Device_OS) |>
+  slice(1) |>
+  ungroup()
+```
+
+The final sample included `r report::report_participants(dfsub, age="Age", sex="Sex")`.
+
+```{r }
+plot_distribution <- function(dfsub, what = "Age", title = what, subtitle = "", fill = "orange") {
+  dfsub |>
+    ggplot(aes_string(x = what)) +
+    geom_density(fill = fill) +
+    geom_vline(xintercept = mean(dfsub[[what]]), color = "red", linetype = "dashed") +
+    scale_x_continuous(expand = c(0, 0)) +
+    scale_y_continuous(expand = c(0, 0)) +
+    ggtitle(title, subtitle = subtitle) +
+    theme_modern() +
+    theme(
+      plot.title = element_text(face = "bold", hjust = 0.5),
+      plot.subtitle = element_text(face = "italic", hjust = 0.5),
+      axis.title.x = element_blank(),
+      axis.title.y = element_blank(),
+      axis.text.y = element_blank()
+    )
+}
+
+plot_waffle <- function(dfsub, what = "Nationality", title = what) {
+  ggwaffle::waffle_iron(dfsub, what) |>
+    # mutate(label = emojifont::fontawesome('fa-twitter')) |>
+    ggplot(aes(x, y, fill = group)) +
+    ggwaffle::geom_waffle() +
+    # geom_point() +
+    # geom_text(aes(label=label), family='fontawesome-webfont', size=4) +
+    coord_equal() +
+    ggtitle(what) +
+    labs(fill = title) +
+    theme_void() +
+    theme(plot.title = element_text(face = "bold", hjust = 0.5))
+}
+```
+
+```{r fig.width=20, fig.height=15}
+p1 <- plot_distribution(dfsub, "Age", fill = "#FF9800")
+p2 <- plot_distribution(dfsub, "Duration", title = "Total Duration", subtitle = "in minutes", fill = "#F44336")
+p3 <- plot_distribution(dfsub, "Break_Duration", title = "Break Duration", subtitle = "in minutes", fill = "#3F51B5")
+
+p4 <- plot_waffle(dfsub, "Sex") +
+  scale_fill_manual(values = c("Male" = "#2196F3", "Female" = "#E91E63", "Other" = "#FF9800"))
+
+p5 <- plot_waffle(dfsub, "Education") +
+  scale_fill_viridis_d()
+
+p6 <- plot_waffle(dfsub, "Nationality") +
+  scale_fill_metro_d()
+
+p7 <- plot_waffle(dfsub, "Ethnicity") +
+  scale_fill_manual(values = c("Latino" = "#FF5722", "Asian" = "#FF9800", "Caucasian" = "#2196F3", "African" = "#4CAF50", "Jewish" = "#9C27B0"))
+
+p8 <- plot_waffle(dfsub, "Screen_Resolution", title = "Screen Resolution") +
+  scale_fill_pizza_d()
+
+p9 <- plot_waffle(dfsub, "Device_OS", title = "Device OS") +
+  scale_fill_bluebrown_d()
+
+# p10 <- plot_waffle(dfsub, "Screen_Refresh") +
+#   scale_fill_viridis_d()
+
+
+(p1 / p2 / p3) | (p4 / p5 / p6) | (p7 / p8 / p9)
+```
+
+
+
+
+## Models {.tabset}
+
+### Delboeuf
+
+#### Model Selection
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+best_models <- function(data) {
+  models_err <- list()
+  models_rt <- list()
+  for (k1 in c("", "_log", "_sqrt", "_cbrt")) {
+    for (k2 in c("", "_log", "_sqrt", "_cbrt")) {
+      for (side in c("", "--SIDE")) {
+        name <- paste0("DIFF", k1, "--", "STRENGTH", k2, side)
+        message(name)
+        f <- paste0(
+          "Illusion_Difference",
+          k1,
+          " * Illusion_Strength",
+          k2,
+          " + (1|Participant)"
+        )
+
+        if (side == "--SIDE") f <- paste0("Illusion_Side * ", f)
+
+        m <- glmmTMB::glmmTMB(as.formula(paste0("Error ~ ", f)),
+          data = data, family = "binomial"
+        )
+        if (performance::check_convergence(m)) {
+          models_err[[name]] <- m
+        }
+
+        m <- glmmTMB::glmmTMB(as.formula(paste0("RT ~ ", f)),
+          data = data
+        )
+        if (performance::check_convergence(m)) {
+          models_rt[[name]] <- m
+        }
+      }
+    }
+  }
+
+  # RT
+  to_keep <- compare_performance(models_rt, metrics = c("BIC")) |>
+    arrange(BIC) |>
+    slice(1:5) |>
+    pull(Name)
+
+  test <- test_performance(models_rt[to_keep], reference = 1)
+  perf <- compare_performance(models_rt[to_keep], metrics = c("BIC", "R2"))
+  rt <- merge(perf, test) |>
+    arrange(BIC) |>
+    select(Name, BIC, R2_marginal, BF) |>
+    mutate(
+      BF = insight::format_bf(BF, name = ""),
+      Model = "RT"
+    )
+
+  # Errors
+  to_keep <- compare_performance(models_err, metrics = c("BIC")) |>
+    arrange(BIC) |>
+    slice(1:5) |>
+    pull(Name)
+
+  test <- test_performance(models_err[to_keep], reference = 1)
+  perf <- compare_performance(models_err[to_keep], metrics = c("BIC", "R2"))
+
+  merge(perf, test) |>
+    arrange(BIC) |>
+    select(Name, BIC, R2_marginal, BF) |>
+    mutate(
+      BF = insight::format_bf(BF, name = ""),
+      Model = "Errors"
+    ) |>
+    rbind(rt)
+}
+
+data <- filter(df, Illusion_Type == "Delboeuf")
+
+best_models(data)
+```
+
+
+#### Error Rate 
+
+##### Descriptive
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+plot_descriptive_err <- function(data, side = "leftright") {
+  # Sanity checks
+  if (length(unique(data$Illusion_Difference)) != 8) stop("Illusion_Difference values != 8")
+  if (length(unique(data$Illusion_Strength)) != 15) stop("Illusion_Strength values != 15")
+
+  if (side == "leftright") {
+    x <- data[data$Error == 0 & data$Illusion_Side == 1, ]$Answer[1]
+    x <- tools::toTitleCase(gsub("arrow", "", x))
+    if (x == "Left") {
+      data$Answer <- ifelse(data$Illusion_Side == 1, "Left", "Right")
+    } else if (x == "Right") {
+      data$Answer <- ifelse(data$Illusion_Side == 1, "Right", "Left")
+    }
+  } else {
+    x <- data[data$Error == 0 & data$Illusion_Side == 1, ]$Answer[1]
+    x <- tools::toTitleCase(gsub("arrow", "", x))
+    if (x == "Up") {
+      data$Answer <- ifelse(data$Illusion_Side == 1, "Up", "Down")
+    } else if (x == "Down") {
+      data$Answer <- ifelse(data$Illusion_Side == 1, "Down", "Up")
+    }
+    data$Answer <- fct_rev(data$Answer)
+  }
+
+  dodge1 <- 0.1 * diff(range(data$Illusion_Difference))
+  dodge2 <- -0.1 * diff(range(data$Illusion_Strength))
+
+  p1 <- data |>
+    group_by(Illusion_Difference, Illusion_Strength, Answer) |>
+    summarize(Error = mean(Error), .groups = "drop") |>
+    ungroup() |>
+    ggplot(aes(x = Illusion_Difference, y = Error)) +
+    geom_bar(aes(fill = Illusion_Strength, group = Illusion_Strength), position = position_dodge(width = dodge1, preserve = "single"), stat = "identity", width=0.03) +
+    # geom_line(aes(color = Illusion_Strength, group=Illusion_Strength), position = position_dodge(width=dodge1)) +
+    geom_hline(yintercept = 0.5, linetype = "dotted", alpha = 0.3) +
+    scale_y_continuous(limits = c(0, 1), expand = c(0, 0), labels = scales::percent) +
+    scale_x_continuous(expand = c(0, 0)) +
+    scale_fill_gradientn(colours = c("#4CAF50", "#009688", "#00BCD4", "#2196F3", "#3F51B5", "#673AB7", "#9C27B0")) +
+    theme_modern() +
+    labs(
+      color = "Illusion Strength",
+      fill = "Illusion Strength",
+      y = "Probability of Error",
+      x = "Task Difficulty"
+    ) +
+    theme(plot.title = element_text(face = "bold", hjust = 0.5))
+
+
+  p2 <- data |>
+    group_by(Illusion_Difference, Illusion_Strength, Answer) |>
+    summarize(Error = mean(Error), .groups = "drop") |>
+    ungroup() |>
+    # mutate(Illusion_Difference = as.factor(round(Illusion_Difference, 4))) |>
+    ggplot(aes(x = Illusion_Strength, y = Error)) +
+    geom_hline(yintercept = 0.5, linetype = "dotted", alpha = 0.3) +
+    geom_vline(xintercept = 0, linetype = "dashed", alpha = 0.6) +
+    geom_bar(aes(fill = Illusion_Difference, group = Illusion_Difference), position = position_dodge(width = dodge2, preserve = "single"), stat = "identity", width=0.1) +
+    # geom_line(aes(color = Illusion_Difference), position = position_dodge(width=dodge2)) +
+    scale_y_continuous(limits = c(0, 1), expand = c(0, 0), labels = scales::percent) +
+    scale_x_continuous(expand = c(0, 0)) +
+    scale_fill_gradientn(colours = c("#F44336", "#FFC107", "#4CAF50")) +
+    theme_modern() +
+    labs(
+      color = "Task Difficulty",
+      fill = "Task Difficulty",
+      y = "Probability of Error",
+      x = "Illusion Strength"
+    ) +
+    theme(plot.title = element_text(face = "bold", hjust = 0.5))
+
+  if (side == "leftright") {
+    p <- ((p1 + facet_wrap(~Answer, ncol = 2, labeller = "label_both")) /
+      (p2 + facet_wrap(~Answer, ncol = 2, labeller = "label_both"))) +
+      plot_annotation(
+        title = paste(data$Illusion_Type[1], "Illusion"),
+        theme = theme(plot.title = element_text(face = "bold", hjust = 0.5))
+      )
+  } else {
+    p <- ((p1 + facet_wrap(~Answer, nrow = 2, labeller = "label_both")) |
+      (p2 + facet_wrap(~Answer, nrow = 2, labeller = "label_both"))) +
+      plot_annotation(
+        title = paste(data$Illusion_Type[1], "Illusion"),
+        theme = theme(plot.title = element_text(face = "bold", hjust = 0.5))
+      )
+  }
+  p
+}
+
+
+plot_descriptive_err(data)
+```
+
+
+
+##### Model Specification
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+formula <- brms::bf(
+  Error ~ Illusion_Difference * Illusion_Strength + 
+    (1 + (Illusion_Difference * Illusion_Strength) | Participant),
+  family = "bernoulli"
+)
+
+# brms::get_prior(formula, data = data)
+# brms::validate_prior(formula)
+
+model_delboeuf_err <- brms::brm(formula,
+  data = data,
+  refresh = 0
+)
+
+# parameters::parameters(model)
+```
+
+
+### Model Visualization
+
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+plot_model_err <- function(data, model) {
+  data <- mutate(data, .dots_side = ifelse(Error == 1, "bottom", "top"))
+  
+  # Get variables
+  vars <- insight::find_predictors(model)$conditional
+  vardiff <- vars[1]
+  varstrength <- vars[2]
+  
+  # Get predicted
+  pred <- estimate_relation(model,
+                            at = vars,
+                            length = c(NA, 25))
+
+  # Set colors for lines
+  colors <- colorRampPalette(c("#F44336", "#FFC107", "#4CAF50"))(length(unique(data[[vardiff]])))
+  diffvals <- as.numeric(as.character(unique(sort(pred[[vardiff]]))))
+  names(colors) <- diffvals
+  
+  # Assign color from the same palette to every observation of data (for geom_dots)
+  closest <- diffvals[max.col(-abs(outer(data[[vars[1]]], diffvals, "-")))]
+  data$color <- colors[as.character(closest)]
+  data$color <- fct_reorder(data$color, closest)
+  
+  # Manual jittering
+  xrange <- 0.05*diff(range(data[[varstrength]]))
+  data$x <- data[[varstrength]]
+  data$x[data$x > 0] <- data$x[data$x > 0] - runif(sum(data$x > 0), 0, xrange)
+  data$x[data$x < 0] <- data$x[data$x < 0] + runif(sum(data$x < 0), 0, xrange)
+  data$x[round(data$x, 2) == 0] <- data$x[round(data$x, 2) == 0] + runif(sum(round(data$x, 2) == 0), -xrange/2, xrange/2)
+  
+  
+  pred |>
+    ggplot(aes_string(x = varstrength, y = "Predicted")) +
+    geom_dots(
+      data = data,
+      aes(x=x, 
+          y = Error, 
+          group = Error,
+          side = .dots_side, 
+          # order=as.numeric(color) * ifelse(Error == 1, 1, -1)), 
+          order=color), 
+      fill = data$color,
+      color = NA, 
+      alpha=0.5) +
+    geom_slab(data=data, aes(y = Error)) +
+    geom_ribbon(aes_string(ymin = "CI_low", ymax = "CI_high", fill = vardiff, group = vardiff), alpha = 0.2) +
+    geom_vline(xintercept = 0, linetype = "dashed") +
+    geom_hline(yintercept = c(0.05, 0.5, 0.95), linetype = "dotted", alpha = 0.5) +
+    geom_line(aes_string(color = vardiff, group = vardiff)) +
+    scale_y_continuous(limits = c(0, 1), expand = c(0, 0), labels = scales::percent) +
+    scale_x_continuous(expand = c(0, 0)) +
+    scale_color_gradientn(colours = c("#F44336", "#FFC107", "#4CAF50")) +
+    scale_fill_gradientn(colours = c("#F44336", "#FFC107", "#4CAF50")) +
+    coord_cartesian(xlim=c(min(data[[varstrength]]), max(data[[varstrength]]))) +
+    theme_modern() +
+    labs(
+      title = paste0(data$Illusion_Type[1], " Illusion"),
+      color = "Difficulty", fill = "Difficulty",
+      y = "Probability of Error",
+      x = "Illusion Strength"
+    ) +
+    theme(plot.title = element_text(face = "bold", hjust = 0.5))
+}
+
+plot_model_err(data, model_delboeuf_err)
+```
+
+
+
+#### Reaction Time
+
+##### Descriptive
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+plot_descriptive_rt <- function(data, side = "leftright") {
+  if (side == "leftright") {
+    x <- data[data$Error == 0 & data$Illusion_Side == 1, ]$Answer[1]
+    x <- tools::toTitleCase(gsub("arrow", "", x))
+    if (x == "Left") {
+      data$Answer <- ifelse(data$Illusion_Side == 1, "Left", "Right")
+    } else if (x == "Right") {
+      data$Answer <- ifelse(data$Illusion_Side == 1, "Right", "Left")
+    }
+  } else {
+    x <- data[data$Error == 0 & data$Illusion_Side == 1, ]$Answer[1]
+    x <- tools::toTitleCase(gsub("arrow", "", x))
+    if (x == "Up") {
+      data$Answer <- ifelse(data$Illusion_Side == 1, "Up", "Down")
+    } else if (x == "Down") {
+      data$Answer <- ifelse(data$Illusion_Side == 1, "Down", "Up")
+    }
+    data$Answer <- fct_rev(data$Answer)
+  }
+
+  p1 <- data |>
+    group_by(Illusion_Difference, Illusion_Strength, Answer) |>
+    summarize(RT = mean(RT), .groups = "drop") |>
+    ggplot(aes(x = Illusion_Difference, y = RT)) +
+    ggdist::stat_slabinterval(aes(fill = Illusion_Strength, group = Illusion_Strength, color = Illusion_Strength), alpha = 0.5, normalize = "groups") +
+    # geom_line(aes(color = Illusion_Strength), position = position_dodge(width=dodge1)) +
+    scale_y_continuous(expand = c(0, 0)) +
+    scale_x_continuous(expand = c(0, 0)) +
+    scale_color_gradientn(colours = c("#4CAF50", "#009688", "#00BCD4", "#2196F3", "#3F51B5", "#673AB7", "#9C27B0")) +
+    scale_fill_gradientn(colours = c("#4CAF50", "#009688", "#00BCD4", "#2196F3", "#3F51B5", "#673AB7", "#9C27B0")) +
+    theme_modern() +
+    labs(
+      color = "Illusion Strength",
+      fill = "Illusion Strength",
+      y = "Reaction Time (ms)",
+      x = "Task Difficulty"
+    ) +
+    theme(plot.title = element_text(face = "bold", hjust = 0.5))
+
+  p2 <- data |>
+    group_by(Illusion_Difference, Illusion_Strength, Answer) |>
+    summarize(RT = mean(RT), .groups = "drop") |>
+    ggplot(aes(x = Illusion_Strength, y = RT)) +
+    geom_vline(xintercept = 0, linetype = "dashed", alpha = 0.6) +
+    ggdist::stat_slabinterval(aes(fill = Illusion_Difference, group = Illusion_Difference, color = Illusion_Difference), alpha = 0.5, normalize = "groups") +
+    # geom_line(aes(color = Illusion_Difference), position = position_dodge(width=dodge2)) +
+    scale_y_continuous(expand = c(0, 0)) +
+    scale_x_continuous(expand = c(0, 0)) +
+    scale_color_gradientn(colours = c("#F44336", "#FFC107", "#4CAF50")) +
+    scale_fill_gradientn(colours = c("#F44336", "#FFC107", "#4CAF50")) +
+    theme_modern() +
+    labs(
+      color = "Task Difficulty",
+      fill = "Task Difficulty",
+      y = "Reaction Time (ms)",
+      x = "Illusion Strength"
+    ) +
+    theme(plot.title = element_text(face = "bold", hjust = 0.5))
+
+  if (side == "leftright") {
+    p <- ((p1 + facet_wrap(~Answer, ncol = 2, labeller = "label_both")) /
+      (p2 + facet_wrap(~Answer, ncol = 2, labeller = "label_both"))) +
+      plot_annotation(
+        title = paste(data$Illusion_Type[1], "Illusion"),
+        theme = theme(plot.title = element_text(face = "bold", hjust = 0.5))
+      )
+  } else {
+    p <- ((p1 + facet_wrap(~Answer, nrow = 2, labeller = "label_both")) |
+      (p2 + facet_wrap(~Answer, nrow = 2, labeller = "label_both"))) +
+      plot_annotation(
+        title = paste(data$Illusion_Type[1], "Illusion"),
+        theme = theme(plot.title = element_text(face = "bold", hjust = 0.5))
+      )
+  }
+  p
+}
+
+data <- filter(data, Error == 0)
+
+plot_descriptive_rt(data)
+```
+
+##### Model Specification
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+formula <- brms::bf(
+  Error ~ Illusion_Difference * Illusion_Strength + 
+    (1 + (Illusion_Difference * Illusion_Strength) | Participant),
+  family = "bernoulli"
+)
+
+# brms::get_prior(formula, data = data)
+# brms::validate_prior(formula)
+
+model_delboeuf_err <- brms::brm(formula,
+  data = data,
+  refresh = 0
+)
+
+# parameters::parameters(model)
+```
+
+
+### Model Visualization
+
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+plot_model_err <- function(data, model) {
+  data <- mutate(data, .dots_side = ifelse(Error == 1, "bottom", "top"))
+  
+  # Get variables
+  vars <- insight::find_predictors(model)$conditional
+  vardiff <- vars[1]
+  varstrength <- vars[2]
+  
+  # Get predicted
+  pred <- estimate_relation(model,
+                            at = vars,
+                            length = c(NA, 25))
+
+  # Set colors for lines
+  colors <- colorRampPalette(c("#F44336", "#FFC107", "#4CAF50"))(length(unique(data[[vardiff]])))
+  diffvals <- as.numeric(as.character(unique(sort(pred[[vardiff]]))))
+  names(colors) <- diffvals
+  
+  # Assign color from the same palette to every observation of data (for geom_dots)
+  closest <- diffvals[max.col(-abs(outer(data[[vars[1]]], diffvals, "-")))]
+  data$color <- colors[as.character(closest)]
+  data$color <- fct_reorder(data$color, closest)
+  
+  # Manual jittering
+  xrange <- 0.05*diff(range(data[[varstrength]]))
+  data$x <- data[[varstrength]]
+  data$x[data$x > 0] <- data$x[data$x > 0] - runif(sum(data$x > 0), 0, xrange)
+  data$x[data$x < 0] <- data$x[data$x < 0] + runif(sum(data$x < 0), 0, xrange)
+  data$x[round(data$x, 2) == 0] <- data$x[round(data$x, 2) == 0] + runif(sum(round(data$x, 2) == 0), -xrange/2, xrange/2)
+  
+  
+  pred |>
+    ggplot(aes_string(x = varstrength, y = "Predicted")) +
+    geom_dots(
+      data = data,
+      aes(x=x, 
+          y = Error, 
+          group = Error,
+          side = .dots_side, 
+          # order=as.numeric(color) * ifelse(Error == 1, 1, -1)), 
+          order=color), 
+      fill = data$color,
+      color = NA, 
+      alpha=0.5) +
+    geom_slab(data=data, aes(y = Error)) +
+    geom_ribbon(aes_string(ymin = "CI_low", ymax = "CI_high", fill = vardiff, group = vardiff), alpha = 0.2) +
+    geom_vline(xintercept = 0, linetype = "dashed") +
+    geom_hline(yintercept = c(0.05, 0.5, 0.95), linetype = "dotted", alpha = 0.5) +
+    geom_line(aes_string(color = vardiff, group = vardiff)) +
+    scale_y_continuous(limits = c(0, 1), expand = c(0, 0), labels = scales::percent) +
+    scale_x_continuous(expand = c(0, 0)) +
+    scale_color_gradientn(colours = c("#F44336", "#FFC107", "#4CAF50")) +
+    scale_fill_gradientn(colours = c("#F44336", "#FFC107", "#4CAF50")) +
+    coord_cartesian(xlim=c(min(data[[varstrength]]), max(data[[varstrength]]))) +
+    theme_modern() +
+    labs(
+      title = paste0(data$Illusion_Type[1], " Illusion"),
+      color = "Difficulty", fill = "Difficulty",
+      y = "Probability of Error",
+      x = "Illusion Strength"
+    ) +
+    theme(plot.title = element_text(face = "bold", hjust = 0.5))
+}
+
+plot_model_err(data, model_delboeuf_err)
+```
+
+
+
+
+### Ebbinghaus
+
+#### Error Rate 
+
+##### Descriptive
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+data <- filter(df, Illusion_Type == "Ebbinghaus")
+
+plot_descriptive_err(data)
+```
+
+
+#### Reaction Time
+
+##### Descriptive
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+data <- filter(df, Illusion_Type == "Ebbinghaus", Error == 0)
+
+plot_descriptive_rt(data)
+```
+
+### Rod and Frame
+
+#### Model Selection
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+data <- filter(df, Illusion_Type == "Rod-Frame")
+
+best_models(data)
+```
+
+#### Error Rate 
+
+##### Descriptive
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+plot_descriptive_err(data)
+```
+
+
+#### Reaction Time
+
+##### Descriptive
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+data <- filter(data, Error == 0)
+
+plot_descriptive_rt(data)
+```
+
+### Vertical-Horizontal
+
+#### Error Rate 
+
+##### Descriptive
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+data <- filter(df, Illusion_Type == "Vertical-Horizontal")
+
+plot_descriptive_err(data)
+```
+
+
+#### Reaction Time
+
+##### Descriptive
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+data <- filter(df, Illusion_Type == "Vertical-Horizontal", Error == 0)
+
+plot_descriptive_rt(data)
+```
+
+
+### Zöllner
+
+#### Error Rate 
+
+##### Descriptive
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+data <- filter(df, Illusion_Type == "Zöllner")
+
+plot_descriptive_err(data)
+```
+
+
+#### Reaction Time
+
+##### Descriptive
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+data <- filter(df, Illusion_Type == "Zöllner", Error == 0)
+
+plot_descriptive_rt(data)
+```
+
+
+### White
+
+#### Error Rate 
+
+##### Descriptive
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+data <- filter(df, Illusion_Type == "White")
+
+plot_descriptive_err(data)
+```
+
+
+#### Reaction Time
+
+##### Descriptive
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+data <- filter(df, Illusion_Type == "White", Error == 0)
+
+plot_descriptive_rt(data)
+```
+
+
+### Müller-Lyer
+
+#### Error Rate 
+
+##### Descriptive
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+data <- filter(df, Illusion_Type == "Müller-Lyer")
+
+plot_descriptive_err(data, side = "updown")
+```
+
+
+#### Reaction Time
+
+##### Descriptive
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+data <- filter(df, Illusion_Type == "Müller-Lyer", Error == 0)
+
+plot_descriptive_rt(data, side = "updown")
+```
+
+### Ponzo
+
+#### Error Rate 
+
+##### Descriptive
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+data <- filter(df, Illusion_Type == "Ponzo")
+
+plot_descriptive_err(data, side = "updown")
+```
+
+
+#### Reaction Time
+
+##### Descriptive
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+data <- filter(df, Illusion_Type == "Ponzo", Error == 0)
+
+plot_descriptive_rt(data, side = "updown")
+```
+
+
+### Poggendorff
+
+#### Error Rate 
+
+##### Descriptive
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+data <- filter(df, Illusion_Type == "Poggendorff")
+
+plot_descriptive_err(data, side = "updown")
+```
+
+
+#### Reaction Time
+
+##### Descriptive
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+data <- filter(df, Illusion_Type == "Poggendorff", Error == 0)
+
+plot_descriptive_rt(data, side = "updown")
+```
+
+
+
+### Contrast
+
+#### Error Rate 
+
+##### Descriptive
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+data <- filter(df, Illusion_Type == "Contrast")
+
+plot_descriptive_err(data, side = "updown")
+```
+
+
+#### Reaction Time
+
+##### Descriptive
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+data <- filter(df, Illusion_Type == "Contrast", Error == 0)
+
+plot_descriptive_rt(data, side = "updown")
+```
+
+
+## Individual Scores
+
+### Delboeuf 
+
+#### Reliability
+
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+random <- model_delboeuf_err 
+random <- as.data.frame(model_delboeuf_err)
+random <- random[str_detect(names(random), "Participant\\[")]
+random <- random |> 
+  mutate(Draw = 1:nrow(random)) |>
+  pivot_longer(-Draw, names_to="Parameter", values_to = "Value") |> 
+  separate(Parameter, into = c("Participant", "Parameter"), sep = ",") |> 
+  mutate(Participant = str_remove(Participant, "r_Participant\\["),
+         Parameter = str_remove(Parameter, "]"))
+
+random |> 
+  ggplot(aes(y= Participant, x = Value)) +
+  ggdist::stat_slabinterval() +
+  facet_wrap(~Parameter)
+
+data <- random |> 
+  mutate(Parameter = paste0("Delboeuf_", Parameter)) |> 
+  group_by(Participant, Parameter) |> 
+  summarize(Score = as.numeric(bayestestR::map_estimate(Value)), .groups="drop") |>
+  ungroup() |> 
+  pivot_wider(names_from = Parameter, values_from = Score)
+
+```
+
+
+#### Approximation
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+dat <- data.frame()
+for(participant in unique(data$Participant)) {
+  freq <- glm(Error ~ Illusion_Difference * Illusion_Strength, 
+              family = "binomial",
+              data=filter(df, Participant == participant, 
+                          Illusion_Type == "Delboeuf"))
+  
+  parameters::parameters(freq)[1:2] |> 
+    as.data.frame() |> 
+    mutate(Participant = participant, 
+           Parameter = paste0("freq_Delboeuf_", Parameter))
+}
+```
+
+
+
+## Structure
+
+## Variability

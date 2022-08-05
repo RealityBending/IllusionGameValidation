@@ -13,8 +13,14 @@ preprocess_raw <- function(file) {
   # Info
   info <- data[data$screen == "browser_info" & !is.na(data$screen), ]
 
+  # Filter out practice trials
+  if ("practice_debrief" %in% data$screen) {
+    data <- data[which(data$screen == "practice_debrief"):nrow(data), ]
+  }
 
+  # Trial data
   trials <- data[data$screen == "Trial", ]
+
   df <- data.frame(
     Participant = trials$participant_id,
     Age = as.numeric(jsonlite::fromJSON(dem[1])$age),
@@ -50,13 +56,8 @@ preprocess_raw <- function(file) {
   # Correct duration
   df$Duration <- df$Duration - df$Break_Duration
 
-  # Transformation
-  df$Illusion_Difference_log <- log(1 + df$Illusion_Difference)
-  df$Illusion_Difference_sqrt <- sqrt(df$Illusion_Difference)
-  df$Illusion_Difference_cbrt <- round(df$Illusion_Difference**(1/3), 4)
-  df$Illusion_Strength_log <- sign(df$Illusion_Strength) * log(1 + abs(df$Illusion_Strength))
-  df$Illusion_Strength_sqrt <- sign(df$Illusion_Strength) * sqrt(abs(df$Illusion_Strength))
-  df$Illusion_Strength_cbrt <- sign(df$Illusion_Strength) * (abs(df$Illusion_Strength)**(1/3))
+  # Manual fixes
+  df[df$Participant == "5d3c6e745602310001bca8aa_6bdtb", "Sex"] <- "Female"
 
   # Format names
   df$Illusion_Type <- ifelse(df$Illusion_Type == "MullerLyer", "Müller-Lyer", df$Illusion_Type)
@@ -76,9 +77,10 @@ preprocess_raw <- function(file) {
   df$Ethnicity <- ifelse(df$Ethnicity %in% c("Latin"), "Latino", df$Ethnicity)
   df$Ethnicity <- ifelse(df$Ethnicity %in% c("White Middle European (Slavic)", "Greek"), "Caucasian", df$Ethnicity)
   df$Ethnicity <- ifelse(df$Ethnicity %in% c("White - Caucasian", " Caucasian"), "Caucasian", df$Ethnicity)
-  df$Ethnicity <- ifelse(df$Ethnicity %in% c("White", "Caucasian "), "Caucasian", df$Ethnicity)
+  df$Ethnicity <- ifelse(df$Ethnicity %in% c("White", "Caucasian ", "German"), "Caucasian", df$Ethnicity)
   df$Ethnicity <- ifelse(df$Ethnicity %in% c("Black"), "African", df$Ethnicity)
   df$Ethnicity <- ifelse(df$Ethnicity %in% c("5c73e5d89b46930001ee7edc"), NA, df$Ethnicity)
+
 
   # unique(df$Nationality)
   df$Nationality <- ifelse(df$Nationality %in% c("Israe;"), "Israel", df$Nationality)
