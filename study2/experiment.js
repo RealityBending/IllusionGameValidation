@@ -41,7 +41,7 @@ function get_debrief_display(results, type = "Block") {
         var score =
             "<p>Your score for this illusion is " +
             '<p style="color: black; font-size: 48px; font-weight: bold;">' +
-            Math.round(results.score*10)/10 +
+            Math.round(results.score * 10) / 10 +
             " %</p>"
     } else if (type === "Final") {
         // Final debriefing at end of game
@@ -86,17 +86,28 @@ var fixation = {
 }
 
 // Break
-var make_break = {
+var make_break1 = {
     type: jsPsychHtmlButtonResponse,
     choices: ["I am ready to continue!"],
     stimulus:
         "<p><b>CONGRATULATIONS!</b></p>" +
         "<p>You have finished half of the game. We know it's long and challenging, so we appreciate you staying focused until the end!</p>" +
-        "<p>You will now see all the illusions once again. <b>Try to beat your previous score!</b></p>",
+        "<p>Before you see all the illusions once again, let's take a break by answering a few questions about yourself.</p>",
     save_trial_parameters: {
         trial_duration: true,
     },
-    data: { screen: "break" },
+    data: { screen: "break1" },
+}
+var make_break2 = {
+    type: jsPsychHtmlButtonResponse,
+    choices: ["I am ready to continue!"],
+    stimulus:
+        "<p><b>Back to the illusions</b></p>" +
+        "<p>Try to improve your previous score!</p>",
+    save_trial_parameters: {
+        trial_duration: true,
+    },
+    data: { screen: "break2" },
 }
 
 // Marker
@@ -428,43 +439,60 @@ const verticalhorizontal_instructions =
     "<p class='small'>In this example, the correct answer is the <b>LEFT arrow</b>.</p></div>" +
     "<p>Are you ready? <b>Press ENTER to start</b></p>"
 
-
-
 /* Psychometric scales---------------------------------------------------------------------*/
 
 // Mini IPIP scale
 var IPIP = [
-    "Am the life of the party<br>",
-    "Sympathize with others' feelings<br>",
-    "Get chores done right away<br>",
-    "Have frequent mood swings<br>",
-    "Have a vivid imagination<br>",
-    "Do not talk a lot<br>",
-    "Am not interested in other people's problems<br>",
-    "Have difficulty understanding abstract ideas<br>",
-    "Like order<br>",
-    "Make a mess of things<br>",
-    "Deserve more things in life<br>",
-    "Do not have a good imagination<br>",
-    "Feel other's emotions<br>",
-    "Am relaxed most of the time<br>",
-    "Get upset easily<br>",
-    "Seldom feel blue<br>",
-    "would like to be seen driving around in a very expensive car<br>",
-    "Keep in the background<br>",
-    "Am not really interested in others<br>",
-    "Am not interested in abstract ideas<br>",
-    "Often forget to put things back in their proper place<br>",
-    "Talk to a lot of different people at parties<br>",
-    "Would get a lot of pleasure from owning expensive luxury goods<br>"
+    "I am the life of the party<br>",
+    "I sympathize with others' feelings<br>",
+    "I get chores done right away<br>",
+    "I have frequent mood swings<br>",
+    "I have a vivid imagination<br>",
+    "I do not talk a lot<br>",
+    "I am not interested in other people's problems<br>",
+    "I have difficulty understanding abstract ideas<br>",
+    "I like order<br>",
+    "I make a mess of things<br>",
+    "I deserve more things in life<br>",
+    "I do not have a good imagination<br>",
+    "I feel other's emotions<br>",
+    "I am relaxed most of the time<br>",
+    "I get upset easily<br>",
+    "I seldom feel blue<br>",
+    "I would like to be seen driving around in a very expensive car<br>",
+    "I keep in the background<br>",
+    "I am not really interested in others<br>",
+    "I am not interested in abstract ideas<br>",
+    "I often forget to put things back in their proper place<br>",
+    "I talk to a lot of different people at parties<br>",
+    "I would get a lot of pleasure from owning expensive luxury goods<br>",
 ]
 
 var IPIP_dim = [
-    "Ext_1", "Agr_2", "Con_3", "Neu_4", "Open_5",
-    "HH_6_R", "Ext_7_R", "Agr_8_R", "Open_9_R", "Con_10",
-    "Con_11_R", "HH_12_R", "Open_13_R", "Agr_14", "Neu_15_R",
-    "Neu_16", "Neu_17_R", "HH_18_R", "Ext_19_R", "Agr_20_R",
-    "Open_21_R", "Con_22_R", "Ext_23", "HH_24_R"
+    "Extraversion_1",
+    "Agreeableness_2",
+    "Conscientiousness_3",
+    "Neuroticism_4",
+    "Openness_5",
+    "HonestyHumility_6_R",
+    "Extraversion_7_R",
+    "Agreeableness_8_R",
+    "Openness_9_R",
+    "Conscientiousness_10",
+    "Conscientiousness_11_R",
+    "HonestyHumility_12_R",
+    "Openness_13_R",
+    "Agreeableness_14",
+    "Neuroticism_15_R",
+    "Neuroticism_16",
+    "Neuroticism_17_R",
+    "HonestyHumility_18_R",
+    "Extraversion_19_R",
+    "Agreeableness_20_R",
+    "Openness_21_R",
+    "Conscientiousness_22_R",
+    "Extraversion_23",
+    "HonestyHumility_24_R",
 ]
 
 var PID = [
@@ -492,13 +520,33 @@ var PID = [
     "I use people to get what I want<br>",
     "I often 'zone out' and then suddenly come to and realize that a lot of time has passed<br>",
     "Things around me often feel unreal, or more real than usual<br>",
-    "It is easy for me to take advantage of others<br>"
+    "It is easy for me to take advantage of others<br>",
 ]
 
-var PID_dim =[
-    "Dis_1", "Dis_2", "Dis_3", "Det_4", "Dis_5",
-    "Dis_6", "Psych_7", "NA_8", "NA_9", "NA_10",
-    "NA_11", "Psych_12", "Det_13", "Det_14", "NA_15",
-    "Det_16", "Ant_17", "Det_18", "Ant_19", "Ant_20",
-    "Psych_21", "Ant_22", "Psych_23", "Psych_24", "Ant_25"
+var PID_dim = [
+    "Disinhibition_1",
+    "Disinhibition_2",
+    "Disinhibition_3",
+    "Detachment_4",
+    "Disinhibition_5",
+    "Disinhibition_6",
+    "Psychoticism_7",
+    "NegativeAffect_8",
+    "NegativeAffect_9",
+    "NegativeAffect_10",
+    "NegativeAffect_11",
+    "Psychoticism_12",
+    "Detachment_13",
+    "Detachment_14",
+    "NegativeAffect_15",
+    "Detachment_16",
+    "Antagonism_17",
+    "Detachment_18",
+    "Antagonism_19",
+    "Antagonism_20",
+    "Psychoticism_21",
+    "Antagonism_22",
+    "Psychoticism_23",
+    "Psychoticism_24",
+    "Antagonism_25",
 ]
