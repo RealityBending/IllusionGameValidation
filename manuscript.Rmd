@@ -1,0 +1,80 @@
+---
+title             : "**Something**"
+shorttitle        : "Optimal Tolerance"
+author: 
+  - name          : "Dominique Makowski"
+    affiliation   : "1"
+    corresponding : no    # Define only one corresponding author
+    address       : "HSS 04-18, 48 Nanyang Avenue, Singapore"
+    email         : "dmakowski@ntu.edu.sg"
+    orcid         : 0000-0001-5375-9967
+      
+affiliation:
+  - id            : "1"
+    institution   : "School of Social Sciences, Nanyang Technological University, Singapore"
+authornote: |
+  Correspondence concerning this article should be addressed to Dominique Makowski, HSS 04-18, 48 Nanyang Avenue, Singapore (dom.makowski@gmail.com).
+abstract: |
+  Abstract abstract.
+  
+keywords          : "chaos, complexity, fractal, physiology, tolerance"
+wordcount         : "1156"
+bibliography      : "bibliography.bib"
+floatsintext      : no
+linenumbers       : yes
+draft             : no
+mask              : no
+figurelist        : yes
+tablelist         : no
+footnotelist      : no
+classoption       : "man"
+output            : papaja::apa6_pdf
+csl: utils/apa.csl
+header-includes:
+  - \usepackage[labelfont=bf, font={scriptsize, color=gray}]{caption}
+editor_options: 
+  chunk_output_type: console
+---
+
+
+
+```{r, echo = FALSE, warning=FALSE, message=FALSE}
+# options and parameters
+options(digits = 3)
+
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  dpi = 450,
+  fig.width = see::golden_ratio(9),
+  fig.height = 9,
+  fig.path = "figures/"
+)
+
+cache <- TRUE
+```
+
+
+## Introduction
+
+<!-- Intro  & Gaps-->
+Visual illusions are blabla. Despite the historical interest, several gaps remained unanswered:
+
+This could be caused by the relative difficulty to adapt visual illusions to an experimental setting, which typically requires the parametric modulation of variables at stake.
+
+<!-- Target, strength, difficulty -->
+Many visual illusions can be seen as made of *targets* (e.g., parallel lines, same-size circles, same-length lines), which perception is biased by the *context* (e.g., parallel lines are seen as angled, circle or segments appear of different lengths). To date, most of the paradigms prompt the subjective extent the context biases the perception ("how much does the circle appear bigger", e.g., **REFS**).
+
+Although visual illusions are inherently tied to subjective perception, we tested a reversal of the traditional paradigm to access the "objective" effect of illusions. 
+
+To achieve this, we first developed a parametric framework to generate visual illusions that we implemented and made accessible in the open-source Pyllusion software (REF). This allows us to generate stimuli ...
+
+In the present study, we will test this novel paradigm to ...
+
+
+
+\newpage
+
+## References
+
+::: {#refs custom-style="Bibliography"}
+:::

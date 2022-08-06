@@ -41,11 +41,11 @@ source("preprocessing.R")
 # This is a local folder containing raw data from unzipped pavlovia
 # It has been added to .gitignore to NOT be published on github
 # (it contains the subject ID of the participants)
-participants <- list.files("study2/data/")
+participants <- list.files("data/")
 
 df <- data.frame()
 for (ppt in participants) {
-  df <- rbind(df, preprocess_raw(file = paste0("study2/data/", ppt)))
+  df <- rbind(df, preprocess_raw(file = paste0("data/", ppt)))
 }
 
 df$Pyllusion <- "1.2"
@@ -62,7 +62,7 @@ df$Illusion_Strength_sqrt <- sign(df$Illusion_Strength) * sqrt(abs(df$Illusion_S
 df$Illusion_Strength_cbrt <- sign(df$Illusion_Strength) * (abs(df$Illusion_Strength)**(1/3))
 
 # Save anonymized data
-write.csv(df, "data/study2.csv", row.names = FALSE)
+write.csv(df, "../data/study2.csv", row.names = FALSE)
 ```
 
 
@@ -74,7 +74,7 @@ library(easystats)
 library(patchwork)
 library(brms)
 
-df <- read.csv("data/study2.csv") |>
+df <- read.csv("../data/study2.csv") |>
   mutate(
     Date = as.Date(Date),
     Participant = fct_reorder(Participant, Date),
@@ -549,7 +549,7 @@ model_delboeuf_err <- brms::brm(formula,
 ```
 
 
-### Model Visualization
+##### Model Visualization
 
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
@@ -572,7 +572,7 @@ plot_model_err <- function(data, model) {
   names(colors) <- diffvals
   
   # Assign color from the same palette to every observation of data (for geom_dots)
-  closest <- diffvals[max.col(-abs(outer(data[[vars[1]]], diffvals, "-")))]
+  closest <- diffvals[max.col(-abs(outer(data[[vardiff]], diffvals, "-")))]
   data$color <- colors[as.character(closest)]
   data$color <- fct_reorder(data$color, closest)
   
@@ -600,7 +600,7 @@ plot_model_err <- function(data, model) {
     geom_slab(data=data, aes(y = Error)) +
     geom_ribbon(aes_string(ymin = "CI_low", ymax = "CI_high", fill = vardiff, group = vardiff), alpha = 0.2) +
     geom_vline(xintercept = 0, linetype = "dashed") +
-    geom_hline(yintercept = c(0.05, 0.5, 0.95), linetype = "dotted", alpha = 0.5) +
+    geom_hline(yintercept = c(0.5), linetype = "dotted", alpha = 0.5) +
     geom_line(aes_string(color = vardiff, group = vardiff)) +
     scale_y_continuous(limits = c(0, 1), expand = c(0, 0), labels = scales::percent) +
     scale_x_continuous(expand = c(0, 0)) +
@@ -617,7 +617,8 @@ plot_model_err <- function(data, model) {
     theme(plot.title = element_text(face = "bold", hjust = 0.5))
 }
 
-plot_model_err(data, model_delboeuf_err)
+p_delboeuf_err <- plot_model_err(data, model_delboeuf_err)
+p_delboeuf_err
 ```
 
 
@@ -713,28 +714,40 @@ plot_descriptive_rt(data)
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
 formula <- brms::bf(
-  Error ~ Illusion_Difference * Illusion_Strength + 
+  RT ~ Illusion_Difference * Illusion_Strength + 
     (1 + (Illusion_Difference * Illusion_Strength) | Participant),
-  family = "bernoulli"
+  family="shifted_lognormal"
 )
+
+# prior = c(
+#     prior(normal(6, 1.5), class = Intercept),
+#     prior(normal(0, 1), class = sigma),
+#     prior(normal(0, .01), class = b, coef = c_trial)
+#   )
 
 # brms::get_prior(formula, data = data)
 # brms::validate_prior(formula)
 
-model_delboeuf_err <- brms::brm(formula,
+model_delboeuf_rt <- brms::brm(formula,
   data = data,
   refresh = 0
 )
 
+modelbased::estimate_prediction(model_delboeuf_rt, keep_iterations = 10) |> 
+  as.data.frame() |> 
+  head()
+  bayestestR::reshape_iterations()
+nrow(as.data.frame(pred))
+performance::check_model(model_delboeuf_rt)
 # parameters::parameters(model)
 ```
 
 
-### Model Visualization
+##### Model Visualization
 
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
-plot_model_err <- function(data, model) {
+plot_model_rt <- function(data, model) {
   data <- mutate(data, .dots_side = ifelse(Error == 1, "bottom", "top"))
   
   # Get variables
@@ -753,55 +766,112 @@ plot_model_err <- function(data, model) {
   names(colors) <- diffvals
   
   # Assign color from the same palette to every observation of data (for geom_dots)
-  closest <- diffvals[max.col(-abs(outer(data[[vars[1]]], diffvals, "-")))]
+  closest <- diffvals[max.col(-abs(outer(data[[vardiff]], diffvals, "-")))]
   data$color <- colors[as.character(closest)]
   data$color <- fct_reorder(data$color, closest)
   
-  # Manual jittering
-  xrange <- 0.05*diff(range(data[[varstrength]]))
-  data$x <- data[[varstrength]]
-  data$x[data$x > 0] <- data$x[data$x > 0] - runif(sum(data$x > 0), 0, xrange)
-  data$x[data$x < 0] <- data$x[data$x < 0] + runif(sum(data$x < 0), 0, xrange)
-  data$x[round(data$x, 2) == 0] <- data$x[round(data$x, 2) == 0] + runif(sum(round(data$x, 2) == 0), -xrange/2, xrange/2)
-  
-  
-  pred |>
+  p <- pred |>
     ggplot(aes_string(x = varstrength, y = "Predicted")) +
-    geom_dots(
-      data = data,
-      aes(x=x, 
-          y = Error, 
-          group = Error,
-          side = .dots_side, 
-          # order=as.numeric(color) * ifelse(Error == 1, 1, -1)), 
-          order=color), 
-      fill = data$color,
-      color = NA, 
-      alpha=0.5) +
-    geom_slab(data=data, aes(y = Error)) +
+    ggdist::stat_slab(data=data, aes_string(y="RT", group = vardiff, fill=vardiff), alpha=0.5) +
     geom_ribbon(aes_string(ymin = "CI_low", ymax = "CI_high", fill = vardiff, group = vardiff), alpha = 0.2) +
     geom_vline(xintercept = 0, linetype = "dashed") +
-    geom_hline(yintercept = c(0.05, 0.5, 0.95), linetype = "dotted", alpha = 0.5) +
     geom_line(aes_string(color = vardiff, group = vardiff)) +
-    scale_y_continuous(limits = c(0, 1), expand = c(0, 0), labels = scales::percent) +
+    scale_y_continuous(expand = c(0, 0)) +
     scale_x_continuous(expand = c(0, 0)) +
     scale_color_gradientn(colours = c("#F44336", "#FFC107", "#4CAF50")) +
     scale_fill_gradientn(colours = c("#F44336", "#FFC107", "#4CAF50")) +
-    coord_cartesian(xlim=c(min(data[[varstrength]]), max(data[[varstrength]]))) +
+    coord_cartesian(xlim=c(min(data[[varstrength]]), max(data[[varstrength]])),
+                    ylim=c(150, 2000)) +
     theme_modern() +
     labs(
       title = paste0(data$Illusion_Type[1], " Illusion"),
       color = "Difficulty", fill = "Difficulty",
-      y = "Probability of Error",
+      y = "Reaction Time (ms)",
       x = "Illusion Strength"
     ) +
     theme(plot.title = element_text(face = "bold", hjust = 0.5))
+  
+
 }
 
-plot_model_err(data, model_delboeuf_err)
+p_delboeuf_rt <- plot_model_rt(data, model_delboeuf_rt)
+p_delboeuf_rt
 ```
 
 
+#### Visualization
+
+```{r message=FALSE, warning=FALSE, cache=cache, fig.height=fig.height*2}
+plot_all <- function(data, p_err, p_rt) {
+  # Get stimuli
+  dat <- df |>
+    filter(Error == 0) |> 
+    filter(Illusion_Type == unique(data$Illusion_Type),
+           Answer %in% c("arrowleft", "arrowup")) |>
+    select(Stimulus, Illusion_Strength, Illusion_Difference)
+  
+  dat <- rbind(
+    filter(dat, Illusion_Strength == min(Illusion_Strength)) |> 
+    filter(Illusion_Difference %in% c(min(Illusion_Difference), max(Illusion_Difference))),
+    filter(dat, Illusion_Strength == max(Illusion_Strength)) |> 
+    filter(Illusion_Difference %in% c(min(Illusion_Difference), max(Illusion_Difference))),
+    filter(dat, Illusion_Difference == min(Illusion_Difference)) |> 
+    filter(Illusion_Strength %in% c(min(Illusion_Strength), max(Illusion_Strength))),
+    filter(dat, Illusion_Difference == max(Illusion_Difference)) |> 
+    filter(Illusion_Strength %in% c(min(Illusion_Strength), max(Illusion_Strength))))
+  
+  
+  img_leftdown <- filter(dat, Illusion_Difference == max(Illusion_Difference)) |> 
+    filter(Illusion_Strength == min(Illusion_Strength)) |> 
+    pull(Stimulus) |> 
+    unique()
+  img_rightdown <- filter(dat, Illusion_Difference == max(Illusion_Difference)) |> 
+    filter(Illusion_Strength == max(Illusion_Strength)) |> 
+    pull(Stimulus) |> 
+    unique()
+  img_leftup <- filter(dat, Illusion_Strength == min(Illusion_Strength)) |> 
+    filter(Illusion_Difference == min(Illusion_Difference)) |> 
+    pull(Stimulus) |> 
+    unique()
+  img_rightup <- filter(dat, Illusion_Strength == max(Illusion_Strength)) |> 
+    filter(Illusion_Difference == min(Illusion_Difference)) |> 
+    pull(Stimulus) |> 
+    unique()
+  
+  
+  img_leftdown <- paste0("study2/stimuli/", img_leftdown, ".png") |> 
+    png::readPNG() |> 
+    grid::rasterGrob(interpolate=TRUE) |> 
+    patchwork::wrap_elements()
+  img_rightdown <- paste0("study2/stimuli/", img_rightdown, ".png") |> 
+    png::readPNG() |> 
+    grid::rasterGrob(interpolate=TRUE) |> 
+    patchwork::wrap_elements()
+  img_leftup <- paste0("study2/stimuli/", img_leftup, ".png") |> 
+    png::readPNG() |>  
+    grid::rasterGrob(interpolate=TRUE) |> 
+    patchwork::wrap_elements()
+  img_rightup <- paste0("study2/stimuli/", img_rightup, ".png") |> 
+    png::readPNG() |> 
+    grid::rasterGrob(interpolate=TRUE) |> 
+    patchwork::wrap_elements()
+  
+  p <- ((p_err + labs(x = "")) / (p_rt + labs(title = "")) + patchwork::plot_layout(guides="collect"))
+  
+  # (
+  #   (img_leftup / patchwork::plot_spacer() / img_leftdown + patchwork::plot_layout(heights = c(0.5, 2, 0.5))) | 
+  #   (patchwork::plot_spacer() / p / patchwork::plot_spacer()  + patchwork::plot_layout(heights = c(0.5, 2, 0.5))) | 
+  #   (img_rightup / patchwork::plot_spacer() / img_rightdown  + patchwork::plot_layout(heights = c(0.5, 2, 0.5)))
+  #   ) + 
+  #   patchwork::plot_layout(widths = c(0.5, 1, 0.5))
+  
+  (img_leftup | patchwork::plot_spacer() | img_rightup) / p / (img_leftdown | patchwork::plot_spacer() | img_rightdown) + 
+    patchwork::plot_layout(heights = c(0.5, 1.5, 0.5))
+}
+
+p_delboeuf <- plot_all(data, p_delboeuf_err, p_delboeuf_rt)
+p_delboeuf
+```
 
 
 ### Ebbinghaus

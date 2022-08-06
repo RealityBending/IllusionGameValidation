@@ -43,11 +43,11 @@ source("preprocessing.R")
 # This is a local folder containing raw data from unzipped pavlovia
 # It has been added to .gitignore to NOT be published on github
 # (it contains the subject ID of the participants)
-participants <- list.files("study1/data/")
+participants <- list.files("data/")
 
 df <- data.frame()
 for (ppt in participants) {
-  df <- rbind(df, preprocess_raw(file = paste0("study1/rawdata/", ppt)))
+  df <- rbind(df, preprocess_raw(file = paste0("data/", ppt)))
 }
 
 
@@ -64,7 +64,7 @@ df$Illusion_Strength_sqrt <- sign(df$Illusion_Strength) * sqrt(abs(df$Illusion_S
 df$Illusion_Strength_cbrt <- sign(df$Illusion_Strength) * (abs(df$Illusion_Strength)**(1/3))
 
 # Save anonymized data
-write.csv(df, "data/study1.csv", row.names = FALSE)
+write.csv(df, "../data/study1.csv", row.names = FALSE)
 ```
 
 
@@ -76,7 +76,7 @@ library(easystats)
 library(patchwork)
 library(brms)
 
-df <- read.csv("data/study1.csv") |>
+df <- read.csv("../data/study1.csv") |>
   mutate(
     Date = as.Date(Date),
     Participant = fct_reorder(Participant, Date),

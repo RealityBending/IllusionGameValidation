@@ -55,9 +55,9 @@ def generate_images(data, strengths, differences, function, name="Delboeuf", **k
             path = (
                 name
                 + "_str"
-                + str(np.round(strength, 4))
+                + str(np.round(strength, 5))
                 + "_diff"
-                + str(np.round(difference, 4))
+                + str(np.round(difference, 5))
                 + ".png"
             )
             img.save("stimuli/" + path)
@@ -175,13 +175,12 @@ data_block1 = generate_images(
 
 data_block2 = generate_images(
     data_block2,
-    strengths=strengths[0::2],
+    strengths=np.concatenate((strengths[0::2], [0])),
     differences=diff2,
     function=ill.Delboeuf,
     name="Delboeuf",
     distance=0.9,  # Distance between circles
 )
-
 
 # -------------------------- Ebbinghaus Illusion --------------------------
 ill.Ebbinghaus(illusion_strength=-1.4, difference=1.4).to_image(width=800, height=600).save(
@@ -216,7 +215,7 @@ data_block1 = generate_images(
 
 data_block2 = generate_images(
     data_block2,
-    strengths=strengths[0::2],
+    strengths=np.concatenate((strengths[0::2], [0])),
     differences=diff2,
     function=ill.Ebbinghaus,
     name="Ebbinghaus",
@@ -254,7 +253,7 @@ data_block1 = generate_images(
 
 data_block2 = generate_images(
     data_block2,
-    strengths=strengths[0::2],
+    strengths=np.concatenate((strengths[0::2], [0])),
     differences=diff2,
     function=ill.RodFrame,
     name="RodFrame",
@@ -289,7 +288,7 @@ data_block1 = generate_images(
 
 data_block2 = generate_images(
     data_block2,
-    strengths=strengths[0::2],
+    strengths=np.concatenate((strengths[0::2], [0])),
     differences=diff2,
     function=ill.VerticalHorizontal,
     name="VerticalHorizontal",
@@ -325,7 +324,7 @@ data_block1 = generate_images(
 
 data_block2 = generate_images(
     data_block2,
-    strengths=strengths[0::2],
+    strengths=np.concatenate((strengths[0::2], [0])),
     differences=diff2,
     function=ill.Zollner,
     name="Zollner",
@@ -362,7 +361,7 @@ data_block1 = generate_images(
 
 data_block2 = generate_images(
     data_block2,
-    strengths=strengths[0::2],
+    strengths=np.concatenate((strengths[0::2], [0])),
     differences=diff2,
     function=ill.White,
     name="White",
@@ -400,7 +399,7 @@ data_block1 = generate_images(
 
 data_block2 = generate_images(
     data_block2,
-    strengths=strengths[0::2],
+    strengths=np.concatenate((strengths[0::2], [0])),
     differences=diff2,
     function=ill.MullerLyer,
     name="MullerLyer",
@@ -438,7 +437,7 @@ data_block1 = generate_images(
 
 data_block2 = generate_images(
     data_block2,
-    strengths=strengths[0::2],
+    strengths=np.concatenate((strengths[0::2], [0])),
     differences=diff2,
     function=ill.Ponzo,
     name="Ponzo",
@@ -476,7 +475,7 @@ data_block1 = generate_images(
 
 data_block2 = generate_images(
     data_block2,
-    strengths=strengths[0::2],
+    strengths=np.concatenate((strengths[0::2], [0])),
     differences=diff2,
     function=ill.Poggendorff,
     name="Poggendorff",
@@ -514,7 +513,7 @@ data_block1 = generate_images(
 
 data_block2 = generate_images(
     data_block2,
-    strengths=strengths[0::2],
+    strengths=np.concatenate((strengths[0::2], [0])),
     differences=diff2,
     function=ill.Contrast,
     name="Contrast",
