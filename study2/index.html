@@ -20,6 +20,7 @@
     <script src="stimuli/stimuli_part1.js"></script>
     <script src="stimuli/stimuli_part2.js"></script>
     <script src="experiment.js"></script>
+    <script src="utils/plugin-survey-multiple-slider.js"></script>
     <!-- CSS -->
     <link href="utils/jspsych/jspsych.css" rel="stylesheet" type="text/css" />
     <!--<script type="text/javascript" src="lib/vendors/jquery-2.2.0.min.js"></script>-->
@@ -492,6 +493,76 @@
             (type = "leftright")
         )
 
+         /* ================================================================ */
+        /* --------------------- Psychometric scales----------------------- */
+        /* ================================================================ */
+        var IPIP_items = []
+        for (const [index, element] of IPIP.entries()) {
+            IPIP_items.push({
+                prompt: element,
+                name: IPIP_dim[index],
+                ticks:  ["Very Inaccurate", "Very Accurate"],
+                required: false
+            })
+        }
+
+        var Mini_IPIP6 = {
+            type: jsPsychMultipleSlider,
+            questions: IPIP_items,
+            randomize_question_order: false,
+            preamble: "<p>For this part, we are interested in finding out more about your traits and attributes.</p>" +
+                "<p>Please answer the following questions based on how accurately each statement describes you.</p>" +
+                "<p><b>I...</b></p>",
+            require_movement: false,
+            slider_width: 800,
+            min: 0,
+            max: 100,
+            slider_start: 50,
+            on_start: function () {
+                ; (document.body.style.cursor = "auto"),
+                    (document.querySelector(
+                        "#jspsych-progressbar-container"
+                    ).style.display = "inline")
+            },
+            data: {
+                screen: 'IPIP6',
+            }
+        };
+
+        var PID_items = []
+        for (const [index, element] of PID.entries()) {
+            PID_items.push({
+                prompt: element,
+                name: PID_dim[index],
+                ticks:  ["Often False", "Often True"],
+                required: false
+            })
+        }
+
+        var PID5 = {
+            type: jsPsychMultipleSlider,
+            questions: PID_items,
+            randomize_question_order: false,
+            preamble: "<p>This is a list of things different people might say about themselves.</p>"+
+            "<p>For this part, we are interested in finding out how you would describe yourself.</p>" +
+            "<p>There are no right or wrong answers so you can respond as honestly as possible</p>" +
+            "<p>We would like you to take your time and read each statement careefully, selecting the response that best describes you.</p>",
+            require_movement: false,
+            slider_width: 800,
+            min: 0,
+            max: 100,
+            slider_start: 50,
+            on_start: function () {
+                ; (document.body.style.cursor = "auto"),
+                    (document.querySelector(
+                        "#jspsych-progressbar-container"
+                    ).style.display = "inline")
+            },
+            data: {
+                screen: 'PID6',
+            }
+        };
+
         /* ================================================================ */
         /* ---------------------- END OF EXPERIMENT ----------------------- */
         /* ================================================================ */
@@ -510,6 +581,8 @@
             timeline.push({timeline: t})
         }
         if (i === 1) {
+            timeline.push(Mini_IPIP6)
+            timeline.push(PID5)
             timeline.push(make_break)
         }
     }

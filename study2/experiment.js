@@ -427,3 +427,78 @@ const verticalhorizontal_instructions =
     "<p><img src='utils/answer/answer_leftright_keyboard.PNG' height='150'></img></p>" +
     "<p class='small'>In this example, the correct answer is the <b>LEFT arrow</b>.</p></div>" +
     "<p>Are you ready? <b>Press ENTER to start</b></p>"
+
+
+
+/* Psychometric scales---------------------------------------------------------------------*/
+
+// Mini IPIP scale
+var IPIP = [
+    "Am the life of the party",
+    "Sympathize with others' feelings",
+    "Get chores done right away",
+    "Have frequent mood swings",
+    "Have a vivid imagination",
+    "Do not talk a lot",
+    "Am not interested in other people's problems",
+    "Have difficulty understanding abstract ideas",
+    "Like order",
+    "Make a mess of things",
+    "Deserve more things in life",
+    "Do not have a good imagination",
+    "Feel other's emotions",
+    "Am relaxed most of the time",
+    "Get upset easily",
+    "Seldom feel blue",
+    "would like to be seen driving around in a very expensive car",
+    "Keep in the background",
+    "Am not really interested in others",
+    "Am not interested in abstract ideas",
+    "Often forget to put things back in their proper place",
+    "Talk to a lot of different people at parties",
+    "Would get a lot of pleasure from owning expensive luxury goods"
+]
+
+var IPIP_dim = [
+    "Ext_1", "Agr_2", "Con_3", "Neu_4", "Open_5",
+    "HH_6_R", "Ext_7_R", "Agr_8_R", "Open_9_R", "Con_10",
+    "Con_11_R", "HH_12_R", "Open_13_R", "Agr_14", "Neu_15_R",
+    "Neu_16", "Neu_17_R", "HH_18_R", "Ext_19_R", "Agr_20_R",
+    "Open_21_R", "Con_22_R", "Ext_23", "HH_24_R"
+]
+
+var PID = [
+    "People would describe me as reckless",
+    "I feel like I act totally on impulse",
+    "Even though I know better, I can't stop making rash decisions",
+    "I often feel like nothing I do really matters",
+    "Others see me as irresponsible",
+    "I'm not good at planning ahead",
+    "My thoughts often don't make sense to others",
+    "I worry about almost everything",
+    "I get emotional easily, often for very little reason",
+    "I fear being alone in life more than anything else",
+    "I get stuck on one way of doing things,even when it's clear it won't work",
+    "I have seen things that weren't really there",
+    "I steer clear of romantic relationships",
+    "I'm not interested in making friends",
+    "I get irritated easily by all sorts of things",
+    "I don't like to get too close to people",
+    "It's no big deal if I hurt other people's feelings",
+    "I rarely get enthusiastic about anything",
+    "I crave attention",
+    "I often have to deal with people who are less important than me",
+    "I often have thoughts that make sense to me but that other people say are strange",
+    "I use people to get what I want",
+    "I often 'zone out' and then suddenly come to and realize that a lot of time has passed",
+    "Things around me often feel unreal, or more real than usual",
+    "It is easy for me to take advantage of others"
+]
+
+var PID_dim =[
+    "Dis_1", "Dis_2", "Dis_3", "Det_4", "Dis_5",
+    "Dis_6", "Psych_7", "NA_8", "NA_9", "NA_10",
+    "NA_11", "Psych_12", "Det_13", "Det_14", "NA_15",
+    "Det_16", "Ant_17", "Det_18", "Ant_19", "Ant_20",
+    "Psych_21", "Ant_22", "Psych_23", "Psych_24", "Ant_25"
+]
