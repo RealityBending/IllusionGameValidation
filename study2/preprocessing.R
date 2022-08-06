@@ -111,7 +111,7 @@ preprocess_raw <- function(file) {
   ipip <- extract_response('IPIP6')
   pid <- extract_response('PID6')
   
-  # Fix for participants with missing question 6 in IPIP
+  # Fix for participants with missing HH_6_R in IPIP
   out <- c('5eb3a734d249ac18a413063a',
            '60f5fa488f7b1381d175ecb5',
            '5bdbfff9ee652a0001efca64',
@@ -146,7 +146,7 @@ preprocess_raw <- function(file) {
            '5e6e14f53c76d23b934a67f3',
            '5c1bb460a05a64000125c522',
            '611fb1635c5f446a6bb2848d',
-           '5ed7a7a467a98224295459ff')  # list of participants with missing HonestyHumility_6_R
+           '5ed7a7a467a98224295459ff')
   
   fixed_question <- c("Extraversion_1",
                       "Agreeableness_2",
@@ -231,7 +231,3 @@ preprocess_raw <- function(file) {
   
   df
 }
-
-
-
-
