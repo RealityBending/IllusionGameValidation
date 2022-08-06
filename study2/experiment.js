@@ -448,6 +448,7 @@ var IPIP = [
     "I get chores done right away<br>",
     "I have frequent mood swings<br>",
     "I have a vivid imagination<br>",
+    "I feel entitled to more of everything<br>",
     "I do not talk a lot<br>",
     "I am not interested in other people's problems<br>",
     "I have difficulty understanding abstract ideas<br>",
