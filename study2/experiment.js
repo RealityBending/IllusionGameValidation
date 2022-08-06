@@ -75,7 +75,7 @@ var fixation = {
     type: jsPsychHtmlKeyboardResponse,
     stimulus: '<div style="font-size:60px;">+</div>',
     choices: "NO_KEYS" /* no responses will be accepted as a valid response */,
-    //trial_duration: 0, // (for testing)
+    // trial_duration: 0, // (for testing)
     trial_duration: function () {
         return randomInteger(500, 1000) // Function from RealityBending/JSmisc
     },
@@ -434,29 +434,29 @@ const verticalhorizontal_instructions =
 
 // Mini IPIP scale
 var IPIP = [
-    "Am the life of the party",
-    "Sympathize with others' feelings",
-    "Get chores done right away",
-    "Have frequent mood swings",
-    "Have a vivid imagination",
-    "Do not talk a lot",
-    "Am not interested in other people's problems",
-    "Have difficulty understanding abstract ideas",
-    "Like order",
-    "Make a mess of things",
-    "Deserve more things in life",
-    "Do not have a good imagination",
-    "Feel other's emotions",
-    "Am relaxed most of the time",
-    "Get upset easily",
-    "Seldom feel blue",
-    "would like to be seen driving around in a very expensive car",
-    "Keep in the background",
-    "Am not really interested in others",
-    "Am not interested in abstract ideas",
-    "Often forget to put things back in their proper place",
-    "Talk to a lot of different people at parties",
-    "Would get a lot of pleasure from owning expensive luxury goods"
+    "Am the life of the party<br>",
+    "Sympathize with others' feelings<br>",
+    "Get chores done right away<br>",
+    "Have frequent mood swings<br>",
+    "Have a vivid imagination<br>",
+    "Do not talk a lot<br>",
+    "Am not interested in other people's problems<br>",
+    "Have difficulty understanding abstract ideas<br>",
+    "Like order<br>",
+    "Make a mess of things<br>",
+    "Deserve more things in life<br>",
+    "Do not have a good imagination<br>",
+    "Feel other's emotions<br>",
+    "Am relaxed most of the time<br>",
+    "Get upset easily<br>",
+    "Seldom feel blue<br>",
+    "would like to be seen driving around in a very expensive car<br>",
+    "Keep in the background<br>",
+    "Am not really interested in others<br>",
+    "Am not interested in abstract ideas<br>",
+    "Often forget to put things back in their proper place<br>",
+    "Talk to a lot of different people at parties<br>",
+    "Would get a lot of pleasure from owning expensive luxury goods<br>"
 ]
 
 var IPIP_dim = [
@@ -468,31 +468,31 @@ var IPIP_dim = [
 ]
 
 var PID = [
-    "People would describe me as reckless",
-    "I feel like I act totally on impulse",
-    "Even though I know better, I can't stop making rash decisions",
-    "I often feel like nothing I do really matters",
-    "Others see me as irresponsible",
-    "I'm not good at planning ahead",
-    "My thoughts often don't make sense to others",
-    "I worry about almost everything",
-    "I get emotional easily, often for very little reason",
-    "I fear being alone in life more than anything else",
-    "I get stuck on one way of doing things,even when it's clear it won't work",
-    "I have seen things that weren't really there",
-    "I steer clear of romantic relationships",
-    "I'm not interested in making friends",
-    "I get irritated easily by all sorts of things",
-    "I don't like to get too close to people",
-    "It's no big deal if I hurt other people's feelings",
-    "I rarely get enthusiastic about anything",
-    "I crave attention",
-    "I often have to deal with people who are less important than me",
-    "I often have thoughts that make sense to me but that other people say are strange",
-    "I use people to get what I want",
-    "I often 'zone out' and then suddenly come to and realize that a lot of time has passed",
-    "Things around me often feel unreal, or more real than usual",
-    "It is easy for me to take advantage of others"
+    "People would describe me as reckless<br>",
+    "I feel like I act totally on impulse<br>",
+    "Even though I know better, I can't stop making rash decisions<br>",
+    "I often feel like nothing I do really matters<br>",
+    "Others see me as irresponsible<br>",
+    "I'm not good at planning ahead<br>",
+    "My thoughts often don't make sense to others<br>",
+    "I worry about almost everything<br>",
+    "I get emotional easily, often for very little reason<br>",
+    "I fear being alone in life more than anything else<br>",
+    "I get stuck on one way of doing things,even when it's clear it won't work<br>",
+    "I have seen things that weren't really there<br>",
+    "I steer clear of romantic relationships<br>",
+    "I'm not interested in making friends<br>",
+    "I get irritated easily by all sorts of things<br>",
+    "I don't like to get too close to people<br>",
+    "It's no big deal if I hurt other people's feelings<br>",
+    "I rarely get enthusiastic about anything<br>",
+    "I crave attention<br>",
+    "I often have to deal with people who are less important than me<br>",
+    "I often have thoughts that make sense to me but that other people say are strange<br>",
+    "I use people to get what I want<br>",
+    "I often 'zone out' and then suddenly come to and realize that a lot of time has passed<br>",
+    "Things around me often feel unreal, or more real than usual<br>",
+    "It is easy for me to take advantage of others<br>"
 ]
 
 var PID_dim =[

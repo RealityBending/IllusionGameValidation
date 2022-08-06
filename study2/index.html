@@ -502,18 +502,18 @@
                 prompt: element,
                 name: IPIP_dim[index],
                 ticks:  ["Very Inaccurate", "Very Accurate"],
-                required: false
+                required: true
             })
         }
 
         var Mini_IPIP6 = {
-            type: jsPsychMultipleSlider,
+            type: jsPsychMultipleSlider,  // custom plugin in utils
             questions: IPIP_items,
             randomize_question_order: false,
             preamble: "<p>For this part, we are interested in finding out more about your traits and attributes.</p>" +
                 "<p>Please answer the following questions based on how accurately each statement describes you.</p>" +
                 "<p><b>I...</b></p>",
-            require_movement: false,
+            require_movement: true,
             slider_width: 800,
             min: 0,
             max: 100,
@@ -535,7 +535,7 @@
                 prompt: element,
                 name: PID_dim[index],
                 ticks:  ["Often False", "Often True"],
-                required: false
+                required: true
             })
         }
 
@@ -546,8 +546,8 @@
             preamble: "<p>This is a list of things different people might say about themselves.</p>"+
             "<p>For this part, we are interested in finding out how you would describe yourself.</p>" +
             "<p>There are no right or wrong answers so you can respond as honestly as possible</p>" +
-            "<p>We would like you to take your time and read each statement careefully, selecting the response that best describes you.</p>",
-            require_movement: false,
+            "<p>We would like you to take your time and read each statement carefully, selecting the response that best describes you.</p>",
+            require_movement: true,
             slider_width: 800,
             min: 0,
             max: 100,
