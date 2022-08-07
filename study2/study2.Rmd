@@ -10,7 +10,7 @@ editor_options:
 options(
   digits = 3,
   mc.cores = 4,
-  brms.algorithm = "sampling",
+  brms.algorithm = "meanfield",
   brms.backend = "cmdstanr"
 )
 
@@ -93,11 +93,15 @@ df <- read.csv("../data/study2.csv") |>
 ```{r message=FALSE, warning=FALSE}
 # plot(estimate_density(dfraw[dfraw$Participant == "60684f29dbfe1bb2059e5e27_rkqoy", "RT"]))
 
+# Dear participant, thank you for participating in our study. Unfortunately, we didn't receive your data :( did something happen? Some technical issue? We would like to kindly ask you to return your participation so that we can open up more slots. Thank you in advance, and apologies for the inconvenience! 
+
 # Dear participant, thank you for participating in our study. Unfortunately, our system detected multiple issues in your data (such as implausibly short responses, and random-like pattern of answers), which makes it unusable. We understand that you might have been in a hurry or had some other issues; we hope to open-up more slots in the future would you be interested to participate again.
+
+# Just received the results: in your case, the three most prominent issues were your response pattern that was equivalent to random (in the sequence of keystrokes) that led to a chance-level performance (that was also significantly different from the rest of the population). Moreover, your reaction time distribution was also very different from the norm, with a vast majority of implausibly short responses (i.e., that are faster than the time it takes the brain to process a visual input). This issue was even more prominent in the second block (after the break), which typically happens when participants are in a rush to finish. Finally, your overall completion time was also significantly below the average. Again, we apologize, we understand that your time is valuable, but unfortunately we run too on limited funds and can hardly spare more on unusable data. Sorry for the inconvenience, we will try to open-up more slots soon.
 
 outliers <- c(
   # Error rate of 48.8% Very short RT
-  # Prolific Status: NA
+  # Prolific Status: REJECTED (06/08)
   "5e66ed53de7896486f9a71f8_p8ckk"
 )
 ```
@@ -116,12 +120,17 @@ dfsub <- df |>
     Error = sum(Error) / n(),
     RT_Mean = mean(RT),
     RT_SD = sd(RT),
+    IPIP6_SD = mean(IPIP6_SD),
+    PID5_SD = mean(PID5_SD),
   ) |>
   ungroup() |>
   arrange(desc(Error))
 
-knitr::kable(dfsub) |>
-  kableExtra::row_spec(which(dfsub$Participant %in% outliers), background = "#EF9A9A")
+data.frame(Participant = c("Total"), t(sapply(dfsub[2:ncol(dfsub)], mean, na.rm=TRUE))) |> 
+  rbind(dfsub) |> 
+  knitr::kable() |>
+  kableExtra::row_spec(1, italic = TRUE) |> 
+  kableExtra::row_spec(which(dfsub$Participant %in% outliers) + 1, background = "#EF9A9A")
 ```
 
 
@@ -208,6 +217,11 @@ df <- df |>
   filter(ErrorRate_per_block < 0.5) |>
   select(-ErrorRate_per_block)
 
+# Drop also participant with bad block
+df <- filter(
+  df,
+  !(Participant == "5c43cd414fe4f800016e4983_0zp37" & df$Block == 2))
+
 rm(temp, temp2)
 ```
 
@@ -274,7 +288,7 @@ df <- filter(df, Outlier == FALSE)
 ```{r message=FALSE, warning=FALSE}
 dfsub <- df |>
   group_by(Participant) |>
-  select(Participant, Age, Sex, Education, Nationality, Ethnicity, Duration, Break_Duration, Screen_Resolution, Screen_Refresh, Device_OS) |>
+  select(Participant, Age, Sex, Education, Nationality, Ethnicity, Duration, Break_Duration, Screen_Resolution, Screen_Refresh, Device_OS, starts_with("IPIP6"), starts_with("PID5")) |>
   slice(1) |>
   ungroup()
 ```
@@ -308,8 +322,8 @@ plot_waffle <- function(dfsub, what = "Nationality", title = what) {
     # geom_point() +
     # geom_text(aes(label=label), family='fontawesome-webfont', size=4) +
     coord_equal() +
-    ggtitle(what) +
-    labs(fill = title) +
+    ggtitle(title) +
+    labs(fill = "") +
     theme_void() +
     theme(plot.title = element_text(face = "bold", hjust = 0.5))
 }
@@ -361,30 +375,32 @@ best_models <- function(data) {
   for (k1 in c("", "_log", "_sqrt", "_cbrt")) {
     for (k2 in c("", "_log", "_sqrt", "_cbrt")) {
       for (side in c("", "--SIDE")) {
-        name <- paste0("DIFF", k1, "--", "STRENGTH", k2, side)
-        message(name)
-        f <- paste0(
-          "Illusion_Difference",
-          k1,
-          " * Illusion_Strength",
-          k2,
-          " + (1|Participant)"
-        )
-
-        if (side == "--SIDE") f <- paste0("Illusion_Side * ", f)
-
-        m <- glmmTMB::glmmTMB(as.formula(paste0("Error ~ ", f)),
-          data = data, family = "binomial"
-        )
-        if (performance::check_convergence(m)) {
-          models_err[[name]] <- m
-        }
-
-        m <- glmmTMB::glmmTMB(as.formula(paste0("RT ~ ", f)),
-          data = data
-        )
-        if (performance::check_convergence(m)) {
-          models_rt[[name]] <- m
+        for (effect in c("", "--EFFECT")) {
+          name <- paste0("DIFF", k1, "--", "STRENGTH", k2, side)
+          message(name)
+          f <- paste0(
+            "Illusion_Difference",
+            k1,
+            " * Illusion_Strength",
+            k2,
+            " + (1|Participant)"
+          )
+  
+          if (side == "--SIDE") f <- paste0("Illusion_Side * ", f)
+  
+          m <- glmmTMB::glmmTMB(as.formula(paste0("Error ~ ", f)),
+            data = data, family = "binomial"
+          )
+          if (performance::check_convergence(m)) {
+            models_err[[name]] <- m
+          }
+  
+          m <- glmmTMB::glmmTMB(as.formula(paste0("RT ~ ", f)),
+            data = data
+          )
+          if (performance::check_convergence(m)) {
+            models_rt[[name]] <- m
+          }
         }
       }
     }
@@ -468,7 +484,7 @@ plot_descriptive_err <- function(data, side = "leftright") {
     summarize(Error = mean(Error), .groups = "drop") |>
     ungroup() |>
     ggplot(aes(x = Illusion_Difference, y = Error)) +
-    geom_bar(aes(fill = Illusion_Strength, group = Illusion_Strength), position = position_dodge(width = dodge1, preserve = "single"), stat = "identity", width = 0.03) +
+    geom_bar(aes(fill = Illusion_Strength, group = Illusion_Strength), position = position_dodge(width = dodge1, preserve = "single"), stat = "identity", width = dodge1) +
     # geom_line(aes(color = Illusion_Strength, group=Illusion_Strength), position = position_dodge(width=dodge1)) +
     geom_hline(yintercept = 0.5, linetype = "dotted", alpha = 0.3) +
     scale_y_continuous(limits = c(0, 1), expand = c(0, 0), labels = scales::percent) +
@@ -492,7 +508,7 @@ plot_descriptive_err <- function(data, side = "leftright") {
     ggplot(aes(x = Illusion_Strength, y = Error)) +
     geom_hline(yintercept = 0.5, linetype = "dotted", alpha = 0.3) +
     geom_vline(xintercept = 0, linetype = "dashed", alpha = 0.6) +
-    geom_bar(aes(fill = Illusion_Difference, group = Illusion_Difference), position = position_dodge(width = dodge2, preserve = "single"), stat = "identity", width = 0.1) +
+    geom_bar(aes(fill = Illusion_Difference, group = Illusion_Difference), position = position_dodge(width = dodge2, preserve = "single"), stat = "identity", width = dodge2) +
     # geom_line(aes(color = Illusion_Difference), position = position_dodge(width=dodge2)) +
     scale_y_continuous(limits = c(0, 1), expand = c(0, 0), labels = scales::percent) +
     scale_x_continuous(expand = c(0, 0)) +
@@ -533,9 +549,11 @@ plot_descriptive_err(data)
 ##### Model Specification
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
+logmod <- function(x) sign(x) * log(1 + abs(x))
+
 formula <- brms::bf(
-  Error ~ Illusion_Difference * Illusion_Strength +
-    (1 + (Illusion_Difference * Illusion_Strength) | Participant),
+  Error ~ logmod(1 + Illusion_Difference) * logmod(1 + Illusion_Strength) +
+    (1 | Participant),
   family = "bernoulli"
 )
 
@@ -603,7 +621,7 @@ plot_model_err <- function(data, model) {
       color = NA,
       alpha = 0.5
     ) +
-    geom_slab(data = data, aes(y = Error)) +
+    # geom_slab(data = data, aes(y = Error)) +
     geom_ribbon(aes_string(ymin = "CI_low", ymax = "CI_high", fill = vardiff, group = vardiff), alpha = 0.2) +
     geom_vline(xintercept = 0, linetype = "dashed") +
     geom_hline(yintercept = c(0.5), linetype = "dotted", alpha = 0.5) +
@@ -655,15 +673,14 @@ plot_descriptive_rt <- function(data, side = "leftright") {
   }
 
   p1 <- data |>
-    group_by(Illusion_Difference, Illusion_Strength, Answer) |>
-    summarize(RT = mean(RT), .groups = "drop") |>
     ggplot(aes(x = Illusion_Difference, y = RT)) +
-    ggdist::stat_slabinterval(aes(fill = Illusion_Strength, group = Illusion_Strength, color = Illusion_Strength), alpha = 0.5, normalize = "groups") +
+    ggdist::stat_slabinterval(aes(fill = Illusion_Strength, group = Illusion_Strength, color = Illusion_Strength), alpha = 0.5, normalize = "groups", position="dodge") +
     # geom_line(aes(color = Illusion_Strength), position = position_dodge(width=dodge1)) +
     scale_y_continuous(expand = c(0, 0)) +
     scale_x_continuous(expand = c(0, 0)) +
     scale_color_gradientn(colours = c("#4CAF50", "#009688", "#00BCD4", "#2196F3", "#3F51B5", "#673AB7", "#9C27B0")) +
     scale_fill_gradientn(colours = c("#4CAF50", "#009688", "#00BCD4", "#2196F3", "#3F51B5", "#673AB7", "#9C27B0")) +
+    coord_cartesian(ylim = c(125, 3000)) +
     theme_modern() +
     labs(
       color = "Illusion Strength",
@@ -674,16 +691,15 @@ plot_descriptive_rt <- function(data, side = "leftright") {
     theme(plot.title = element_text(face = "bold", hjust = 0.5))
 
   p2 <- data |>
-    group_by(Illusion_Difference, Illusion_Strength, Answer) |>
-    summarize(RT = mean(RT), .groups = "drop") |>
     ggplot(aes(x = Illusion_Strength, y = RT)) +
     geom_vline(xintercept = 0, linetype = "dashed", alpha = 0.6) +
-    ggdist::stat_slabinterval(aes(fill = Illusion_Difference, group = Illusion_Difference, color = Illusion_Difference), alpha = 0.5, normalize = "groups") +
+    ggdist::stat_slabinterval(aes(fill = Illusion_Difference, group = Illusion_Difference, color = Illusion_Difference), alpha = 0.5, normalize = "groups", position="dodge") +
     # geom_line(aes(color = Illusion_Difference), position = position_dodge(width=dodge2)) +
     scale_y_continuous(expand = c(0, 0)) +
     scale_x_continuous(expand = c(0, 0)) +
     scale_color_gradientn(colours = c("#F44336", "#FFC107", "#4CAF50")) +
     scale_fill_gradientn(colours = c("#F44336", "#FFC107", "#4CAF50")) +
+    coord_cartesian(ylim = c(125, 3000)) +
     theme_modern() +
     labs(
       color = "Task Difficulty",
@@ -719,14 +735,31 @@ plot_descriptive_rt(data)
 ##### Model Specification
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
+# formula <- brms::bf(
+#   RT ~ Illusion_Difference * Illusion_Strength +
+#     (1 + (Illusion_Difference * Illusion_Strength) | Participant),
+#   sigma ~ Illusion_Difference * Illusion_Strength +
+#     (1 + (Illusion_Difference * Illusion_Strength) | Participant),
+#   # ndt ~ Illusion_Difference * Illusion_Strength +
+#   #   (1 | G | Participant),
+#   family = "shifted_lognormal"
+# )
+# formula <- brms::bf(
+#   RT ~ Illusion_Difference * Illusion_Strength +
+#     (1 + (Illusion_Difference * Illusion_Strength) | Participant),
+#   sigma ~ Illusion_Difference * Illusion_Strength +
+#     (1 + (Illusion_Difference * Illusion_Strength) | Participant),
+#   # beta ~ Illusion_Difference * Illusion_Strength +
+#   #   (1 + (Illusion_Difference * Illusion_Strength) | Participant),
+#   family = "exgaussian"
+# )
 formula <- brms::bf(
-  RT ~ Illusion_Difference * Illusion_Strength +
-    (1 + (Illusion_Difference * Illusion_Strength) | G | Participant),
-  sigma ~ Illusion_Difference * Illusion_Strength +
-    (1 + (Illusion_Difference * Illusion_Strength) | G | Participant),
-  family = "shifted_lognormal"
+  RT ~ t2(Illusion_Difference, Illusion_Strength, k=4) +
+    (1 | Participant)
+  # sigma ~ t2(Illusion_Difference * Illusion_Strength) +
+  #   (1 | Participant),
+  # family = "exgaussian"
 )
-
 # prior = c(
 #     prior(normal(6, 1.5), class = Intercept),
 #     prior(normal(0, 1), class = sigma),

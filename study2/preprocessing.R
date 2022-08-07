@@ -18,6 +18,7 @@ preprocess_raw <- function(file) {
     data <- data[which(data$screen == "practice_debrief"):nrow(data), ]
   }
 
+
   # Trial data
   trials <- data[data$screen == "Trial", ]
 
@@ -31,7 +32,7 @@ preprocess_raw <- function(file) {
     Date = ifelse(is.null(info$date), NA, info$date),
     Time = ifelse(is.null(info$time), NA, info$time),
     Duration = as.numeric(data[data$screen == "final_results", "time_elapsed"]) / 1000 / 60,
-    Break_Duration = as.numeric(data[data$screen == "break" & !is.na(data$screen), "rt"]) / 1000 / 60,
+    Break_Duration = as.numeric(data[data$screen %in% c("break", "break2") & !is.na(data$screen), "rt"]) / 1000 / 60,
     Screen_Resolution = paste0(trials$screen_width, "x", trials$screen_height),
     Screen_Size = (as.numeric(trials$screen_width) / 1000) * (as.numeric(trials$screen_height) / 1000),
     Screen_Refresh = trials$vsync_rate,
@@ -45,6 +46,7 @@ preprocess_raw <- function(file) {
     Trial = as.numeric(trials$trial_number),
     Stimulus = gsub(".png", "", gsub("stimuli/", "", trials$stimulus)),
     Illusion_Strength = as.numeric(trials$illusion_strength),
+    Illusion_Effect = as.factor(sign(as.numeric(trials$illusion_strength))),
     Illusion_Side = as.factor(sign(as.numeric(trials$illusion_difference))),
     Illusion_Difference = abs(as.numeric(trials$illusion_difference)),
     Answer = trials$response,
@@ -53,11 +55,50 @@ preprocess_raw <- function(file) {
     RT = as.numeric(trials$rt)
   )
 
+
+  if("IPIP6" %in% data$screen) {
+    # IPIP6
+    ipip6 <- as.data.frame(jsonlite::fromJSON(data[data$screen == "IPIP6", "response"]))
+    ipip6[grepl("_R", names(ipip6))] <- 100 - ipip6[grepl("_R", names(ipip6))]
+    df$IPIP6_Extraversion <- rowMeans(ipip6[grepl("Extraversion", names(ipip6))])
+    df$IPIP6_Conscientiousness <- rowMeans(ipip6[grepl("Conscientiousness", names(ipip6))])
+    df$IPIP6_Neuroticism <- rowMeans(ipip6[grepl("Neuroticism", names(ipip6))])
+    df$IPIP6_Openness <- rowMeans(ipip6[grepl("Openness", names(ipip6))])
+    df$IPIP6_HonestyHumility <- rowMeans(ipip6[grepl("HonestyHumility", names(ipip6))])
+    df$IPIP6_Agreeableness <- rowMeans(ipip6[grepl("Agreeableness", names(ipip6))])
+    df$IPIP6_SD <- mean(c(sd(ipip6[grepl("Extraversion", names(ipip6))]),
+                          sd(ipip6[grepl("Conscientiousness", names(ipip6))]),
+                          sd(ipip6[grepl("Neuroticism", names(ipip6))]),
+                          sd(ipip6[grepl("Openness", names(ipip6))]),
+                          sd(ipip6[grepl("HonestyHumility", names(ipip6))]),
+                          sd(ipip6[grepl("Agreeableness", names(ipip6))])))
+
+    # PID5
+    pid5 <- as.data.frame(jsonlite::fromJSON(data[data$screen == "PID6", "response"]))
+    df$PID5_Disinhibition <- rowMeans(pid5[grepl("Disinhibition", names(pid5))])
+    df$PID5_Detachment <- rowMeans(pid5[grepl("Detachment", names(pid5))])
+    df$PID5_NegativeAffect <- rowMeans(pid5[grepl("NegativeAffect", names(pid5))])
+    df$PID5_Antagonism <- rowMeans(pid5[grepl("Antagonism", names(pid5))])
+    df$PID5_Psychoticism <- rowMeans(pid5[grepl("Psychoticism", names(pid5))])
+    df$PID5_SD <- mean(c(sd(pid5[grepl("Disinhibition", names(pid5))]),
+                         sd(pid5[grepl("Detachment", names(pid5))]),
+                         sd(pid5[grepl("NegativeAffect", names(pid5))]),
+                         sd(pid5[grepl("Antagonism", names(pid5))]),
+                         sd(pid5[grepl("Psychoticism", names(pid5))])))
+  } else {
+    df$IPIP6_Extraversion <- df$IPIP6_Conscientiousness <- df$IPIP6_Neuroticism <- df$IPIP6_Openness <- df$IPIP6_HonestyHumility <- df$IPIP6_Agreeableness <- df$IPIP6_SD <- NA
+    df$PID5_Disinhibition <- df$PID5_Detachment <- df$PID5_NegativeAffect <- df$PID5_Antagonism <- df$PID5_Psychoticism <- df$PID5_SD <- NA
+  }
+
+
   # Correct duration
   df$Duration <- df$Duration - df$Break_Duration
 
   # Manual fixes
+  # df[df$Sex == "Prefer not to say", "Participant"]
   df[df$Participant == "5d3c6e745602310001bca8aa_6bdtb", "Sex"] <- "Female"
+  df[df$Participant == "60f5fa488f7b1381d175ecb5_qwvfs", "Sex"] <- "Male"
+
 
   # Format names
   df$Illusion_Type <- ifelse(df$Illusion_Type == "MullerLyer", "Müller-Lyer", df$Illusion_Type)
@@ -74,11 +115,13 @@ preprocess_raw <- function(file) {
   # unique(df$Ethnicity)
   df$Ethnicity <- ifelse(df$Ethnicity %in% c("Hispanic", "Hisapanic"), "Latino", df$Ethnicity)
   df$Ethnicity <- ifelse(df$Ethnicity %in% c("Mixed/Latino", "Mexicano"), "Latino", df$Ethnicity)
+  df$Ethnicity <- ifelse(df$Ethnicity %in% c("Hispanic/Latino "), "Latino", df$Ethnicity)
   df$Ethnicity <- ifelse(df$Ethnicity %in% c("Latin"), "Latino", df$Ethnicity)
   df$Ethnicity <- ifelse(df$Ethnicity %in% c("White Middle European (Slavic)", "Greek"), "Caucasian", df$Ethnicity)
   df$Ethnicity <- ifelse(df$Ethnicity %in% c("White - Caucasian", " Caucasian"), "Caucasian", df$Ethnicity)
   df$Ethnicity <- ifelse(df$Ethnicity %in% c("White", "Caucasian ", "German"), "Caucasian", df$Ethnicity)
-  df$Ethnicity <- ifelse(df$Ethnicity %in% c("Black"), "African", df$Ethnicity)
+  df$Ethnicity <- ifelse(df$Ethnicity %in% c("European/White"), "Caucasian", df$Ethnicity)
+  df$Ethnicity <- ifelse(df$Ethnicity %in% c("Black", "Black African "), "African", df$Ethnicity)
   df$Ethnicity <- ifelse(df$Ethnicity %in% c("5c73e5d89b46930001ee7edc"), NA, df$Ethnicity)
 
 
