@@ -31,7 +31,7 @@ knitr::opts_chunk$set(
 # Introduction
 
 
-The goal of study 1 was to...
+The goal of study 1 was to test and refine the stimuli pool.
 
 # Methods
 
