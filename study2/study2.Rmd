@@ -10,12 +10,13 @@ editor_options:
 options(
   digits = 3,
   mc.cores = 4,
-  brms.algorithm = "meanfield",
+  brms.algorithm = "sampling",
   brms.backend = "cmdstanr"
 )
 
-cache <- FALSE
-runModels <- FALSE
+cache <- TRUE
+runModels <- TRUE
+bestModels <- TRUE
 fig.width <- see::golden_ratio(7)
 fig.height <- 7
 
@@ -55,16 +56,6 @@ df$Pyllusion <- "1.2"
 
 # Fix
 df[df$Illusion_Type == "Rod-Frame" & df$Date == "05/08/2022", "Illusion_Strength"] <- -1 * (df[df$Illusion_Type == "Rod-Frame" & df$Date == "05/08/2022", "Illusion_Strength"])
-df[df$Illusion_Type == "Ebbinghaus", "Illusion_Difference"] <- round(df[df$Illusion_Type == "Ebbinghaus", "Illusion_Difference"], 5)
-
-
-# Transformation
-df$Illusion_Difference_log <- log(1 + df$Illusion_Difference)
-df$Illusion_Difference_sqrt <- sqrt(df$Illusion_Difference)
-df$Illusion_Difference_cbrt <- round(df$Illusion_Difference**(1 / 3), 4)
-df$Illusion_Strength_log <- sign(df$Illusion_Strength) * log(1 + abs(df$Illusion_Strength))
-df$Illusion_Strength_sqrt <- sign(df$Illusion_Strength) * sqrt(abs(df$Illusion_Strength))
-df$Illusion_Strength_cbrt <- sign(df$Illusion_Strength) * (abs(df$Illusion_Strength)**(1 / 3))
 
 # Save anonymized data
 write.csv(df, "../data/study2.csv", row.names = FALSE)
@@ -82,14 +73,39 @@ source("functions.R")
 
 df <- read.csv("../data/study2.csv") |>
   mutate(
-    Date = as.Date(Date),
+    Date = lubridate::dmy(Date),
     Participant = fct_reorder(Participant, Date),
     Screen_Refresh = as.character(Screen_Refresh),
     Illusion_Side = as.factor(Illusion_Side),
+    # Illusion_Effect = fct_relevel(as.factor(Illusion_Effect), "Incongruent", "Null", "Congruent"),
     Illusion_Effect = fct_relevel(as.factor(Illusion_Effect), "Incongruent", "Congruent"),
     Block = as.factor(Block),
     Education = fct_relevel(Education, "Doctorate", "Master", "Bachelor", "High School", "Other")
   )
+
+# Fix precision
+for(ill in unique(df$Illusion_Type)) {
+  data <- df[df$Illusion_Type == ill, ] 
+  i <- 10
+  while (length(sort(unique(signif(data$Illusion_Difference, i)))) != 8) {
+    i <- i - 1
+  }
+  df[df$Illusion_Type == ill, "Illusion_Difference"] <- signif(df[df$Illusion_Type == ill, "Illusion_Difference"], i)
+  if (i != 10) {
+    message(ill, ": Illusion_Difference values != 8. Rounded to ", i, ".")
+  }
+}
+
+# Transformation
+df <- df |> 
+  mutate(    
+    Illusion_Difference_log = log(1 + Illusion_Difference),
+    Illusion_Difference_sqrt = sqrt(Illusion_Difference),
+    Illusion_Difference_cbrt = Illusion_Difference**(1 / 3),
+    Illusion_Strength_log = sign(Illusion_Strength) * log(1 + abs(Illusion_Strength)),
+    Illusion_Strength_sqrt = sign(Illusion_Strength) * sqrt(abs(Illusion_Strength)),
+    Illusion_Strength_cbrt = sign(Illusion_Strength) * (abs(Illusion_Strength)**(1 / 3))
+    )
 ```
 
 
@@ -98,7 +114,7 @@ df <- read.csv("../data/study2.csv") |>
 ```{r message=FALSE, warning=FALSE}
 # plot(estimate_density(dfraw[dfraw$Participant == "60684f29dbfe1bb2059e5e27_rkqoy", "RT"]))
 
-# Dear participant, thank you for participating in our study. Unfortunately, we didn't receive your data :( did something happen? Some technical issue? We would like to kindly ask you to return your participation so that we can open up more slots. Thank you in advance, and apologies for the inconvenience! 
+# Dear participant, thank you for participating in our studfy. Unfortunately, we didn't receive your data :( did something happen? Some technical issue? We would like to kindly ask you to return your participation so that we can open up more slots. Thank you in advance, and apologies for the inconvenience! 
 
 # Dear participant, thank you for participating in our study. Unfortunately, our system detected multiple issues in your data (such as implausibly short responses, and random-like pattern of answers), which makes it unusable. We understand that you might have been in a hurry or had some other issues; we hope to open-up more slots in the future would you be interested to participate again.
 
@@ -111,7 +127,7 @@ outliers <- c(
   # Prolific Status: REJECTED (06/08)
   "5e66ed53de7896486f9a71f8_p8ckk",
   # 2nd block of responses very fast
-  # Prolific Status: RETURN REQUESTED (07/08)
+  # Prolific Status: REJECTED (15/08)
   "61443e47c248a375c899a0cf_9qz3u"
 )
 
@@ -157,11 +173,13 @@ data.frame(Participant = c("Total"), t(sapply(dfsub[2:ncol(dfsub)], mean, na.rm=
 ```{r message=FALSE, warning=FALSE, fig.width=20, fig.height=20}
 # RT distribution
 p <- df |> 
+  # filter(Date > "2022-08-12") |> 
   filter(RT < 10000) |> 
   estimate_density(select = "RT", at = c("Participant", "Block")) |>
   group_by(Participant) |>
   normalize(select = "y") |>
   ungroup() |>
+  mutate(Participant = factor(Participant, levels=levels(df$Participant))) |> 
   mutate(color = ifelse(Participant %in% outliers, "red", ifelse(Participant %in% partial_outliers, "orange", "blue"))) |>
   ggplot(aes(x = x, y = y)) +
   geom_area(data = normalize(estimate_density(filter(df, RT < 10000), select = "RT"), select = "y"), alpha = 0.2) +
@@ -206,7 +224,7 @@ temp2 <- temp |>
 # knitr::kable(temp2)
 
 p1 <- temp |>
-  estimate_density(at = c("Illusion_Type", "Block")) |>
+  estimate_density(at = c("Illusion_Type", "Block"), method="KernSmooth") |>
   ggplot(aes(x = x, y = y)) +
   geom_line(aes(color = Illusion_Type, linetype = Block)) +
   geom_vline(xintercept = 0.5, linetype = "dashed") +
@@ -263,8 +281,8 @@ p1 <- estimate_density(df, select = "RT", at = "Participant") |>
     summarize(Outlier = mean(RT) + 4 * sd(RT))) |>
   mutate(Outlier = ifelse(x >= Outlier, TRUE, FALSE)) |>
   ggplot(aes(x = x, y = y)) +
-  geom_area(data = normalize(estimate_density(df, select = "RT"), select = "y"), alpha = 0.2) +
-  geom_line(aes(color = Participant, linetype = Outlier)) +
+  geom_area(data = normalize(estimate_density(filter(df, RT < 10000), select = "RT"), select = "y"), alpha = 0.2) +
+  geom_line(aes(color = Participant, linetype = Outlier), alpha=0.2) +
   geom_vline(xintercept = c(125), linetype = "dashed", color = "red") +
   scale_color_material_d("rainbow", guide = "none") +
   scale_x_continuous(expand = c(0, 0)) +
@@ -286,9 +304,10 @@ p2 <- df |>
   scale_x_discrete(expand = c(0, 0)) +
   scale_y_continuous(expand = c(0, 0), labels = scales::percent) +
   see::theme_modern() +
-  theme(axis.text.x = element_blank())
+  theme(axis.text.x = element_blank()) +
+  labs(y = "Percentage of outlier trials")
 
-p1 | p2
+p1 / p2
 ```
 
 We removed `r sum(df$Outlier)` (`r insight::format_value(sum(df$Outlier) / nrow(df), as_percent=TRUE)`) outlier trials (125 ms < RT < 4 SD above mean).
@@ -361,10 +380,10 @@ p5 <- plot_waffle(dfsub, "Education") +
   scale_fill_viridis_d()
 
 p6 <- plot_waffle(dfsub, "Nationality") +
-  scale_fill_metro_d()
+  scale_fill_manual(values = c("South American" = "#FF5722", "Middle Eastern" = "#FF9800", "Western" = "#2196F3", "African" = "#4CAF50", "South African" = "#009688"))
 
 p7 <- plot_waffle(dfsub, "Ethnicity") +
-  scale_fill_manual(values = c("Latino" = "#FF5722", "Asian" = "#FF9800", "Caucasian" = "#2196F3", "African" = "#4CAF50", "Jewish" = "#9C27B0"))
+  scale_fill_manual(values = c("Latino" = "#FF5722", "Asian" = "#FF9800", "Caucasian" = "#2196F3", "African" = "#4CAF50", "Jewish" = "#9C27B0", "Mixed" = "#795548"))
 
 p8 <- plot_waffle(dfsub, "Screen_Resolution", title = "Screen Resolution") +
   scale_fill_pizza_d() +
@@ -377,7 +396,7 @@ p9 <- plot_waffle(dfsub, "Device_OS", title = "Device OS") +
 #   scale_fill_viridis_d()
 
 
-(p1 / p2 / p3) | (p4 / p5 / p6) | (p7 / p8 / p9)
+(p1 / p2 / p3) | (p4 / p5 / p9) | (p6 / p7 / p8)
 ```
 
 
@@ -391,9 +410,12 @@ p9 <- plot_waffle(dfsub, "Device_OS", title = "Device OS") +
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
 data <- filter(df, Illusion_Type == "Delboeuf")
+
+# mm <- model.matrix(Error ~ abs(Illusion_Strength) * Illusion_Effect, data=data)
+# head(as.data.frame(mm))
 ```
 
-```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+```{r message=FALSE, warning=FALSE, cache=cache, eval=bestModels}
 best_models(data)
 ```
 
@@ -412,8 +434,8 @@ plot_descriptive_err(data)
 
 ```{r message=FALSE, warning=FALSE, cache=cache, eval=runModels}
 formula <- brms::bf(
-  Error ~ logmod(Illusion_Difference) * logmod(abs(Illusion_Strength)) * Illusion_Effect +
-    (1 + logmod(Illusion_Difference) * logmod(abs(Illusion_Strength)) * Illusion_Effect | Participant),
+  Error ~ sqrt(Illusion_Difference) * sqrt(abs(Illusion_Strength)) * Illusion_Effect +
+    (1 + sqrt(Illusion_Difference) * sqrt(abs(Illusion_Strength)) * Illusion_Effect | Participant),
   family = "bernoulli"
 )
 
@@ -449,7 +471,6 @@ p_delboeuf_err
 ##### Descriptive
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
-
 data <- filter(df, Illusion_Type == "Delboeuf", Error == 0)
 
 plot_descriptive_rt(data)
@@ -458,45 +479,39 @@ plot_descriptive_rt(data)
 ##### Model Specification
 
 ```{r message=FALSE, warning=FALSE, cache=cache, eval=runModels}
-# formula <- brms::bf(
-#   RT ~ Illusion_Difference * Illusion_Strength +
-#     (1 + (Illusion_Difference * Illusion_Strength) | Participant),
-#   sigma ~ Illusion_Difference * Illusion_Strength +
-#     (1 + (Illusion_Difference * Illusion_Strength) | Participant),
-#   # ndt ~ Illusion_Difference * Illusion_Strength +
-#   #   (1 | G | Participant),
-#   family = "shifted_lognormal"
-# )
-# formula <- brms::bf(
-#   RT ~ Illusion_Difference * Illusion_Strength +
-#     (1 + (Illusion_Difference * Illusion_Strength) | Participant),
-#   sigma ~ Illusion_Difference * Illusion_Strength +
-#     (1 + (Illusion_Difference * Illusion_Strength) | Participant),
-#   # beta ~ Illusion_Difference * Illusion_Strength +
-#   #   (1 + (Illusion_Difference * Illusion_Strength) | Participant),
-#   family = "exgaussian"
-# )
-
 formula <- brms::bf(
-  RT ~ logmod(Illusion_Difference) * logmod(abs(Illusion_Strength)) * Illusion_Effect +
-    (1 | Participant),
+  RT ~ sqrt(Illusion_Difference) * sqrt(abs(Illusion_Strength)) * Illusion_Effect +
+    (1 + sqrt(Illusion_Difference) * sqrt(abs(Illusion_Strength)) * Illusion_Effect | Participant),
   sigma ~ 1 + (1 | Participant),
+  beta ~ 1 + (1 | Participant),
   family = "exgaussian"
 )
-# prior = c(
-#     prior(normal(6, 1.5), class = Intercept),
-#     prior(normal(0, 1), class = sigma),
-#     prior(normal(0, .01), class = b, coef = c_trial)
-#   )
+
 
 # brms::get_prior(formula, data = data)
-# brms::validate_prior(formula)
+# plot(seq(-5, 5, length.out=100), brms::dstudent_t(seq(-5, 5, length.out=100), df = 3, 0.1, 0.5))
+priors <- c(
+  # Intercept
+  prior("student_t(3, 0, 0.1)", class = "Intercept"),
+  prior("student_t(3, 0.35, 0.1)", class = "sd", coef="Intercept", group="Participant"),
+  # Default parameters
+  prior("student_t(3, 0, 3)", class = "b"),
+  prior("student_t(3, 0.35, 0.5)", class = "sd", group="Participant")
+  
+  # prior("student_t(3, 0, 1)", class="Intercept", dpar = "sigma"),
+  # prior("student_t(3, 0.1, 1)", class="sd", dpar = "sigma")
+  
+  # prior("student_t(3, 0.1, 0.5)", class = "ndt")
+  ) |> 
+  brms::validate_prior(formula, data = data)
+
+# bayestestR::model_to_priors(model_delboeuf_rt, scale_multiply=3)
 
 model_delboeuf_rt <- brms::brm(formula,
   data = data,
-  refresh = 0
+  refresh = 50,
+  init=0
 )
-
 
 
 
@@ -522,7 +537,7 @@ p_delboeuf_rt
 
 #### Visualization
 
-```{r message=FALSE, warning=FALSE, cache=cache, fig.height=fig.height*2}
+```{r message=FALSE, warning=FALSE, cache=cache, fig.height=fig.height*2, eval=FALSE}
 p_delboeuf <- plot_all(data, p_delboeuf_err, p_delboeuf_rt)
 p_delboeuf
 ```
@@ -536,7 +551,7 @@ p_delboeuf
 data <- filter(df, Illusion_Type == "Ebbinghaus") 
 ```
 
-```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+```{r message=FALSE, warning=FALSE, cache=cache, eval=bestModels}
 best_models(data)
 ```
 
@@ -555,8 +570,8 @@ plot_descriptive_err(data)
 
 ```{r message=FALSE, warning=FALSE, cache=cache, eval=runModels}
 formula <- brms::bf(
-  Error ~ sqrt(Illusion_Difference) * sqrt(abs(Illusion_Strength)) * Illusion_Effect +
-    (1 + sqrt(Illusion_Difference) * sqrt(abs(Illusion_Strength)) * Illusion_Effect | Participant),
+  Error ~ sqrt(Illusion_Difference) * logmod(abs(Illusion_Strength)) * Illusion_Effect +
+    (1 + sqrt(Illusion_Difference) * logmod(abs(Illusion_Strength)) * Illusion_Effect | Participant),
   family = "bernoulli"
 )
 
@@ -602,17 +617,18 @@ plot_descriptive_rt(data)
 
 ```{r message=FALSE, warning=FALSE, cache=cache, eval=runModels}
 formula <- brms::bf(
-  RT ~ sqrt(Illusion_Difference) * sqrt(abs(Illusion_Strength)) * Illusion_Effect +
-    (1 | Participant),
-  # sigma ~ t2(Illusion_Difference * Illusion_Strength) +
-  #   (1 | Participant),
+  RT ~ sqrt(Illusion_Difference) * logmod(abs(Illusion_Strength)) * Illusion_Effect +
+    (1 + sqrt(Illusion_Difference) * logmod(abs(Illusion_Strength)) * Illusion_Effect | Participant),
+  sigma ~ 1 + (1 | Participant),
+  beta ~ 1 + (1 | Participant),
   family = "exgaussian"
 )
 
 
 model_ebbinghaus_rt <- brms::brm(formula,
   data = data,
-  refresh = 0
+  refresh = 0,
+  init = 0
 )
 
 plot_ppcheck(model_ebbinghaus_rt)
@@ -643,7 +659,7 @@ p_ebbinghaus_rt
 data <- filter(df, Illusion_Type == "Rod-Frame")
 ```
 
-```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+```{r message=FALSE, warning=FALSE, cache=cache, eval=bestModels}
 best_models(data)
 ```
 
@@ -708,15 +724,16 @@ plot_descriptive_rt(data)
 formula <- brms::bf(
   RT ~ sqrt(Illusion_Difference) * sqrt(abs(Illusion_Strength)) * Illusion_Effect +
     (1 | Participant),
-  # sigma ~ t2(Illusion_Difference * Illusion_Strength) +
-  #   (1 | Participant),
+  sigma ~ 1 + (1 | Participant),
+  beta ~ 1 + (1 | Participant),
   family = "exgaussian"
 )
 
 
 model_rodframe_rt <- brms::brm(formula,
   data = data,
-  refresh = 0
+  refresh = 0,
+  init = 0
 )
 
 plot_ppcheck(model_rodframe_rt)
@@ -738,6 +755,10 @@ p_rodframe_rt <- plot_model_rt(data, model_rodframe_rt)
 p_rodframe_rt
 ```
 
+
+
+
+
 ### Vertical-Horizontal
 
 #### Model Selection
@@ -746,7 +767,7 @@ p_rodframe_rt
 data <- filter(df, Illusion_Type == "Vertical-Horizontal") 
 ```
 
-```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+```{r message=FALSE, warning=FALSE, cache=cache, eval=bestModels}
 best_models(data)
 ```
 
@@ -855,7 +876,7 @@ p_verticalhorizontal_rt
 data <- filter(df, Illusion_Type == "Zöllner")
 ```
 
-```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+```{r message=FALSE, warning=FALSE, cache=cache, eval=bestModels}
 best_models(data)
 ```
 
@@ -961,7 +982,7 @@ p_zollner_rt
 data <- filter(df, Illusion_Type == "White")
 ```
 
-```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+```{r message=FALSE, warning=FALSE, cache=cache, eval=bestModels}
 best_models(data)
 ```
 
@@ -1065,7 +1086,7 @@ p_white_rt
 data <- filter(df, Illusion_Type == "Müller-Lyer")
 ```
 
-```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+```{r message=FALSE, warning=FALSE, cache=cache, eval=bestModels}
 best_models(data)
 ```
 
@@ -1168,7 +1189,7 @@ p_mullerlyer_rt
 data <- filter(df, Illusion_Type == "Ponzo")
 ```
 
-```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+```{r message=FALSE, warning=FALSE, cache=cache, eval=bestModels}
 best_models(data)
 ```
 
@@ -1272,7 +1293,7 @@ p_ponzo_rt
 data <- filter(df, Illusion_Type == "Poggendorff")
 ```
 
-```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+```{r message=FALSE, warning=FALSE, cache=cache, eval=bestModels}
 best_models(data)
 ```
 
@@ -1374,7 +1395,7 @@ p_poggendorff_rt
 data <- filter(df, Illusion_Type == "Contrast")
 ```
 
-```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+```{r message=FALSE, warning=FALSE, cache=cache, eval=bestModels}
 best_models(data)
 ```
 
@@ -1473,30 +1494,28 @@ p_contrast_rt
 
 ## Individual Scores
 
-### Delboeuf 
-
-#### Reliability
+### Reliability
 
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
 random <- rbind(
   extract_random(model_delboeuf_err, "Delboeuf"),
-  # extract_random(model_delboeuf_rt, "Delboeuf"),
-  extract_random(model_ebbinghaus_err, "Ebbinghaus"),
+  extract_random(model_delboeuf_rt, "Delboeuf")
+  # extract_random(model_ebbinghaus_err, "Ebbinghaus"),
   # extract_random(model_ebbinghaus_rt, "Ebbinghaus"),
-  extract_random(model_rodframe_err, "Rod-Frame"),
+  # extract_random(model_rodframe_err, "Rod-Frame"),
   # extract_random(model_rodframe_rt, "Rod-Frame"),
-  extract_random(model_verticalhorizontal_err, "Vertical-Horizontal"),
+  # extract_random(model_verticalhorizontal_err, "Vertical-Horizontal"),
   # extract_random(model_verticalhorizontal_rt, "Vertical-Horizontal"),
-  extract_random(model_zollner_err, "Zöllner"),
+  # extract_random(model_zollner_err, "Zöllner"),
   # extract_random(model_zollner_rt, "Zöllner"),
-  extract_random(model_white_err, "White"),
+  # extract_random(model_white_err, "White"),
   # extract_random(model_white_rt, "White"),
-  extract_random(model_mullerlyer_err, "Müller-Lyer"),
+  # extract_random(model_mullerlyer_err, "Müller-Lyer"),
   # extract_random(model_mullerlyer_rt, "Müller-Lyer"),
-  extract_random(model_ponzo_err, "Ponzo"),
+  # extract_random(model_ponzo_err, "Ponzo"),
   # extract_random(model_ponzo_rt, "Ponzo"),
-  extract_random(model_poggendorff_err, "Poggendorff"),
+  # extract_random(model_poggendorff_err, "Poggendorff"),
   # extract_random(model_poggendorff_rt, "Poggendorff"),
   # extract_random(model_contrast_err, "Contrast")
   # extract_random(model_contrast_rt, "Contrast")
@@ -1515,9 +1534,11 @@ random |>
   # ungroup() |> 
   # mutate(Participant = fct_reorder(Participant, order)) |> 
   ggplot(aes(y = Participant, x = Value)) +
-  ggdist::stat_slabinterval(aes(fill = Illusion_Type, color=Illusion_Type), alpha=0.5) +
+  # ggdist::stat_slabinterval(aes(fill = Illusion_Type, color=Illusion_Type), alpha=0.5) +
+  ggdist::stat_pointinterval(aes(fill = Illusion_Type, color=Illusion_Type), alpha=0.5) +
   # coord_cartesian(xlim=c(-4, 4)) +
-  facet_wrap(~Parameter, scales = "free_x") 
+  facet_wrap(~Parameter, scales = "free_x") +
+  theme(axis.text.y = element_blank())
 
 
 
@@ -1537,8 +1558,34 @@ random <- random |>
 # plot(estimate_density(select(random, -Participant)))
 ```
 
+### Relationship with empirical descriptors
 
-<!-- #### Approximation -->
+```{r message=FALSE, warning=FALSE, cache=cache}
+empirical <- df |>
+  group_by(Participant, Illusion_Type) |>
+  summarize(
+    # n = n(),
+    Error = sum(Error, na.rm=TRUE) / n(),
+    RT_Mean = mean(RT, na.rm=TRUE),
+    RT_SD = sd(RT, na.rm=TRUE),
+  ) |>
+  ungroup()
+
+
+
+r <- correlation::correlation(
+  data = random |> 
+    arrange(Participant) |> 
+    data_select(select="Delboeuf", regex=TRUE),
+  data2 = empirical |>
+    filter(Illusion_Type %in% c("Delboeuf")) |> 
+    pivot_wider(names_from = c("Illusion_Type"), values_from = c("Error", "RT_Mean", "RT_SD")) |> 
+    arrange(Participant)
+  )
+
+plot(summary(r))
+```
+<!-- ### Approximation -->
 
 <!-- ```{r message=FALSE, warning=FALSE, cache=cache} -->
 <!-- dat <- data.frame() -->

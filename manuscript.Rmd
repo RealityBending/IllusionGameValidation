@@ -57,18 +57,28 @@ cache <- TRUE
 ## Introduction
 
 <!-- Intro  & Gaps-->
-Visual illusions are blabla. Despite the historical interest, several gaps remained unanswered:
+Visual illusions are *blabla*. Despite the historical interest, several gaps remained unanswered: *blabla*. One key challenge hindering the further development of the field is the relative difficulty to adapt visual illusions to an experimental setting, which typically requires the controlled modulation of the specific variables of interest. 
 
-This could be caused by the relative difficulty to adapt visual illusions to an experimental setting, which typically requires the parametric modulation of variables at stake.
+<!-- Pyllusion -->
+To address this issue, we first developed a parametric framework to generate visual illusions, that we implemented and made accessible in the open-source *Pyllusion* software (REF).
+
 
 <!-- Target, strength, difficulty -->
-Many visual illusions can be seen as made of *targets* (e.g., parallel lines, same-size circles, same-length lines), which perception is biased by the *context* (e.g., parallel lines are seen as angled, circle or segments appear of different lengths). To date, most of the paradigms prompt the subjective extent the context biases the perception ("how much does the circle appear bigger", e.g., **REFS**).
+Many visual illusions can be seen as made of *targets* (e.g., parallel lines, same-size circles, same-length lines), which perception is biased by the *context* (e.g., parallel lines are seen as angled, circle or segments appear of different lengths). 
 
-Although visual illusions are inherently tied to subjective perception, we tested a reversal of the traditional paradigm to access the "objective" effect of illusions. 
+This framework allows the continuous and independent modulation of *illusion strength* and *task difficulty*.
+ 
+ 
 
-To achieve this, we first developed a parametric framework to generate visual illusions that we implemented and made accessible in the open-source Pyllusion software (REF). This allows us to generate stimuli ...
+To date, most of the paradigms prompt the subjective extent the context biases the perception ("how much does the circle appear bigger", e.g., **REFS**).
 
-In the present study, we will test this novel paradigm to ...
+Although visual illusions are inherently tied to subjective perception, we tested a reversal of the traditional paradigm to access the "objective" effect of illusions. By generating stimuli that 
+
+
+In the present set of studies, we will test this novel paradigm to investigate 1) if the effect of illusion can be manipulated continuously, 2) whether 10 different illusions share a common latent factor, 3) how the the inter-individual sensitivity to illusions relates to other characteristics, such as sex or personality.
+
+## Methods
+
 
 
 

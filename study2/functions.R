@@ -1,6 +1,6 @@
 logmod <- function(x) sign(x) * log(1 + abs(x))
 sqrtmod <- function(x) sign(x) * sqrt(abs(x))
-cbrtmod <- function(x) sign(x) * (abs(x)**(1/3))
+cbrtmod <- function(x) sign(x) * (abs(x)**(1 / 3))
 
 
 
@@ -12,36 +12,33 @@ best_models <- function(data) {
   models_rt <- list()
   for (k1 in c("", "_log", "_sqrt", "_cbrt")) {
     for (k2 in c("", "_log", "_sqrt", "_cbrt")) {
-      for (side in c("", "--SIDE")) {
-        for (effect in c("", "--EFFECT")) {
-          name <- paste0("DIFF", k1, "--", "STRENGTH", k2, side, effect)
-          message(name)
-          f <- paste0(
-            "Illusion_Difference",
-            k1,
-            " * Illusion_Strength",
-            k2,
-            " + (1|Participant)"
-          )
+      # for (side in c("", "--SIDE")) {
+      # for (effect in c("", "--EFFECT")) {
+      name <- paste0("DIFF", k1, "--", "STRENGTH", k2)
+      message(name)
+      f <- paste0(
+        "Illusion_Side + Illusion_Effect * Illusion_Difference",
+        k1,
+        " * abs(Illusion_Strength",
+        k2,
+        ") + (1|Participant)"
+      )
 
-          if (side == "--SIDE") f <- paste0("Illusion_Side * ", f)
-          if (effect == "--EFFECT") f <- paste0("Illusion_Effect * ", str_replace(str_replace(f, "Illusion_Strength", "abs(Illusion_Strength"), " \\+ \\(1", "\\) \\+ \\(1"))
-
-          m <- glmmTMB::glmmTMB(as.formula(paste0("Error ~ ", f)),
-                                data = data, family = "binomial"
-          )
-          if (performance::check_convergence(m)) {
-            models_err[[name]] <- m
-          }
-
-          m <- glmmTMB::glmmTMB(as.formula(paste0("RT ~ ", f)),
-                                data = filter(data, Error == 0)
-          )
-          if (performance::check_convergence(m)) {
-            models_rt[[name]] <- m
-          }
-        }
+      m <- glmmTMB::glmmTMB(as.formula(paste0("Error ~ ", f)),
+        data = data, family = "binomial"
+      )
+      if (performance::check_convergence(m)) {
+        models_err[[name]] <- m
       }
+
+      m <- glmmTMB::glmmTMB(as.formula(paste0("RT ~ ", f)),
+        data = filter(data, Error == 0)
+      )
+      if (performance::check_convergence(m)) {
+        models_rt[[name]] <- m
+      }
+      # }
+      # }
     }
   }
 
@@ -53,13 +50,24 @@ best_models <- function(data) {
 
   test <- test_performance(models_rt[to_keep], reference = 1)
   perf <- compare_performance(models_rt[to_keep], metrics = c("BIC", "R2"))
+  side <- data.frame()
+  for (m in to_keep) {
+    params <- parameters::parameters(models_rt[[m]], keep = "Side")
+    side <- rbind(side, data.frame(Name = m, Side = min(params$p)))
+  }
+
   rt <- merge(perf, test) |>
+    merge(side) |>
     arrange(BIC) |>
-    select(Name, BIC, R2_marginal, BF) |>
+    select(Name, BIC, R2_marginal, BF, Side) |>
     mutate(
       BF = insight::format_bf(BF, name = ""),
       Model = "RT"
     )
+
+
+
+
 
   # Errors
   to_keep <- compare_performance(models_err, metrics = c("BIC")) |>
@@ -69,10 +77,16 @@ best_models <- function(data) {
 
   test <- test_performance(models_err[to_keep], reference = 1)
   perf <- compare_performance(models_err[to_keep], metrics = c("BIC", "R2"))
+  side <- data.frame()
+  for (m in to_keep) {
+    params <- parameters::parameters(models_err[[m]], keep = "Side")
+    side <- rbind(side, data.frame(Name = m, Side = min(params$p)))
+  }
 
   merge(perf, test) |>
+    merge(side) |>
     arrange(BIC) |>
-    select(Name, BIC, R2_marginal, BF) |>
+    select(Name, BIC, R2_marginal, BF, Side) |>
     mutate(
       BF = insight::format_bf(BF, name = ""),
       Model = "Errors"
@@ -102,8 +116,8 @@ best_models <- function(data) {
 
 plot_descriptive_err <- function(data, side = "leftright") {
   # Sanity checks
-  if (length(unique(data$Illusion_Difference)) != 8) stop("Illusion_Difference values != 8")
-  if (length(unique(data$Illusion_Strength)) != 15) stop("Illusion_Strength values != 15")
+  if (length(sort(unique(data$Illusion_Difference))) != 8) stop("Illusion_Difference values != 8")
+  if (length(sort(unique(data$Illusion_Strength))) != 15) stop("Illusion_Strength values != 15")
 
   if (side == "leftright") {
     x <- data[data$Error == 0 & data$Illusion_Side == 1, ]$Answer[1]
@@ -124,8 +138,8 @@ plot_descriptive_err <- function(data, side = "leftright") {
     data$Answer <- fct_rev(data$Answer)
   }
 
-  dodge1 <- 0.1 * diff(range(data$Illusion_Difference))
-  dodge2 <- -0.1 * diff(range(data$Illusion_Strength))
+  dodge1 <- 0.05 * diff(range(data$Illusion_Difference))
+  dodge2 <- -0.05 * diff(range(data$Illusion_Strength))
 
   p1 <- data |>
     group_by(Illusion_Difference, Illusion_Strength, Answer) |>
@@ -172,14 +186,14 @@ plot_descriptive_err <- function(data, side = "leftright") {
 
   if (side == "leftright") {
     p <- ((p1 + facet_wrap(~Answer, ncol = 2, labeller = "label_both")) /
-            (p2 + facet_wrap(~Answer, ncol = 2, labeller = "label_both"))) +
+      (p2 + facet_wrap(~Answer, ncol = 2, labeller = "label_both"))) +
       plot_annotation(
         title = paste(data$Illusion_Type[1], "Illusion"),
         theme = theme(plot.title = element_text(face = "bold", hjust = 0.5))
       )
   } else {
     p <- ((p1 + facet_wrap(~Answer, nrow = 2, labeller = "label_both")) |
-            (p2 + facet_wrap(~Answer, nrow = 2, labeller = "label_both"))) +
+      (p2 + facet_wrap(~Answer, nrow = 2, labeller = "label_both"))) +
       plot_annotation(
         title = paste(data$Illusion_Type[1], "Illusion"),
         theme = theme(plot.title = element_text(face = "bold", hjust = 0.5))
@@ -202,8 +216,8 @@ plot_model_err <- function(data, model) {
 
   # Get predicted
   pred <- estimate_relation(model,
-                            at = vars,
-                            length = c(NA, 50)
+    at = vars,
+    length = c(NA, NA)
   )
 
   # Set colors for lines
@@ -286,12 +300,12 @@ plot_descriptive_rt <- function(data, side = "leftright") {
     data$Answer <- fct_rev(data$Answer)
   }
 
-  dodge1 <- 0.1 * diff(range(data$Illusion_Difference))
-  dodge2 <- -0.1 * diff(range(data$Illusion_Strength))
+  dodge1 <- 0.05 * diff(range(data$Illusion_Difference))
+  dodge2 <- -0.05 * diff(range(data$Illusion_Strength))
 
   p1 <- data |>
     ggplot(aes(x = Illusion_Difference, y = RT)) +
-    ggdist::stat_slabinterval(aes(fill = Illusion_Strength, group = Illusion_Strength, color = Illusion_Strength), alpha = 0.5, normalize = "groups", position=position_dodge(width=dodge1)) +
+    ggdist::stat_pointinterval(aes(fill = Illusion_Strength, group = Illusion_Strength, color = Illusion_Strength), alpha = 0.5, normalize = "groups", position = position_dodge(width = dodge1)) +
     # geom_line(aes(color = Illusion_Strength), position = position_dodge(width=dodge1)) +
     scale_y_continuous(expand = c(0, 0)) +
     scale_x_continuous(expand = c(0, 0)) +
@@ -310,7 +324,7 @@ plot_descriptive_rt <- function(data, side = "leftright") {
   p2 <- data |>
     ggplot(aes(x = Illusion_Strength, y = RT)) +
     geom_vline(xintercept = 0, linetype = "dashed", alpha = 0.6) +
-    ggdist::stat_slabinterval(aes(fill = Illusion_Difference, group = Illusion_Difference, color = Illusion_Difference), alpha = 0.5, normalize = "groups", position=position_dodge(width=dodge2)) +
+    ggdist::stat_pointinterval(aes(fill = Illusion_Difference, group = Illusion_Difference, color = Illusion_Difference), alpha = 0.5, normalize = "groups", position = position_dodge(width = dodge2)) +
     # geom_line(aes(color = Illusion_Difference), position = position_dodge(width=dodge2)) +
     scale_y_continuous(expand = c(0, 0)) +
     scale_x_continuous(expand = c(0, 0)) +
@@ -328,14 +342,14 @@ plot_descriptive_rt <- function(data, side = "leftright") {
 
   if (side == "leftright") {
     p <- ((p1 + facet_wrap(~Answer, ncol = 2, labeller = "label_both")) /
-            (p2 + facet_wrap(~Answer, ncol = 2, labeller = "label_both"))) +
+      (p2 + facet_wrap(~Answer, ncol = 2, labeller = "label_both"))) +
       plot_annotation(
         title = paste(data$Illusion_Type[1], "Illusion"),
         theme = theme(plot.title = element_text(face = "bold", hjust = 0.5))
       )
   } else {
     p <- ((p1 + facet_wrap(~Answer, nrow = 2, labeller = "label_both")) |
-            (p2 + facet_wrap(~Answer, nrow = 2, labeller = "label_both"))) +
+      (p2 + facet_wrap(~Answer, nrow = 2, labeller = "label_both"))) +
       plot_annotation(
         title = paste(data$Illusion_Type[1], "Illusion"),
         theme = theme(plot.title = element_text(face = "bold", hjust = 0.5))
@@ -347,20 +361,30 @@ plot_descriptive_rt <- function(data, side = "leftright") {
 
 
 plot_ppcheck <- function(model) {
+  # prior <- update(model, sample_prior="only", silent=2, refresh=0) |>
+  # modelbased::estimate_prediction(keep_iterations = 50)
   pred <- modelbased::estimate_prediction(model, keep_iterations = 100)
   estimate_density(pred$RT) |>
+    # normalize(select = "y") |>
     ggplot(aes(x = x, y = y)) +
     geom_area(fill = "#9E9E9E") +
+    # geom_line(data = prior |>
+    #             bayestestR::reshape_iterations() |>
+    #             mutate(iter_group = as.factor(iter_group)) |>
+    #             estimate_density(select = "iter_value", at = "iter_group") |>
+    #             normalize(select = "y"),
+    #           aes(group = iter_group), color = "#FF9800", size = 0.1, alpha = 0.5) +
     geom_line(
       data = pred |>
         bayestestR::reshape_iterations() |>
         mutate(iter_group = as.factor(iter_group)) |>
         estimate_density(select = "iter_value", at = "iter_group"),
+      # normalize(select = "y"),
       aes(group = iter_group), color = "#2196F3", size = 0.1, alpha = 0.5
     ) +
     scale_y_continuous(expand = c(0, 0)) +
     scale_x_continuous(expand = c(0, 0)) +
-    # coord_cartesian(xlim = c(100, 3000)) +
+    coord_cartesian(xlim = c(0, 2)) +
     theme_modern() +
     labs(x = "Reaction Time (ms)", y = "", title = "Posterior Predictive Check") +
     theme(
@@ -383,8 +407,8 @@ plot_model_rt <- function(data, model) {
 
   # Get predicted
   pred <- estimate_relation(model,
-                            at = vars,
-                            length = c(NA, 25)
+    at = vars,
+    length = c(NA, NA)
   )
 
   # Set colors for lines
@@ -502,6 +526,7 @@ plot_all <- function(data, p_err, p_rt) {
 
 extract_random <- function(model, illusion = "Delboeuf") {
   random <- as.data.frame(model)
+  random <- random[sample(nrow(random), 200), ]
   random <- random[str_detect(names(random), regex("^r_Participant"))]
 
   if (insight::model_info(model)$is_logit) {
@@ -537,4 +562,13 @@ extract_random <- function(model, illusion = "Delboeuf") {
       Parameter = str_replace(Parameter, "Illusion_EffectCongruent", "Cong"),
       Parameter = str_replace_all(Parameter, ":", "")
     )
+}
+
+
+clean_name <- function(x) {
+  x |>
+    str_replace("_Loc", " (loc)") |>
+    str_replace("_Disp", " (disp)") |>
+    str_replace("_Prob", " (prob)") |>
+    str_replace("_", " - ")
 }
