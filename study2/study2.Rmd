@@ -15,8 +15,8 @@ options(
 )
 
 cache <- TRUE
-runModels <- TRUE
-bestModels <- TRUE
+runModels <- FALSE
+bestModels <- FALSE
 fig.width <- see::golden_ratio(7)
 fig.height <- 7
 
@@ -54,8 +54,9 @@ for (ppt in participants) {
 
 df$Pyllusion <- "1.2"
 
-# Fix
+# Fix due to technical issue in the paradigm on the first day
 df[df$Illusion_Type == "Rod-Frame" & df$Date == "05/08/2022", "Illusion_Strength"] <- -1 * (df[df$Illusion_Type == "Rod-Frame" & df$Date == "05/08/2022", "Illusion_Strength"])
+df[df$Illusion_Type == "Rod-Frame" & df$Date == "05/08/2022", "Illusion_Effect"] <- ifelse(sign(df[df$Illusion_Type == "Rod-Frame" & df$Date == "05/08/2022", "Illusion_Strength"]) == -1, "Congruent", "Incongruent")
 
 # Save anonymized data
 write.csv(df, "../data/study2.csv", row.names = FALSE)
@@ -80,7 +81,7 @@ df <- read.csv("../data/study2.csv") |>
     # Illusion_Effect = fct_relevel(as.factor(Illusion_Effect), "Incongruent", "Null", "Congruent"),
     Illusion_Effect = fct_relevel(as.factor(Illusion_Effect), "Incongruent", "Congruent"),
     Block = as.factor(Block),
-    Education = fct_relevel(Education, "Doctorate", "Master", "Bachelor", "High School", "Other")
+    Education = fct_relevel(Education, "High School", "Bachelor", "Master", "Doctorate", "Other", "Prefer not to Say")
   )
 
 # Fix precision
@@ -122,20 +123,38 @@ df <- df |>
 
 # Just received the results: in your case, the three most prominent issues were your response pattern that was equivalent to random (in the sequence of keystrokes) that led to a chance-level performance (that was also significantly different from the rest of the population). Moreover, your reaction time distribution was also very different from the norm, with a vast majority of implausibly short responses (i.e., that are faster than the time it takes the brain to process a visual input). This issue was even more prominent in the second block (after the break), which typically happens when participants are in a rush to finish. Finally, your overall completion time was also significantly below the average. Again, we apologize, we understand that your time is valuable, but unfortunately we run too on limited funds and can hardly spare more on unusable data. Sorry for the inconvenience, we will try to open-up more slots soon.
 
+dfsub$Participant[grepl("60be8d", dfsub$Participant)]
+
 outliers <- c(
   # Error rate of 48.8% Very short RT
   # Prolific Status: REJECTED (06/08)
   "5e66ed53de7896486f9a71f8_p8ckk",
   # 2nd block of responses very fast
   # Prolific Status: REJECTED (15/08)
-  "61443e47c248a375c899a0cf_9qz3u"
+  "61443e47c248a375c899a0cf_9qz3u",
+  # Error rate of 44% and very short RTs
+  # Prolific Status: RETURN REQUESTED (22/08)
+  "60dd626e212aa26c16d953b7_vw35k",
+  # 2nd block bad, first block 1/3 bad
+  # Prolific Status: RETURN REQUESTED (26/08)
+  "5eed37c13661d91555c38308_hpgnt",
+  # Prolific Status: RETURN REQUESTED (26/08)
+  "6159f8a9a2d80ecf1a5acd30_zc8rt",
+  # Prolific status: accepted (not enough proof)
+  "6136aa846e80ebd7daf6e148_aggf6"
 )
 
 partial_outliers <- c(
   # 2nd block a bit bad
   "5c43cd414fe4f800016e4983_0zp37", 
   # Entire 2nd block bad
-  "61564e378e974bdbe42763a2_hhufm")
+  "61564e378e974bdbe42763a2_hhufm",
+  # Entire 2nd block bad
+  "5ff8b21dd2ca6f12bdaa5be8_c5rs6",
+  # Half of 2nd block bad
+  "613a9193ed68e49209b471b7_wrymn",
+  # 2nd block not good
+  "60be8dd61cec210d627483de_cmfx4")
 ```
 
 We removed `r length(outliers)` participants upon inspection of the average error rage (when close to 50%, suggesting random answers) and/or when the reaction time distribution was implausibly fast. 
@@ -173,13 +192,13 @@ data.frame(Participant = c("Total"), t(sapply(dfsub[2:ncol(dfsub)], mean, na.rm=
 ```{r message=FALSE, warning=FALSE, fig.width=20, fig.height=20}
 # RT distribution
 p <- df |> 
-  # filter(Date > "2022-08-12") |> 
+  # filter(Date > "2022-08-24") |>
   filter(RT < 10000) |> 
   estimate_density(select = "RT", at = c("Participant", "Block")) |>
   group_by(Participant) |>
   normalize(select = "y") |>
   ungroup() |>
-  mutate(Participant = factor(Participant, levels=levels(df$Participant))) |> 
+  mutate(Participant = fct_relevel(Participant, as.character(dfsub$Participant))) |> 
   mutate(color = ifelse(Participant %in% outliers, "red", ifelse(Participant %in% partial_outliers, "orange", "blue"))) |>
   ggplot(aes(x = x, y = y)) +
   geom_area(data = normalize(estimate_density(filter(df, RT < 10000), select = "RT"), select = "y"), alpha = 0.2) +
@@ -194,7 +213,7 @@ p <- df |>
   facet_wrap(~Participant) +
   labs(y = "", x = "Reaction Time (ms)")
 # p
-# ggsave("figures/outliers.png", p, width=20, height=15)
+# ggsave("figures/outliers.png", p, width=25, height=25)
 
 # Filter out
 df <- filter(df, !Participant %in% outliers)
@@ -271,7 +290,9 @@ df <- df |>
   mutate(Outlier = ifelse(Error == 0 & (RT < 125 | standardize(RT) > 4), TRUE, FALSE)) |>
   ungroup()
 
-p1 <- estimate_density(df, select = "RT", at = "Participant") |>
+p1 <- df |> 
+  filter(RT < 10000) |> 
+  estimate_density(select = "RT", at = "Participant") |>
   group_by(Participant) |>
   normalize(select = "y") |>
   ungroup() |>
@@ -319,7 +340,6 @@ df$RT <- df$RT / 1000  # Convert to second for better model convergence
 
 
 
-
 ## Participants
 
 
@@ -327,7 +347,7 @@ df$RT <- df$RT / 1000  # Convert to second for better model convergence
 ```{r message=FALSE, warning=FALSE}
 dfsub <- df |>
   group_by(Participant) |>
-  select(Participant, Age, Sex, Education, Nationality, Ethnicity, Duration, Break_Duration, Screen_Resolution, Screen_Refresh, Device_OS, starts_with("IPIP6"), starts_with("PID5")) |>
+  select(Participant, Age, Sex, Ethnicity, Education, Nationality, Duration, Break_Duration, Device_OS, starts_with("Screen"), starts_with("IPIP6"), starts_with("PID5")) |>
   slice(1) |>
   ungroup()
 ```
@@ -380,7 +400,7 @@ p5 <- plot_waffle(dfsub, "Education") +
   scale_fill_viridis_d()
 
 p6 <- plot_waffle(dfsub, "Nationality") +
-  scale_fill_manual(values = c("South American" = "#FF5722", "Middle Eastern" = "#FF9800", "Western" = "#2196F3", "African" = "#4CAF50", "South African" = "#009688"))
+  scale_fill_manual(values = c("South American" = "#FF5722", "Middle Eastern" = "#FF9800", "Western" = "#2196F3", "Eastern" = "#673AB7", "African" = "#4CAF50", "South African" = "#009688"))
 
 p7 <- plot_waffle(dfsub, "Ethnicity") +
   scale_fill_manual(values = c("Latino" = "#FF5722", "Asian" = "#FF9800", "Caucasian" = "#2196F3", "African" = "#4CAF50", "Jewish" = "#9C27B0", "Mixed" = "#795548"))
@@ -399,10 +419,58 @@ p9 <- plot_waffle(dfsub, "Device_OS", title = "Device OS") +
 (p1 / p2 / p3) | (p4 / p5 / p9) | (p6 / p7 / p8)
 ```
 
+## Data Analysis
+
+In the first part of the study focuses on modelling the effect of illusion strength and task difficulty, on errors and reaction time, within each illusion. In order to achieve that, we will start by fitting a General Additive Models (GAM), which can accommodate possible non-linear effects and interactions. Using them as a "ground-truth", we will attempt at approximating them using general linear models, in which we can specify a participant-level variability of the effects (via random effects).
+
+We will then extract this participant-level variability in the effect of illusion strength, task difficulty and their interaction and use it as inter-individual features. We will estimate the relationship across different illusions using factor analysis (FA) and structural equation modelling (SEM). 
 
 
+```{r make_GAMs, message=FALSE, warning=FALSE, eval=runModels}
+for(ill in c("Delboeuf", 
+             "Ebbinghaus", 
+             "Rod-Frame",
+             "Vertical-Horizontal", 
+             "Zöllner",
+             "White",
+             "Müller-Lyer", 
+             "Ponzo", 
+             "Poggendorff",
+             "Contrast")) {
+  print(ill)
+  model <- brms::brm(
+    Error ~ t2(Illusion_Difference, Illusion_Strength, k=8, bs="cr") + (1 | Participant),
+    data = filter(df, Illusion_Type == ill),
+    family = "bernoulli",
+    algorithm="sampling"
+  )
+
+  name <- paste0("gam_", tolower(clean_illusionName(ill)), "_err")
+  assign(name, model)  # Rename with string
+  save(list=name, file=paste0("models/", name, ".Rdata"))
+  
+  model <- brms::brm(
+    brms::bf(
+      RT ~ t2(Illusion_Difference, Illusion_Strength, k=8, bs="cr") + (1 | Participant),
+      sigma ~ t2(Illusion_Difference, Illusion_Strength, k=8, bs="cr") + (1 | Participant),
+      beta ~ t2(Illusion_Difference, Illusion_Strength, k=8, bs="cr") + (1 | Participant)
+    ),
+    data = filter(df, Illusion_Type == ill, Error == 0),
+    family = "exgaussian",
+    init=0,
+    algorithm="sampling"
+  )
+  
+  name <- paste0("gam_", tolower(clean_illusionName(ill)), "_rt")
+  assign(name, model)  # Rename with string
+  save(list=name, file=paste0("models/", name, ".Rdata"))
+}
+```
+
+# Results
 
 ## Models {.tabset}
+
 
 ### Delboeuf
 
@@ -417,6 +485,12 @@ data <- filter(df, Illusion_Type == "Delboeuf")
 
 ```{r message=FALSE, warning=FALSE, cache=cache, eval=bestModels}
 best_models(data)
+
+m1 <- glmmTMB::glmmTMB(Error ~ sqrt(Illusion_Difference) * sqrt(abs(Illusion_Strength)) * Illusion_Effect + (1 | Participant), data = data, family = "binomial")
+m2 <- glmmTMB::glmmTMB(Error ~ sqrt(Illusion_Difference) * sqrtmod(Illusion_Strength) + (1 | Participant), data = data, family = "binomial")
+
+compare_performance(m1, m2, metrics = c("R2", "BIC"))
+test_performance(m1, m2)
 ```
 
 
@@ -432,10 +506,11 @@ plot_descriptive_err(data)
 
 ##### Model Specification
 
-```{r message=FALSE, warning=FALSE, cache=cache, eval=runModels}
+
+```{r m_err_delboeuf, message=FALSE, warning=FALSE, eval=runModels}
 formula <- brms::bf(
-  Error ~ sqrt(Illusion_Difference) * sqrt(abs(Illusion_Strength)) * Illusion_Effect +
-    (1 + sqrt(Illusion_Difference) * sqrt(abs(Illusion_Strength)) * Illusion_Effect | Participant),
+  Error ~ Illusion_Effect / (sqrt(Illusion_Difference) * sqrt(abs(Illusion_Strength))) +
+    (1 + Illusion_Effect / (sqrt(Illusion_Difference) * sqrt(abs(Illusion_Strength))) | Participant),
   family = "bernoulli"
 )
 
@@ -447,12 +522,14 @@ model_delboeuf_err <- brms::brm(formula,
   refresh = 0
 )
 
+
 # parameters::parameters(model_delboeuf_err)
 
 save(model_delboeuf_err, file="models/model_delboeuf_err.Rdata")
 ```
 ```{r message=FALSE, warning=FALSE, cache=cache}
 load("models/model_delboeuf_err.RData")
+load("models/gam_delboeuf_err.RData")
 ```
 
 
@@ -460,7 +537,7 @@ load("models/model_delboeuf_err.RData")
 
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
-p_delboeuf_err <- plot_model_err(data, model_delboeuf_err)
+p_delboeuf_err <- plot_model_err(data, model_delboeuf_err, gam_delboeuf_err)
 p_delboeuf_err
 ```
 
@@ -478,12 +555,12 @@ plot_descriptive_rt(data)
 
 ##### Model Specification
 
-```{r message=FALSE, warning=FALSE, cache=cache, eval=runModels}
+```{r m_rt_delboeuf, message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
 formula <- brms::bf(
-  RT ~ sqrt(Illusion_Difference) * sqrt(abs(Illusion_Strength)) * Illusion_Effect +
-    (1 + sqrt(Illusion_Difference) * sqrt(abs(Illusion_Strength)) * Illusion_Effect | Participant),
-  sigma ~ 1 + (1 | Participant),
-  beta ~ 1 + (1 | Participant),
+  RT ~ Illusion_Effect / (sqrt(Illusion_Difference) * sqrt(abs(Illusion_Strength)))  +
+    (1 + Illusion_Effect / (sqrt(Illusion_Difference) * sqrt(abs(Illusion_Strength))) | Participant),
+  sigma ~ Illusion_Effect / (sqrt(Illusion_Difference) * sqrt(abs(Illusion_Strength))) + (1 | Participant),
+  beta ~ Illusion_Effect / (sqrt(Illusion_Difference) * sqrt(abs(Illusion_Strength))) + (1 | Participant),
   family = "exgaussian"
 )
 
@@ -492,11 +569,11 @@ formula <- brms::bf(
 # plot(seq(-5, 5, length.out=100), brms::dstudent_t(seq(-5, 5, length.out=100), df = 3, 0.1, 0.5))
 priors <- c(
   # Intercept
-  prior("student_t(3, 0, 0.1)", class = "Intercept"),
-  prior("student_t(3, 0.35, 0.1)", class = "sd", coef="Intercept", group="Participant"),
+  # prior("student_t(3, 0, 0.1)", class = "Intercept"),
+  # prior("student_t(3, 0.35, 0.1)", class = "sd", coef="Intercept", group="Participant"),
   # Default parameters
-  prior("student_t(3, 0, 3)", class = "b"),
-  prior("student_t(3, 0.35, 0.5)", class = "sd", group="Participant")
+  # prior("student_t(3, 0, 3)", class = "b"),
+  # prior("student_t(3, 0.35, 0.5)", class = "sd", group="Participant")
   
   # prior("student_t(3, 0, 1)", class="Intercept", dpar = "sigma"),
   # prior("student_t(3, 0.1, 1)", class="sd", dpar = "sigma")
@@ -513,24 +590,23 @@ model_delboeuf_rt <- brms::brm(formula,
   init=0
 )
 
-
+save(model_delboeuf_rt, file="models/model_delboeuf_rt.Rdata")
+```
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+load("models/model_delboeuf_rt.RData")
+load("models/gam_delboeuf_rt.RData")
 
 plot_ppcheck(model_delboeuf_rt)
 # performance::check_model(model_delboeuf_rt)
 # parameters::parameters(model)
-
-save(model_delboeuf_rt, file="models/model_delboeuf_rt.Rdata")
-```
-```{r message=FALSE, warning=FALSE, cache=cache}
-load("models/model_delboeuf_rt.RData")
 ```
 
 
 ##### Model Visualization
 
 
-```{r message=FALSE, warning=FALSE, cache=cache}
-p_delboeuf_rt <- plot_model_rt(data, model_delboeuf_rt)
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+p_delboeuf_rt <- plot_model_rt(data, model_delboeuf_rt, gam_delboeuf_rt)
 p_delboeuf_rt
 ```
 
@@ -553,6 +629,14 @@ data <- filter(df, Illusion_Type == "Ebbinghaus")
 
 ```{r message=FALSE, warning=FALSE, cache=cache, eval=bestModels}
 best_models(data)
+
+m1 <- glmmTMB::glmmTMB(Error ~ sqrt(Illusion_Difference) * logmod(abs(Illusion_Strength)) * Illusion_Effect +
+    (1 | Participant), data = data, family = "binomial")
+m2 <- glmmTMB::glmmTMB(Error ~ sqrt(Illusion_Difference) * logmod(Illusion_Strength) +
+    (1 | Participant), data = data, family = "binomial")
+
+test_performance(m1, m2)
+compare_performance(m1, m2)
 ```
 
 
@@ -568,10 +652,10 @@ plot_descriptive_err(data)
 
 ##### Model Specification
 
-```{r message=FALSE, warning=FALSE, cache=cache, eval=runModels}
+```{r m_err_ebbinghaus, message=FALSE, warning=FALSE, eval=runModels}
 formula <- brms::bf(
-  Error ~ sqrt(Illusion_Difference) * logmod(abs(Illusion_Strength)) * Illusion_Effect +
-    (1 + sqrt(Illusion_Difference) * logmod(abs(Illusion_Strength)) * Illusion_Effect | Participant),
+  Error ~ Illusion_Effect / (sqrt(Illusion_Difference) * logmod(abs(Illusion_Strength))) +
+    (1 + Illusion_Effect / (sqrt(Illusion_Difference) * logmod(abs(Illusion_Strength))) | Participant),
   family = "bernoulli"
 )
 
@@ -589,6 +673,7 @@ save(model_ebbinghaus_err, file="models/model_ebbinghaus_err.Rdata")
 ```
 ```{r message=FALSE, warning=FALSE, cache=cache}
 load("models/model_ebbinghaus_err.RData")
+load("models/gam_ebbinghaus_err.RData")
 ```
 
 
@@ -596,7 +681,7 @@ load("models/model_ebbinghaus_err.RData")
 
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
-p_ebbinghaus_err <- plot_model_err(data, model_ebbinghaus_err)
+p_ebbinghaus_err <- plot_model_err(data, model_ebbinghaus_err, gam_ebbinghaus_err)
 p_ebbinghaus_err
 ```
 
@@ -615,12 +700,12 @@ plot_descriptive_rt(data)
 
 ##### Model Specification
 
-```{r message=FALSE, warning=FALSE, cache=cache, eval=runModels}
+```{r m_rt_ebbinghaus, message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
 formula <- brms::bf(
-  RT ~ sqrt(Illusion_Difference) * logmod(abs(Illusion_Strength)) * Illusion_Effect +
-    (1 + sqrt(Illusion_Difference) * logmod(abs(Illusion_Strength)) * Illusion_Effect | Participant),
-  sigma ~ 1 + (1 | Participant),
-  beta ~ 1 + (1 | Participant),
+  RT ~ Illusion_Effect / (sqrt(Illusion_Difference) * logmod(abs(Illusion_Strength)))  +
+    (1 + Illusion_Effect / (sqrt(Illusion_Difference) * logmod(abs(Illusion_Strength))) | Participant),
+  sigma ~ Illusion_Effect / (sqrt(Illusion_Difference) * logmod(abs(Illusion_Strength))) + (1 | Participant),
+  beta ~ Illusion_Effect / (sqrt(Illusion_Difference) * logmod(abs(Illusion_Strength))) + (1 | Participant),
   family = "exgaussian"
 )
 
@@ -631,22 +716,23 @@ model_ebbinghaus_rt <- brms::brm(formula,
   init = 0
 )
 
+save(model_ebbinghaus_rt, file="models/model_ebbinghaus_rt.Rdata")
+```
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+load("models/model_ebbinghaus_rt.RData")
+load("models/gam_ebbinghaus_rt.RData")
+
 plot_ppcheck(model_ebbinghaus_rt)
 # performance::check_model(model_delboeuf_rt)
 # parameters::parameters(model)
-
-save(model_ebbinghaus_rt, file="models/model_ebbinghaus_rt.Rdata")
-```
-```{r message=FALSE, warning=FALSE, cache=cache}
-load("models/model_ebbinghaus_rt.RData")
 ```
 
 
 ##### Model Visualization
 
 
-```{r message=FALSE, warning=FALSE, cache=cache}
-p_ebbinghaus_rt <- plot_model_rt(data, model_ebbinghaus_rt)
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+p_ebbinghaus_rt <- plot_model_rt(data, model_ebbinghaus_rt, gam_ebbinghaus_rt)
 p_ebbinghaus_rt
 ```
 
@@ -661,6 +747,14 @@ data <- filter(df, Illusion_Type == "Rod-Frame")
 
 ```{r message=FALSE, warning=FALSE, cache=cache, eval=bestModels}
 best_models(data)
+
+m1 <- glmmTMB::glmmTMB(Error ~ logmod(Illusion_Difference) * logmod(abs(Illusion_Strength)) * Illusion_Effect +
+    (1 | Participant), data = data, family = "binomial")
+m2 <- glmmTMB::glmmTMB(Error ~ logmod(Illusion_Difference) * logmod(Illusion_Strength) +
+    (1 | Participant), data = data, family = "binomial")
+
+compare_performance(m1, m2)
+test_performance(m1, m2)
 ```
 
 #### Error Rate 
@@ -674,10 +768,10 @@ plot_descriptive_err(data)
 
 ##### Model Specification
 
-```{r message=FALSE, warning=FALSE, cache=cache, eval=runModels}
+```{r m_err_rodframe, message=FALSE, warning=FALSE, eval=runModels}
 formula <- brms::bf(
-  Error ~ sqrt(Illusion_Difference) * sqrt(abs(Illusion_Strength)) * Illusion_Effect +
-    (1 + sqrt(Illusion_Difference) * sqrt(abs(Illusion_Strength)) * Illusion_Effect | Participant),
+  Error ~ Illusion_Effect / (logmod(Illusion_Difference) * logmod(Illusion_Strength)) +
+    (1 + Illusion_Effect / (logmod(Illusion_Difference) * logmod(Illusion_Strength)) | Participant),
   family = "bernoulli"
 )
 
@@ -695,6 +789,7 @@ save(model_rodframe_err, file="models/model_rodframe_err.Rdata")
 ```
 ```{r message=FALSE, warning=FALSE, cache=cache}
 load("models/model_rodframe_err.RData")
+load("models/gam_rodframe_err.RData")
 ```
 
 
@@ -702,7 +797,7 @@ load("models/model_rodframe_err.RData")
 
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
-p_rodframe_err <- plot_model_err(data, model_rodframe_err)
+p_rodframe_err <- plot_model_err(data, model_rodframe_err, gam_rodframe_err)
 p_rodframe_err
 ```
 
@@ -720,12 +815,12 @@ plot_descriptive_rt(data)
 
 ##### Model Specification
 
-```{r message=FALSE, warning=FALSE, cache=cache, eval=runModels}
+```{r m_rt_rodframe, message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
 formula <- brms::bf(
-  RT ~ sqrt(Illusion_Difference) * sqrt(abs(Illusion_Strength)) * Illusion_Effect +
-    (1 | Participant),
-  sigma ~ 1 + (1 | Participant),
-  beta ~ 1 + (1 | Participant),
+  RT ~ Illusion_Effect / (logmod(Illusion_Difference) * logmod(abs(Illusion_Strength))) +
+    (1 + Illusion_Effect / (logmod(Illusion_Difference) * logmod(abs(Illusion_Strength))) | Participant),
+  sigma ~ Illusion_Effect / (logmod(Illusion_Difference) * logmod(abs(Illusion_Strength))) + (1 | Participant),
+  beta ~ Illusion_Effect / (logmod(Illusion_Difference) * logmod(abs(Illusion_Strength))) + (1 | Participant),
   family = "exgaussian"
 )
 
@@ -736,22 +831,23 @@ model_rodframe_rt <- brms::brm(formula,
   init = 0
 )
 
+save(model_rodframe_rt, file="models/model_rodframe_rt.Rdata")
+```
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+load("models/model_rodframe_rt.RData")
+load("models/gam_rodframe_rt.RData")
+
 plot_ppcheck(model_rodframe_rt)
 # performance::check_model(model_delboeuf_rt)
 # parameters::parameters(model)
-
-save(model_rodframe_rt, file="models/model_rodframe_rt.Rdata")
-```
-```{r message=FALSE, warning=FALSE, cache=cache}
-load("models/model_rodframe_rt.RData")
 ```
 
 
 ##### Model Visualization
 
 
-```{r message=FALSE, warning=FALSE, cache=cache}
-p_rodframe_rt <- plot_model_rt(data, model_rodframe_rt)
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+p_rodframe_rt <- plot_model_rt(data, model_rodframe_rt, gam_rodframe_rt)
 p_rodframe_rt
 ```
 
@@ -783,10 +879,10 @@ plot_descriptive_err(data)
 
 ##### Model Specification
 
-```{r message=FALSE, warning=FALSE, cache=cache, eval=runModels}
+```{r m_err_verticalhorizontal, message=FALSE, warning=FALSE, eval=runModels}
 formula <- brms::bf(
-  Error ~ sqrt(Illusion_Difference) * sqrt(abs(Illusion_Strength)) * Illusion_Effect +
-    (1 | Participant),
+  Error ~ Illusion_Effect / (sqrt(Illusion_Difference) * sqrt(abs(Illusion_Strength))) +
+    (1 + Illusion_Effect / (sqrt(Illusion_Difference) * sqrt(abs(Illusion_Strength))) | Participant),
   family = "bernoulli"
 )
 
@@ -804,6 +900,7 @@ save(model_verticalhorizontal_err, file="models/model_verticalhorizontal_err.Rda
 ```
 ```{r message=FALSE, warning=FALSE, cache=cache}
 load("models/model_verticalhorizontal_err.RData")
+load("models/gam_verticalhorizontal_err.RData")
 ```
 
 
@@ -811,7 +908,7 @@ load("models/model_verticalhorizontal_err.RData")
 
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
-p_verticalhorizontal_err <- plot_model_err(data, model_verticalhorizontal_err)
+p_verticalhorizontal_err <- plot_model_err(data, model_verticalhorizontal_err, gam_verticalhorizontal_err)
 p_verticalhorizontal_err
 ```
 
@@ -830,29 +927,31 @@ plot_descriptive_rt(data)
 
 ##### Model Specification
 
-```{r message=FALSE, warning=FALSE, cache=cache, eval=runModels}
+```{r m_rt_verticalhorizontal, message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
 formula <- brms::bf(
-  RT ~ sqrt(Illusion_Difference) * sqrt(abs(Illusion_Strength)) * Illusion_Effect +
-    (1 | Participant),
-  # sigma ~ t2(Illusion_Difference * Illusion_Strength) +
-  #   (1 | Participant),
+  RT ~ Illusion_Effect / (sqrt(Illusion_Difference) * sqrt(abs(Illusion_Strength))) +
+    (1 + Illusion_Effect / (sqrt(Illusion_Difference) * sqrt(abs(Illusion_Strength))) | Participant),
+  sigma ~ Illusion_Effect / (sqrt(Illusion_Difference) * sqrt(abs(Illusion_Strength))) + (1 | Participant),
+  beta ~ Illusion_Effect / (sqrt(Illusion_Difference) * sqrt(abs(Illusion_Strength))) + (1 | Participant),
   family = "exgaussian"
 )
 
 
 model_verticalhorizontal_rt <- brms::brm(formula,
   data = data,
-  refresh = 0
+  refresh = 100,
+  init = 0
 )
+
+save(model_verticalhorizontal_rt, file="models/model_verticalhorizontal_rt.Rdata")
+```
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+load("models/model_verticalhorizontal_rt.RData")
+load("models/gam_verticalhorizontal_rt.RData")
 
 plot_ppcheck(model_verticalhorizontal_rt)
 # performance::check_model(model_verticalhorizontal_rt)
 # parameters::parameters(model)
-
-save(model_verticalhorizontal_rt, file="models/model_verticalhorizontal_rt.Rdata")
-```
-```{r message=FALSE, warning=FALSE, cache=cache}
-load("models/model_verticalhorizontal_rt.RData")
 ```
 
 
@@ -860,8 +959,8 @@ load("models/model_verticalhorizontal_rt.RData")
 ##### Model Visualization
 
 
-```{r message=FALSE, warning=FALSE, cache=cache}
-p_verticalhorizontal_rt <- plot_model_rt(data, model_verticalhorizontal_rt)
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+p_verticalhorizontal_rt <- plot_model_rt(data, model_verticalhorizontal_rt, gam_verticalhorizontal_rt)
 p_verticalhorizontal_rt
 ```
 
@@ -892,10 +991,10 @@ plot_descriptive_err(data)
 
 ##### Model Specification
 
-```{r message=FALSE, warning=FALSE, cache=cache, eval=runModels}
+```{r m_err_zollner, message=FALSE, warning=FALSE, eval=runModels}
 formula <- brms::bf(
-  Error ~ logmod(Illusion_Difference) * abs(Illusion_Strength) * Illusion_Effect +
-    (1 | Participant),
+  Error ~ Illusion_Effect / (cbrtmod(Illusion_Difference) * abs(Illusion_Strength)) +
+    (1 + Illusion_Effect / (cbrtmod(Illusion_Difference) * abs(Illusion_Strength)) | Participant),
   family = "bernoulli"
 )
 
@@ -913,6 +1012,7 @@ save(model_zollner_err, file="models/model_zollner_err.Rdata")
 ```
 ```{r message=FALSE, warning=FALSE, cache=cache}
 load("models/model_zollner_err.RData")
+load("models/gam_zollner_err.RData")
 ```
 
 
@@ -920,7 +1020,7 @@ load("models/model_zollner_err.RData")
 
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
-p_zollner_err <- plot_model_err(data, model_zollner_err)
+p_zollner_err <- plot_model_err(data, model_zollner_err, gam_zollner_err)
 p_zollner_err
 ```
 
@@ -939,37 +1039,42 @@ plot_descriptive_rt(data)
 
 ##### Model Specification
 
-```{r message=FALSE, warning=FALSE, cache=cache, eval=runModels}
+```{r m_rt_zollner, message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
 formula <- brms::bf(
-  RT ~ logmod(Illusion_Difference) * abs(Illusion_Strength) * Illusion_Effect +
+  RT ~  Illusion_Effect / (cbrtmod(Illusion_Difference) * abs(Illusion_Strength)) +
+    (1 + Illusion_Effect / (cbrtmod(Illusion_Difference) * abs(Illusion_Strength)) | Participant),
+  sigma ~  Illusion_Effect / (cbrtmod(Illusion_Difference) * abs(Illusion_Strength)) +
     (1 | Participant),
-  # sigma ~ t2(Illusion_Difference * Illusion_Strength) +
-  #   (1 | Participant),
+  beta ~ Illusion_Effect / (cbrtmod(Illusion_Difference) * abs(Illusion_Strength)) +
+    (1 | Participant),
   family = "exgaussian"
 )
 
 
 model_zollner_rt <- brms::brm(formula,
   data = data,
-  refresh = 0
+  refresh = 100,
+  init = 0
 )
+
+save(model_zollner_rt, file="models/model_zollner_rt.Rdata")
+```
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+load("models/model_zollner_rt.RData")
+load("models/gam_zollner_rt.RData")
 
 plot_ppcheck(model_zollner_rt)
 # performance::check_model(model_zollner_rt)
 # parameters::parameters(model)
 
-save(model_zollner_rt, file="models/model_zollner_rt.Rdata")
-```
-```{r message=FALSE, warning=FALSE, cache=cache}
-load("models/model_zollner_rt.RData")
 ```
 
 
 ##### Model Visualization
 
 
-```{r message=FALSE, warning=FALSE, cache=cache}
-p_zollner_rt <- plot_model_rt(data, model_zollner_rt)
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+p_zollner_rt <- plot_model_rt(data, model_zollner_rt, gam_zollner_rt)
 p_zollner_rt
 ```
 
@@ -997,10 +1102,10 @@ plot_descriptive_err(data)
 
 ##### Model Specification
 
-```{r message=FALSE, warning=FALSE, cache=cache, eval=runModels}
+```{r m_err_white, essage=FALSE, warning=FALSE, eval=runModels}
 formula <- brms::bf(
-  Error ~ sqrt(Illusion_Difference) * sqrt(abs(Illusion_Strength)) * Illusion_Effect +
-    (1 + sqrt(Illusion_Difference) * sqrt(abs(Illusion_Strength)) * Illusion_Effect | Participant),
+  Error ~ Illusion_Effect / (Illusion_Difference * sqrt(abs(Illusion_Strength))) +
+    (1 + Illusion_Effect / (Illusion_Difference * sqrt(abs(Illusion_Strength))) | Participant),
   family = "bernoulli"
 )
 
@@ -1009,7 +1114,7 @@ formula <- brms::bf(
 
 model_white_err <- brms::brm(formula,
   data = data,
-  refresh = 0
+  refresh = 100
 )
 
 # parameters::parameters(model_white_err)
@@ -1018,6 +1123,7 @@ save(model_white_err, file="models/model_white_err.Rdata")
 ```
 ```{r message=FALSE, warning=FALSE, cache=cache}
 load("models/model_white_err.RData")
+load("models/gam_white_err.RData")
 ```
 
 
@@ -1025,7 +1131,7 @@ load("models/model_white_err.RData")
 
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
-p_white_err <- plot_model_err(data, model_white_err)
+p_white_err <- plot_model_err(data, model_white_err, gam_white_err)
 p_white_err
 ```
 
@@ -1043,37 +1149,41 @@ plot_descriptive_rt(data)
 
 ##### Model Specification
 
-```{r message=FALSE, warning=FALSE, cache=cache, eval=runModels}
+```{r m_rt_white, message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
 formula <- brms::bf(
-  RT ~ sqrt(Illusion_Difference) * sqrt(abs(Illusion_Strength)) * Illusion_Effect +
+  RT ~ Illusion_Effect / (Illusion_Difference * sqrt(abs(Illusion_Strength))) +
+    (1 + Illusion_Effect / (Illusion_Difference * sqrt(abs(Illusion_Strength))) | Participant),
+  sigma ~ Illusion_Effect / (Illusion_Difference * sqrt(abs(Illusion_Strength))) +
     (1 | Participant),
-  # sigma ~ t2(Illusion_Difference * Illusion_Strength) +
-  #   (1 | Participant),
+  beta ~ Illusion_Effect / (Illusion_Difference * sqrt(abs(Illusion_Strength))) +
+    (1 | Participant),
   family = "exgaussian"
 )
 
 
 model_white_rt <- brms::brm(formula,
   data = data,
-  refresh = 0
+  refresh = 100,
+  init = 0
 )
+
+save(model_white_rt, file="models/model_white_rt.Rdata")
+```
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+load("models/model_white_rt.RData")
+load("models/gam_white_rt.RData")
 
 plot_ppcheck(model_white_rt)
 # performance::check_model(model_white_rt)
 # parameters::parameters(model)
-
-save(model_white_rt, file="models/model_white_rt.Rdata")
-```
-```{r message=FALSE, warning=FALSE, cache=cache}
-load("models/model_white_rt.RData")
 ```
 
 
 ##### Model Visualization
 
 
-```{r message=FALSE, warning=FALSE, cache=cache}
-p_white_rt <- plot_model_rt(data, model_white_rt)
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+p_white_rt <- plot_model_rt(data, model_white_rt, gam_white_rt)
 p_white_rt
 ```
 
@@ -1102,10 +1212,10 @@ plot_descriptive_err(data, side = "updown")
 
 ##### Model Specification
 
-```{r message=FALSE, warning=FALSE, cache=cache, eval=runModels}
+```{r m_err_mullerlyer, message=FALSE, warning=FALSE, eval=runModels}
 formula <- brms::bf(
-  Error ~ logmod(Illusion_Difference) * sqrt(abs(Illusion_Strength)) * Illusion_Effect +
-    (1 + logmod(Illusion_Difference) * sqrt(abs(Illusion_Strength)) * Illusion_Effect | Participant),
+  Error ~ Illusion_Effect / (sqrt(Illusion_Difference) * sqrt(abs(Illusion_Strength))) +
+    (1 + Illusion_Effect / (sqrt(Illusion_Difference) * sqrt(abs(Illusion_Strength))) | Participant),
   family = "bernoulli"
 )
 
@@ -1114,7 +1224,7 @@ formula <- brms::bf(
 
 model_mullerlyer_err <- brms::brm(formula,
   data = data,
-  refresh = 0
+  refresh = 100
 )
 
 # parameters::parameters(model_white_err)
@@ -1123,13 +1233,14 @@ save(model_mullerlyer_err, file="models/model_mullerlyer_err.Rdata")
 ```
 ```{r message=FALSE, warning=FALSE, cache=cache}
 load("models/model_mullerlyer_err.RData")
+load("models/gam_mullerlyer_err.RData")
 ```
 
 ##### Model Visualization
 
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
-p_mullerlyer_err <- plot_model_err(data, model_mullerlyer_err)
+p_mullerlyer_err <- plot_model_err(data, model_mullerlyer_err, gam_mullerlyer_err)
 p_mullerlyer_err
 ```
 
@@ -1146,37 +1257,41 @@ plot_descriptive_rt(data, side = "updown")
 
 ##### Model Specification
 
-```{r message=FALSE, warning=FALSE, cache=cache, eval=runModels}
+```{r m_rt_mullerlyer, message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
 formula <- brms::bf(
-  RT ~ logmod(Illusion_Difference) * logmod(abs(Illusion_Strength)) * Illusion_Effect +
+  RT ~ Illusion_Effect / (sqrt(Illusion_Difference) * sqrt(abs(Illusion_Strength))) +
+    (1 + Illusion_Effect / (sqrt(Illusion_Difference) * sqrt(abs(Illusion_Strength))) | Participant),
+  sigma ~ Illusion_Effect / (sqrt(Illusion_Difference) * sqrt(abs(Illusion_Strength))) +
     (1 | Participant),
-  # sigma ~ t2(Illusion_Difference * Illusion_Strength) +
-  #   (1 | Participant),
+  beta ~ Illusion_Effect / (sqrt(Illusion_Difference) * sqrt(abs(Illusion_Strength))) + 
+    (1 | Participant),
   family = "exgaussian"
 )
 
 
 model_mullerlyer_rt <- brms::brm(formula,
   data = data,
-  refresh = 0
+  refresh = 100,
+  init = 0
 )
-
-plot_ppcheck(model_mullerlyer_rt)
-# performance::check_model(model_mullerlyer_rt)
-# parameters::parameters(model)
 
 save(model_mullerlyer_rt, file="models/model_mullerlyer_rt.Rdata")
 # parameters::parameters(model_white_err)
 ```
-```{r message=FALSE, warning=FALSE, cache=cache}
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
 load("models/model_mullerlyer_rt.RData")
+load("models/gam_mullerlyer_rt.RData")
+
+plot_ppcheck(model_mullerlyer_rt)
+# performance::check_model(model_mullerlyer_rt)
+# parameters::parameters(model)
 ```
 
 ##### Model Visualization
 
 
-```{r message=FALSE, warning=FALSE, cache=cache}
-p_mullerlyer_rt <- plot_model_rt(data, model_mullerlyer_rt)
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+p_mullerlyer_rt <- plot_model_rt(data, model_mullerlyer_rt, gam_mullerlyer_rt)
 p_mullerlyer_rt
 ```
 
@@ -1189,7 +1304,7 @@ p_mullerlyer_rt
 data <- filter(df, Illusion_Type == "Ponzo")
 ```
 
-```{r message=FALSE, warning=FALSE, cache=cache, eval=bestModels}
+```{r message=FALSE, warning=FALSE, cache=FALSE, eval=bestModels}
 best_models(data)
 ```
 
@@ -1205,10 +1320,10 @@ plot_descriptive_err(data, side = "updown")
 
 ##### Model Specification
 
-```{r message=FALSE, warning=FALSE, cache=cache, eval=runModels}
+```{r m_err_ponzo, message=FALSE, warning=FALSE, eval=runModels}
 formula <- brms::bf(
-  Error ~ sqrt(Illusion_Difference) * abs(Illusion_Strength) * Illusion_Effect +
-    (1 | Participant),
+  Error ~ Illusion_Effect / (cbrtmod(Illusion_Difference) * abs(Illusion_Strength)) +
+    (1 + Illusion_Effect / (cbrtmod(Illusion_Difference) * abs(Illusion_Strength)) | Participant),
   family = "bernoulli"
 )
 
@@ -1217,7 +1332,7 @@ formula <- brms::bf(
 
 model_ponzo_err <- brms::brm(formula,
   data = data,
-  refresh = 0
+  refresh = 100
 )
 
 # parameters::parameters(model_ponzo_err)
@@ -1226,13 +1341,14 @@ save(model_ponzo_err, file="models/model_ponzo_err.Rdata")
 ```
 ```{r message=FALSE, warning=FALSE, cache=cache}
 load("models/model_ponzo_err.RData")
+load("models/gam_ponzo_err.RData")
 ```
 
 ##### Model Visualization
 
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
-p_ponzo_err <- plot_model_err(data, model_ponzo_err)
+p_ponzo_err <- plot_model_err(data, model_ponzo_err, gam_ponzo_err)
 p_ponzo_err
 ```
 
@@ -1250,37 +1366,41 @@ plot_descriptive_rt(data, side = "updown")
 
 ##### Model Specification
 
-```{r message=FALSE, warning=FALSE, cache=cache, eval=runModels}
+```{r m_rt_ponzo, message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
 formula <- brms::bf(
-  RT ~ sqrt(Illusion_Difference) * abs(Illusion_Strength) * Illusion_Effect +
+  RT ~ Illusion_Effect / (cbrtmod(Illusion_Difference) * abs(Illusion_Strength)) +
+    (1 + Illusion_Effect / (cbrtmod(Illusion_Difference) * abs(Illusion_Strength)) | Participant),
+  sigma ~ Illusion_Effect / (cbrtmod(Illusion_Difference) * abs(Illusion_Strength)) +
     (1 | Participant),
-  # sigma ~ t2(Illusion_Difference * Illusion_Strength) +
-  #   (1 | Participant),
+  beta ~ Illusion_Effect / (cbrtmod(Illusion_Difference) * abs(Illusion_Strength)) +
+    (1 | Participant),
   family = "exgaussian"
 )
 
 
 model_ponzo_rt <- brms::brm(formula,
   data = data,
-  refresh = 0
+  refresh = 100,
+  init = 0
 )
-
-plot_ppcheck(model_ponzo_rt)
-# performance::check_model(model_ponzo_rt)
-# parameters::parameters(model)
 
 save(model_ponzo_rt, file="models/model_ponzo_rt.Rdata")
 # parameters::parameters(model_white_err)
 ```
-```{r message=FALSE, warning=FALSE, cache=cache}
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
 load("models/model_ponzo_rt.RData")
+load("models/gam_ponzo_rt.RData")
+
+plot_ppcheck(model_ponzo_rt)
+# performance::check_model(model_ponzo_rt)
+# parameters::parameters(model)
 ```
 
 ##### Model Visualization
 
 
-```{r message=FALSE, warning=FALSE, cache=cache}
-p_ponzo_rt <- plot_model_rt(data, model_ponzo_rt)
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+p_ponzo_rt <- plot_model_rt(data, model_ponzo_rt, gam_ponzo_rt)
 p_ponzo_rt
 ```
 
@@ -1308,10 +1428,10 @@ plot_descriptive_err(data, side = "updown")
 
 ##### Model Specification
 
-```{r message=FALSE, warning=FALSE, cache=cache, eval=runModels}
+```{r m_err_poggendorff, message=FALSE, warning=FALSE, eval=runModels}
 formula <- brms::bf(
-  Error ~ cbrtmod(Illusion_Difference) * sqrt(abs(Illusion_Strength)) * Illusion_Effect +
-    (1 | Participant),
+  Error ~ Illusion_Effect / (cbrtmod(Illusion_Difference) * sqrt(abs(Illusion_Strength))) +
+    (1 + Illusion_Effect / (cbrtmod(Illusion_Difference) * sqrt(abs(Illusion_Strength))) | Participant),
   family = "bernoulli"
 )
 
@@ -1320,7 +1440,7 @@ formula <- brms::bf(
 
 model_poggendorff_err <- brms::brm(formula,
   data = data,
-  refresh = 0
+  refresh = 100
 )
 
 # parameters::parameters(model_poggendorff_err)
@@ -1329,13 +1449,14 @@ save(model_poggendorff_err, file="models/model_poggendorff_err.Rdata")
 ```
 ```{r message=FALSE, warning=FALSE, cache=cache}
 load("models/model_poggendorff_err.RData")
+load("models/gam_poggendorff_err.RData")
 ```
 
 ##### Model Visualization
 
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
-p_poggendorff_err <- plot_model_err(data, model_poggendorff_err)
+p_poggendorff_err <- plot_model_err(data, model_poggendorff_err, gam_poggendorff_err)
 p_poggendorff_err
 ```
 
@@ -1352,35 +1473,40 @@ plot_descriptive_rt(data, side = "updown")
 
 ##### Model Specification
 
-```{r message=FALSE, warning=FALSE, cache=cache, eval=runModels}
+```{r m_rt_poggendorff, message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
 formula <- brms::bf(
-  RT ~ cbrtmod(Illusion_Difference) * sqrt(abs(Illusion_Strength)) * Illusion_Effect +
+  RT ~ Illusion_Effect / (cbrtmod(Illusion_Difference) * sqrt(abs(Illusion_Strength))) +
+    (1 + Illusion_Effect / (cbrtmod(Illusion_Difference) * sqrt(abs(Illusion_Strength))) | Participant),
+  sigma ~ Illusion_Effect / (cbrtmod(Illusion_Difference) * sqrt(abs(Illusion_Strength))) + 
     (1 | Participant),
-  # sigma ~ 1 + (1 | Participant),
+  beta ~ Illusion_Effect / (cbrtmod(Illusion_Difference) * sqrt(abs(Illusion_Strength))) + 
+    (1 | Participant),
   family = "exgaussian"
 )
 
 
 model_poggendorff_rt <- brms::brm(formula,
   data = data,
-  refresh = 0
+  refresh = 100,
+  init = 0
 )
+
+save(model_ponzo_rt, file="models/model_poggendorff_rt.Rdata")
+```
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+load("models/model_poggendorff_rt.RData")
+load("models/gam_poggendorff_rt.RData")
 
 plot_ppcheck(model_poggendorff_rt)
 # performance::check_model(model_poggendorff_rt)
 # parameters::parameters(model)
-
-save(model_ponzo_rt, file="models/model_poggendorff_rt.Rdata")
-```
-```{r message=FALSE, warning=FALSE, cache=cache}
-load("models/model_poggendorff_rt.RData")
 ```
 
 ##### Model Visualization
 
 
-```{r message=FALSE, warning=FALSE, cache=cache}
-p_poggendorff_rt <- plot_model_rt(data, model_poggendorff_rt)
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+p_poggendorff_rt <- plot_model_rt(data, model_poggendorff_rt, gam_poggendorff_rt)
 p_poggendorff_rt
 ```
 
@@ -1413,10 +1539,10 @@ plot_descriptive_err(data, side = "updown")
 
 ##### Model Specification
 
-```{r message=FALSE, warning=FALSE, cache=cache, eval=runModels}
+```{r m_err_contrast, message=FALSE, warning=FALSE, eval=runModels}
 formula <- brms::bf(
-  Error ~ sqrt(Illusion_Difference) * sqrt(abs(Illusion_Strength)) * Illusion_Effect +
-    (1 + sqrt(Illusion_Difference) * sqrt(abs(Illusion_Strength)) * Illusion_Effect | Participant),
+  Error ~ Illusion_Effect / (sqrt(Illusion_Difference) * sqrt(abs(Illusion_Strength))) +
+    (1 + Illusion_Effect / (sqrt(Illusion_Difference) * sqrt(abs(Illusion_Strength))) | Participant),
   family = "bernoulli"
 )
 
@@ -1425,7 +1551,7 @@ formula <- brms::bf(
 
 model_contrast_err <- brms::brm(formula,
   data = data,
-  refresh = 0
+  refresh = 50
 )
 
 # parameters::parameters(model_contrast_err)
@@ -1434,13 +1560,14 @@ save(model_contrast_err, file="models/model_contrast_err.Rdata")
 ```
 ```{r message=FALSE, warning=FALSE, cache=cache}
 load("models/model_contrast_err.RData")
+load("models/gam_contrast_err.RData")
 ```
 
 ##### Model Visualization
 
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
-p_contrast_err <- plot_model_err(data, model_contrast_err)
+p_contrast_err <- plot_model_err(data, model_contrast_err, gam_contrast_err)
 p_contrast_err
 ```
 
@@ -1458,35 +1585,40 @@ plot_descriptive_rt(data, side = "updown")
 
 ##### Model Specification
 
-```{r message=FALSE, warning=FALSE, cache=cache, eval=runModels}
+```{r m_rt_contrast, message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
 formula <- brms::bf(
-  RT ~ sqrt(Illusion_Difference) * sqrt(abs(Illusion_Strength)) * Illusion_Effect +
+  RT ~ Illusion_Effect / (sqrt(Illusion_Difference) * sqrt(abs(Illusion_Strength))) +
+    (1 + Illusion_Effect / (sqrt(Illusion_Difference) * sqrt(abs(Illusion_Strength))) | Participant),
+  sigma ~ Illusion_Effect / (sqrt(Illusion_Difference) * sqrt(abs(Illusion_Strength))) + 
     (1 | Participant),
-  # sigma ~ 1 + (1 | Participant),
+  beta ~ Illusion_Effect / (sqrt(Illusion_Difference) * sqrt(abs(Illusion_Strength))) + 
+    (1 | Participant),
   family = "exgaussian"
 )
 
 
 model_contrast_rt <- brms::brm(formula,
   data = data,
-  refresh = 0
+  refresh = 50,
+  init = 0
 )
+
+save(model_contrast_rt, file="models/model_contrast_rt.Rdata")
+```
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+load("models/model_contrast_rt.RData")
+load("models/gam_contrast_rt.RData")
 
 plot_ppcheck(model_contrast_rt)
 # performance::check_model(model_contrast_rt)
 # parameters::parameters(model)
-
-save(model_contrast_rt, file="models/model_contrast_rt.Rdata")
-```
-```{r message=FALSE, warning=FALSE, cache=cache}
-load("models/model_contrast_rt.RData")
 ```
 
 ##### Model Visualization
 
 
-```{r message=FALSE, warning=FALSE, cache=cache}
-p_contrast_rt <- plot_model_rt(data, model_contrast_rt)
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+p_contrast_rt <- plot_model_rt(data, model_contrast_rt, gam_contrast_rt)
 p_contrast_rt
 ```
 
@@ -1494,140 +1626,290 @@ p_contrast_rt
 
 ## Individual Scores
 
-### Reliability
+### Model-based Descriptors
 
-
-```{r message=FALSE, warning=FALSE, cache=cache}
-random <- rbind(
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+data <- rbind(
   extract_random(model_delboeuf_err, "Delboeuf"),
-  extract_random(model_delboeuf_rt, "Delboeuf")
-  # extract_random(model_ebbinghaus_err, "Ebbinghaus"),
+  # extract_random(model_delboeuf_rt, "Delboeuf"),
+  extract_random(model_ebbinghaus_err, "Ebbinghaus"),
   # extract_random(model_ebbinghaus_rt, "Ebbinghaus"),
-  # extract_random(model_rodframe_err, "Rod-Frame"),
+  extract_random(model_rodframe_err, "Rod-Frame"),
   # extract_random(model_rodframe_rt, "Rod-Frame"),
-  # extract_random(model_verticalhorizontal_err, "Vertical-Horizontal"),
+  extract_random(model_verticalhorizontal_err, "Vertical-Horizontal"),
   # extract_random(model_verticalhorizontal_rt, "Vertical-Horizontal"),
-  # extract_random(model_zollner_err, "Zöllner"),
+  extract_random(model_zollner_err, "Zöllner"),
   # extract_random(model_zollner_rt, "Zöllner"),
-  # extract_random(model_white_err, "White"),
+  extract_random(model_white_err, "White"),
   # extract_random(model_white_rt, "White"),
-  # extract_random(model_mullerlyer_err, "Müller-Lyer"),
+  extract_random(model_mullerlyer_err, "Müller-Lyer"),
   # extract_random(model_mullerlyer_rt, "Müller-Lyer"),
-  # extract_random(model_ponzo_err, "Ponzo"),
+  extract_random(model_ponzo_err, "Ponzo"),
   # extract_random(model_ponzo_rt, "Ponzo"),
-  # extract_random(model_poggendorff_err, "Poggendorff"),
+  extract_random(model_poggendorff_err, "Poggendorff"),
   # extract_random(model_poggendorff_rt, "Poggendorff"),
-  # extract_random(model_contrast_err, "Contrast")
+  extract_random(model_contrast_err, "Contrast")
   # extract_random(model_contrast_rt, "Contrast")
 ) |> 
   filter(
-    # !str_detect(Parameter, "Intercept_"),
-    !str_detect(Parameter, "Cong_"),
+    !str_detect(Parameter, "Intercept_"),
+    !str_detect(Parameter, "Cong"),
+    !str_detect(Parameter, "Cong_Prob"),
     !str_detect(Parameter, "Null_"))
+# unique(data$Parameter)
+
+# data |>
+#   # group_by(Illusion_Type, Parameter) |> 
+#   # standardize(select="Value") |> 
+#   # ungroup() |> 
+#   # mutate(order = mean(Value)) |> 
+#   # ungroup() |> 
+#   # mutate(Participant = fct_reorder(Participant, order)) |> 
+#   ggplot(aes(y = Participant, x = Value)) +
+#   # ggdist::stat_slabinterval(aes(fill = Illusion_Type, color=Illusion_Type), alpha=0.5) +
+#   ggdist::stat_pointinterval(aes(fill = Illusion_Type, color=Illusion_Type), alpha=0.5) +
+#   # coord_cartesian(xlim=c(-4, 4)) +
+#   facet_wrap(~Parameter, scales = "free_x") +
+#   theme(axis.text.y = element_blank())
 
 
-random |>
-  # group_by(Illusion_Type, Parameter) |> 
-  # standardize(select="Value") |> 
-  # ungroup() |> 
-  # mutate(order = mean(Value)) |> 
-  # ungroup() |> 
-  # mutate(Participant = fct_reorder(Participant, order)) |> 
-  ggplot(aes(y = Participant, x = Value)) +
-  # ggdist::stat_slabinterval(aes(fill = Illusion_Type, color=Illusion_Type), alpha=0.5) +
-  ggdist::stat_pointinterval(aes(fill = Illusion_Type, color=Illusion_Type), alpha=0.5) +
-  # coord_cartesian(xlim=c(-4, 4)) +
-  facet_wrap(~Parameter, scales = "free_x") +
-  theme(axis.text.y = element_blank())
 
+# df[df$Illusion_Type == "Poggendorff" & df$Participant == "5cbb77bf418c540001641e67_sp53j", ]
 
-
-random <- random |>
+random <- data |>
   mutate(Parameter = paste0(Illusion_Type, "_", Parameter),
-         Parameter = str_replace(Parameter, "Rod-Frame", "RodFrame"),
-         Parameter = str_replace(Parameter, "Vertical-Horizontal", "VerticalHorizontal"),
-         Parameter = str_replace(Parameter, "Zöllner", "Zollner")) |>
+         Parameter = clean_illusionName(Parameter)) |>
   group_by(Participant, Parameter) |>
-  summarize(Score = as.numeric(bayestestR::map_estimate(Value)), .groups = "drop") |>
+  summarize(Score = median(Value, na.rm = TRUE), .groups = "drop") |>
   ungroup() |>
-  group_by(Parameter) |> 
-  mutate(Score = Score / sd(Score)) |>  # Scale
-  ungroup()  |> 
+  group_by(Parameter) |>
+  mutate(Score = Score / sd(Score, na.rm = TRUE)) |>  # Scale
+  ungroup()  |>
   pivot_wider(names_from = Parameter, values_from = Score)
 
 # plot(estimate_density(select(random, -Participant)))
 ```
 
-### Relationship with empirical descriptors
 
-```{r message=FALSE, warning=FALSE, cache=cache}
+### Empirical Descriptors
+
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+# Average for 4 higher level of task difficulty
 empirical <- df |>
+  filter(Illusion_Effect == "Incongruent") |> 
+  group_by(Participant, Illusion_Type, Illusion_Strength) |>
+  arrange(Illusion_Difference) |> 
+  slice(0:4) |> 
+  # select(Illusion_Strength, Illusion_Difference)
   group_by(Participant, Illusion_Type) |>
   summarize(
-    # n = n(),
-    Error = sum(Error, na.rm=TRUE) / n(),
-    RT_Mean = mean(RT, na.rm=TRUE),
-    RT_SD = sd(RT, na.rm=TRUE),
+    TaskHard_Error = sum(Error, na.rm=TRUE) / n(),
+    TaskHard_RTMean = mean(ifelse(Error == 0, RT, NA), na.rm=TRUE)
+    # Illu_RTSpread = sd(ifelse(Error == 0, RT, NA), na.rm=TRUE),
   ) |>
-  ungroup()
+  ungroup() |> 
+  mutate(Illusion_Type = clean_illusionName(Illusion_Type))  |> 
+  pivot_wider(names_from = c("Illusion_Type"), values_from = c("TaskHard_Error", "TaskHard_RTMean"), names_glue = "{Illusion_Type}_{.value}") 
 
-
-
-r <- correlation::correlation(
-  data = random |> 
-    arrange(Participant) |> 
-    data_select(select="Delboeuf", regex=TRUE),
-  data2 = empirical |>
-    filter(Illusion_Type %in% c("Delboeuf")) |> 
-    pivot_wider(names_from = c("Illusion_Type"), values_from = c("Error", "RT_Mean", "RT_SD")) |> 
-    arrange(Participant)
-  )
-
-plot(summary(r))
+# Average for 4 higher level of illusion strength
+empirical <- df |>
+  filter(Illusion_Effect == "Incongruent") |> 
+  group_by(Participant, Illusion_Type, Illusion_Difference) |>
+  arrange(desc(Illusion_Strength)) |> 
+  slice(0:4) |> 
+  # select(Illusion_Strength, Illusion_Difference)
+  group_by(Participant, Illusion_Type) |>
+  summarize(
+    IlluStrong_Error = sum(Error, na.rm=TRUE) / n(),
+    IlluStrong_RTMean = mean(ifelse(Error == 0, RT, NA), na.rm=TRUE)
+    # Diff_RTSpread = sd(ifelse(Error == 0, RT, NA), na.rm=TRUE),
+  ) |>
+  ungroup() |> 
+  mutate(Illusion_Type = clean_illusionName(Illusion_Type))  |> 
+  pivot_wider(names_from = c("Illusion_Type"), values_from = c("IlluStrong_Error", "IlluStrong_RTMean"), names_glue = "{Illusion_Type}_{.value}") |> 
+  full_join(empirical, by = "Participant") 
 ```
+
+
+<!-- ```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE} -->
+<!-- rez <- parameters::n_factors(select(empirical, -Participant), n_max=30) -->
+<!-- plot(rez) -->
+
+<!-- r <- correlation::correlation(empirical, p_adjust = "none", sort=TRUE) -->
+
+
+<!-- r |> -->
+<!--   ggplot(aes(x = Parameter2, y = Parameter1)) + -->
+<!--   geom_tile(aes(fill = r)) + -->
+<!--   # geom_text(aes(label = Text), size = 2) + -->
+<!--   scale_fill_gradient2(low = "#2196F3", mid = "white", high = "#F44336", midpoint = 0, limit = c(-1, 1), space = "Lab", name = "Correlation", guide = "legend") + -->
+<!--   scale_x_discrete(expand = c(0, 0)) + -->
+<!--   scale_y_discrete(expand = c(0, 0)) + -->
+<!--   labs(title = "Correlation Matrix", x = NULL, y = NULL) + -->
+<!--   theme_minimal() + -->
+<!--   theme( -->
+<!--     axis.text.x = element_text(angle = 90, hjust = 1), -->
+<!--     plot.title = element_text(hjust = 0.5, face = "bold"), -->
+<!--     panel.grid.major = element_blank(), -->
+<!--     panel.grid.minor = element_blank() -->
+<!--   ) -->
+
+<!-- fa <- parameters::factor_analysis(select(empirical, -Participant), -->
+<!--   n = 13, -->
+<!--   rotation = "oblimin", -->
+<!--   fm = "mle", -->
+<!--   sort = TRUE -->
+<!-- ) -->
+
+
+<!-- print(tibble::as_tibble(fa), n=30) -->
+<!-- plot(fa) -->
+<!-- ``` -->
+
+
+
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+# Correlation
+r <- data.frame()
+for(ill in c("Delboeuf", 
+             "Ebbinghaus",
+             "RodFrame",
+             "VerticalHorizontal",
+             "Zollner",
+             "White",
+             "MullerLyer",
+             "Ponzo",
+             "Poggendorff",
+             "Contrast"
+             )) {
+  r <- correlation::correlation(
+    data = random |> 
+      arrange(Participant) |> 
+      data_select(select=ill, regex=TRUE),
+    data2 = empirical |>
+      data_select(select=ill, regex=TRUE),
+    p_adjust="none"
+    ) |> 
+    mutate(Illusion_Type = ill,
+           Parameter1 = prettify_parameterName(Parameter1),
+           Parameter2 = prettify_parameterName(Parameter2)) |> 
+    select(Illusion_Type, Parameter1, Parameter2, r, p) |> 
+    rbind(r)
+}
+
+r |>
+  mutate(label = insight::format_p(p, stars_only=TRUE)) |> 
+  ggplot(aes(x = Parameter2, y = Parameter1)) +
+  geom_tile(aes(fill = r)) +
+  geom_text(aes(label=label)) +
+  scale_alpha_continuous(range = c(1, 0.5)) +
+  scale_fill_gradient2(low = "#2196F3", mid = "white", high = "#F44336", midpoint = 0, limit = c(-1, 1), space = "Lab", name = "Correlation", guide = "legend") +
+  # facet_wrap(~Illusion_Type, scales = "free") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust=1))
+```
+
+
+
 <!-- ### Approximation -->
 
 <!-- ```{r message=FALSE, warning=FALSE, cache=cache} -->
-<!-- dat <- data.frame() -->
-<!-- for (participant in unique(data$Participant)) { -->
-<!--   freq <- glm(Error ~ Illusion_Difference * Illusion_Strength, -->
+<!-- individual <- data.frame() -->
+<!-- for (participant in unique(dfsub$Participant)) { -->
+<!--   cat(".") -->
+<!--   dat <- data.frame() -->
+
+<!--   dat <- glm(Error ~ sqrtmod(Illusion_Difference) * sqrtmod(Illusion_Strength), -->
 <!--     family = "binomial", -->
 <!--     data = filter( -->
-<!--       df, Participant == participant, -->
+<!--       df,  -->
+<!--       Participant == participant, -->
 <!--       Illusion_Type == "Delboeuf" -->
 <!--     ) -->
-<!--   ) -->
+<!--   ) |>  -->
+<!--     parameters::parameters() |>  -->
+<!--     mutate(Parameter = paste0("Delboeuf_Individual_", Parameter)) |>  -->
+<!--     rbind(dat) -->
 
-<!--   parameters::parameters(freq)[1:2] |> -->
+<!--   dat <- glm(Error ~ sqrt(Illusion_Difference) * logmod(Illusion_Strength), -->
+<!--     family = "binomial", -->
+<!--     data = filter( -->
+<!--       df,  -->
+<!--       Participant == participant, -->
+<!--       Illusion_Type == "Ebbinghaus" -->
+<!--     ) -->
+<!--   ) |>  -->
+<!--     parameters::parameters() |>  -->
+<!--     mutate(Parameter = paste0("Ebbinghaus_Individual_", Parameter)) |>  -->
+<!--     rbind(dat) -->
+
+
+<!--   individual <- dat |> -->
+<!--     select(Parameter, Coefficient) |>  -->
 <!--     as.data.frame() |> -->
 <!--     mutate( -->
 <!--       Participant = participant, -->
-<!--       Parameter = paste0("freq_Delboeuf_", Parameter) -->
-<!--     ) -->
+<!--       Parameter = clean_parameterName(Parameter) -->
+<!--     ) |>  -->
+<!--     rbind(individual) -->
 <!-- } -->
+
+<!-- individual <- individual |>  -->
+<!--   pivot_wider(names_from = c("Parameter"), values_from = c("Coefficient")) |>  -->
+<!--   arrange(Participant) -->
 <!-- ``` -->
 
+
+
+
+
+
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+# Correlation
+r <- data.frame()
+for(ill in c("Delboeuf", 
+             "Ebbinghaus")) {
+  r <- correlation::correlation(
+    # data = random |> 
+    #   arrange(Participant) |> 
+    #   data_select(select=ill, regex=TRUE),
+    data = empirical |> 
+      data_select(select=ill, regex=TRUE),
+    data2 = individual |>
+      data_select(select=ill, regex=TRUE),
+    p_adjust="none"
+    ) |> 
+    mutate(Illusion_Type = ill,
+           Parameter1 = prettify_parameterName(Parameter1),
+           Parameter2 = prettify_parameterName(Parameter2)) |> 
+    select(Illusion_Type, Parameter1, Parameter2, r, p) |> 
+    rbind(r)
+}
+
+r |>
+  mutate(label = insight::format_p(p, stars_only=TRUE)) |> 
+  ggplot(aes(x = Parameter2, y = Parameter1)) +
+  geom_tile(aes(fill = r)) +
+  geom_text(aes(label=label)) +
+  scale_alpha_continuous(range = c(1, 0.5)) +
+  scale_fill_gradient2(low = "#2196F3", mid = "white", high = "#F44336", midpoint = 0, limit = c(-1, 1), space = "Lab", name = "Correlation", guide = "legend") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust=1)) +
+  facet_wrap(~Illusion_Type, scales = "free")
+```
 
 
 ## Structure
 
 ### Correlation 
 
-```{r message=FALSE, warning=FALSE, cache=cache}
-clean_name <- function(x) {
-  x |>
-    str_replace("_Loc", " (loc)") |>
-    str_replace("_Disp", " (disp)") |>
-    str_replace("_Prob", " (prob)") |>
-    str_replace("_", " - ")
-}
-
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
 cor <- correlation::correlation(random, redundant = TRUE)
 
 p_data <- cor |>
   mutate(
-    Parameter1 = clean_name(Parameter1),
-    Parameter2 = clean_name(Parameter2)
+    Parameter1 = prettify_parameterName(Parameter1),
+    Parameter2 = prettify_parameterName(Parameter2)
   ) |>
   correlation::cor_sort(hclust_method = "ward.D2") |>
   cor_lower() |>
@@ -1659,36 +1941,39 @@ p_data |>
 
 #### First Level
 
-```{r message=FALSE, warning=FALSE, cache=cache}
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
 data <- select(random, -Participant)
 
-rez <- parameters::n_factors(data)
+rez <- parameters::n_factors(data, n_max=15)
 plot(rez)
 
 
 fa <- parameters::factor_analysis(data,
   cor = as.matrix(cor),
-  n = 5,
+  n = 9,
   rotation = "oblimin",
   fm = "mle",
   sort = TRUE
 )
 
-# psych::omega(data, nfactors=3)
+
+print(tibble::as_tibble(fa), n=30)
+plot(fa)
+# psych::omega(data, fm = "mle", nfactors=9)
 # fa <- psych::fa.multi(as.matrix(cor), nfactors = 3, nfact2 = 1, n.obs = nrow(random))
 # psych::fa.multi.diagram(fa)
 ```
 
 #### Second Level
 
-```{r message=FALSE, warning=FALSE, cache=cache}
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
 data <- predict(fa)
 
 rez <- parameters::n_factors(data, rotation = "oblimin")
 plot(rez)
 
 fa2 <- parameters::factor_analysis(data,
-  n = 2,
+  n = 1,
   rotation = "varimax",
   fm = "mle",
   sort = TRUE
@@ -1699,7 +1984,7 @@ fa2 <- parameters::factor_analysis(data,
 
 
 #### Visualization
-```{r message=FALSE, warning=FALSE, cache=cache}
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
 library(ggraph)
 
 dat <- rbind(
@@ -1720,13 +2005,23 @@ idx <- fa$Variable
 
 get_x <- function(name, x) {
   case_when(
-    name == "G1" ~ 0/1,
-    name == "G2" ~ 1/1,
-    name == "ML1" ~ 0/4,
-    name == "ML2" ~ 1/4,
-    name == "ML3" ~ 2/4,
-    name == "ML4" ~ 3/4,
-    name == "ML5" ~ 4/4,
+    name == "G1" ~ 0.5,
+    # name == "G1" ~ 0/3,
+    # name == "G2" ~ 1/3,
+    # name == "G3" ~ 2/3,
+    # name == "G4" ~ 3/3,
+    name == "ML1" ~ 0/(ncol(fa)-3),
+    name == "ML2" ~ 1/(ncol(fa)-3),
+    name == "ML3" ~ 2/(ncol(fa)-3),
+    name == "ML4" ~ 3/(ncol(fa)-3),
+    name == "ML5" ~ 4/(ncol(fa)-3),
+    name == "ML6" ~ 5/(ncol(fa)-3),
+    name == "ML7" ~ 6/(ncol(fa)-3),
+    name == "ML8" ~ 7/(ncol(fa)-3),
+    name == "ML9" ~ 8/(ncol(fa)-3),
+    name == "ML10" ~ 9/(ncol(fa)-3),
+    name == "ML11" ~ 10/(ncol(fa)-3),
+    name == "ML12" ~ 11/(ncol(fa)-3),
     TRUE ~ x)
 }
 
@@ -1748,7 +2043,7 @@ dat |>
     TRUE ~ 0),
     angle = ifelse(name %in% idx, 90, 0),
     hjust = ifelse(name %in% idx, 1.01, 0),
-    name = clean_name(name),
+    name = prettify_parameterName(name),
     Illusion_Type = str_split_fixed(name, " - ", n=2)[, 1]) |> 
   tidygraph::activate("edges") |> 
   filter(abs(Loading) > 0.2) |> 
@@ -1767,57 +2062,100 @@ dat |>
 
 ### SEM
 
-```{r message=FALSE, warning=FALSE, cache=cache}
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
 library(lavaan)
 library(tidySEM)
+library(ggraph)
 
 
 names <- names(select(random, -Participant))
 data <- setNames(as.data.frame(str_split_fixed(names, "_", 3)), c("Illusion_Type", "Parameter", "Model"))
 data$Name <- names
 
-# Model 1
+# Model 1 - by Illusion
 lvl1 <- paste(data$Illusion_Type, "=~", data$Name)
-lvl2 <- paste("G =~", unique(data$Illusion_Type))
+lvl2 <- paste("I =~", unique(data$Illusion_Type))
 resid <- as.data.frame(t(utils::combn(x=unique(data$Illusion_Type), 2)))
-resid <- paste(resid$V1, "~~", resid$V2)[1:2]
+resid <- paste(resid$V1, "~~", resid$V2)
+
+m1 <- sem(model = paste0(c(lvl1, lvl2), collapse = "\n"),
+          data  = random,
+          estimator = "ML",
+          missing = "ml",
+          bounds = TRUE)  # robust.two.stage
 
 
-
-m1 <- sem(model = paste0(c(lvl1, lvl2, resid), collapse = "\n"),
-           data  = random)
-
-
-# Model 2
-lvl1 <- paste(data$Model, "=~", data$Name)
-lvl2 <- paste("G =~", unique(data$Model))
+# Model 2 - by Parameter
+lvl1 <- paste(data$Parameter, "=~", data$Name)
+lvl2 <- paste("I =~", unique(data$Parameter))
+resid <- as.data.frame(t(utils::combn(x=unique(data$Parameter), 2)))
+resid <- paste(resid$V1, "~~", resid$V2)
 
 m2 <- sem(model = paste0(c(lvl1, lvl2), collapse = "\n"),
-           data  = random)
+          data  = random)
 
-# Model 3
-lvl1 <- paste(data$Parameter, "=~", data$Name)
-lvl2 <- paste("G =~", unique(data$Parameter))
+# # Model 3
+# lvl1 <- paste(data$Model, "=~", data$Name)
+# lvl2 <- paste("G =~", unique(data$Model))
+# 
+# m2 <- sem(model = paste0(c(lvl1, lvl2), collapse = "\n"),
+#            data  = random)
 
-m3 <- sem(model = paste0(c(lvl1, lvl2), collapse = "\n"),
-           data  = random)
 
-anova(m1, m2, m3)
+
+anova(m1, m2)
 
 summary(m1, standardize = TRUE)
-
-tidySEM::graph_sem(model = m1)
-
-# as_tbl_graph(fit, standardize = TRUE)
 ```
 
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+# https://cjvanlissa.github.io/tidySEM/articles/sem_graph.html
+edges <- tidySEM::get_edges(m1) |> 
+  mutate(color = ifelse(sign(as.numeric(est)) >= 0, "1", "-1"),
+         width = abs(as.numeric(est))) |> 
+  filter(lhs != rhs)
 
-```{r message=FALSE, warning=FALSE, cache=cache}
+nodes <- tidySEM::get_nodes(m1) |> 
+  mutate(label = prettify_parameterName(name),
+         angle = ifelse(grepl("_", name), 90, 0),
+         hjust = ifelse(grepl("_", name), 1.01, 0))
+
+tidygraph::tbl_graph(nodes = nodes,
+                     edges = edges) |> 
+  ggraph(layout = "sugiyama") +
+  geom_edge_link(aes(edge_width = width, 
+                             color = color,
+                             label=est_sig_std), angle_calc="along", label_dodge=unit(-0.015, "npc")) +
+  geom_node_point() +
+  geom_node_text(aes(label = label, angle = angle, hjust=hjust)) +
+  scale_edge_color_manual(values=c("#F44336", "#2196F3"))  +
+  scale_y_continuous(expand = expansion(c(.6, .1))) +
+  scale_edge_width_continuous(range=c(0.1, 1.5)) +
+  guides(edge_colour = "none", edge_width = "none") +
+  theme_graph() 
+
+dfsem <- mutate(as.data.frame(predict(m1)), Participant = random$Participant)
+```
+
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+r <- correlation(arrange(dfsem, Participant), arrange(empirical, Participant), sort=TRUE, p_adjust="none")
+
+r |>
+  mutate(label = insight::format_p(p, stars_only=TRUE)) |> 
+  ggplot(aes(x = Parameter1, y = Parameter2)) +
+  geom_tile(aes(fill = r)) +
+  geom_text(aes(label=label)) +
+  scale_alpha_continuous(range = c(1, 0.5)) +
+  scale_fill_gradient2(low = "#2196F3", mid = "white", high = "#F44336", midpoint = 0, limit = c(-1, 1), space = "Lab", name = "Correlation", guide = "legend") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust=1))
+```
+
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
 # Save
-dfsub <- dfsub |> 
-  merge(random, by = "Participant") |> 
-  cbind(data, predict(fa2, names=c("G1", "G2")))
-
-write.csv("../data/study3.csv")
+dfsub |> 
+  merge(dfsem, by = "Participant") |> 
+  merge(empirical, by = "Participant") |> 
+  write.csv("../data/study3.csv", row.names = FALSE)
 ```
 

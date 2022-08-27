@@ -1,6 +1,6 @@
 ---
-title             : "**Something**"
-shorttitle        : "Optimal Tolerance"
+title             : "**The Illusion Game: A Novel Experimental Paradigm to study Visual Illusions**"
+shorttitle        : "Illusion Game"
 author: 
   - name          : "Dominique Makowski"
     affiliation   : "1"
@@ -17,10 +17,10 @@ authornote: |
 abstract: |
   Abstract abstract.
   
-keywords          : "chaos, complexity, fractal, physiology, tolerance"
+keywords          : "visual illusions, illusion game, pyllusion, illusion effect, personality"
 wordcount         : "1156"
 bibliography      : "bibliography.bib"
-floatsintext      : no
+floatsintext      : yes
 linenumbers       : yes
 draft             : no
 mask              : no
@@ -53,34 +53,53 @@ knitr::opts_chunk$set(
 cache <- TRUE
 ```
 
+<!-- Title: -->
+<!-- The Illusion Game: Validation of a Novel Experimental Paradigm to study Visual Illusions  -->
+
 
 ## Introduction
 
 <!-- Intro  & Gaps-->
-Visual illusions are *blabla*. Despite the historical interest, several gaps remained unanswered: *blabla*. One key challenge hindering the further development of the field is the relative difficulty to adapt visual illusions to an experimental setting, which typically requires the controlled modulation of the specific variables of interest. 
+Visual illusions are fascinating stimuli capturing a key feature of our neurocognitive systems. They eloquently show that our brains did not evolve to be perfect perceptual devices, but to take into account contextual information and prior knowledge that manifests in our conscious experience **(REF)**. Despite the historical interest within the fields of visual perception **(REF)**, consciousness science **(REF)**, or psychiatry **(REF)**, several gaps remained unanswered. *mention common factor for illusions and link with disorders*. 
 
 <!-- Pyllusion -->
-To address this issue, we first developed a parametric framework to generate visual illusions, that we implemented and made accessible in the open-source *Pyllusion* software (REF).
+One key challenge hindering the further development of illusion research is the relative difficulty to adapt visual illusions to an experimental setting, which typically requires the controlled modulation of the specific variables of interest. To address this issue, we first developed a parametric framework to manipulate visual illusions, that we implemented and made accessible in the open-source software *Pyllusion* **(REF)**. This software allows us to generate different types of historical visual illusions with a continuous and independent modulation of two parameters, *illusion strength* and *task difficulty* (see **Figure 1**).
+ 
+```{r message=FALSE, warning=FALSE, fig.cap="Explanation of the parametric framework for visual illusions (Makowski et al., 2021) applied to the Müller-Lyer illusion (above). Examples of stimuli showcasing the manipulation of the two main parameters, the task difficulty and the illusion strength (below)."}
+knitr::include_graphics("figures/Figure1.png")
+```
 
-
+ 
 <!-- Target, strength, difficulty -->
-Many visual illusions can be seen as made of *targets* (e.g., parallel lines, same-size circles, same-length lines), which perception is biased by the *context* (e.g., parallel lines are seen as angled, circle or segments appear of different lengths). 
-
-This framework allows the continuous and independent modulation of *illusion strength* and *task difficulty*.
- 
- 
-
-To date, most of the paradigms prompt the subjective extent the context biases the perception ("how much does the circle appear bigger", e.g., **REFS**).
-
-Although visual illusions are inherently tied to subjective perception, we tested a reversal of the traditional paradigm to access the "objective" effect of illusions. By generating stimuli that 
+Indeed, many visual illusions can be seen as made of *targets* (e.g., same-length lines), which perception is biased by the *context* (e.g., in the Müller-Lyer illusion, the segments appear of different lengths when they end with inwards or outwards pointing arrows). While most of the paradigms used in the literature prompt the subjective extent the context biases the perception ("how much does the circle appear bigger", e.g., **REFS**), *Pyllusions* allows to create illusions in which the targets are actually more or less different (i.e., one segment is longer than the other), and in which the illusion is of varying strength (the arrows are more or less pointy). 
 
 
-In the present set of studies, we will test this novel paradigm to investigate 1) if the effect of illusion can be manipulated continuously, 2) whether 10 different illusions share a common latent factor, 3) how the the inter-individual sensitivity to illusions relates to other characteristics, such as sex or personality.
+<!-- Paradigm -->
+This opens the door of an experimental task in which participants have to make perceptual judgments about the targets (e.g., which segment in the longest) under different conditions of objective difficulty and illusion strength. Moreover, the illusion effect can be either "incongruent" (making the task even harder by biasing the perception in the opposite way) or "congruent" (making the task easier). Although visual illusions are inherently tied to subjective perception, this framework allows a reversal of the traditional paradigm that could quantify the "objective" effect of illusions by measuring its behavioral effect (error rate and reaction times) on the performance in a perceptual task.
 
-## Methods
+<!-- Goals -->
+In the present set of studies, we will first test this novel paradigm by investigate if the effect of illusion and task difficulty can be manipulated continuously and separated statistically. Then, we will use the paradigm to assess whether 10 different illusions share a common latent factor (a long-standing debate). Finally, we will investigate how the the inter-individual sensitivity to illusions relates to other characteristics, such as demographic variables and personality.
+
+In line with our full open-access standards, all the material (stimuli generation code, experiment code, )
+
+## Study 1
+
+### Aim
+
+### Participants
+
+### Procedure
+
+### Results
+
+### Discussion
+
+## General Discussion
 
 
+## Future Directions
 
+We strongly invite researchers to explore and re-analyze our dataset with other approaches and methods to push the understanding further.
 
 \newpage
 

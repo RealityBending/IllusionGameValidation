@@ -206,13 +206,13 @@ plot_descriptive_err <- function(data, side = "leftright") {
 
 
 
-plot_model_err <- function(data, model) {
+plot_model_err <- function(data, model, gam=NULL) {
   data <- mutate(data, .dots_side = ifelse(Error == 1, "bottom", "top"))
 
   # Get variables
   vars <- insight::find_predictors(model)$conditional
-  vardiff <- vars[1]
-  varstrength <- vars[2]
+  vardiff <- vars[2]
+  varstrength <- vars[3]
 
   # Get predicted
   pred <- estimate_relation(model,
@@ -240,6 +240,8 @@ plot_model_err <- function(data, model) {
   # Remove first stim of strength 0
   data <- filter(data, !(Block == 1 & Illusion_Strength == 0))
 
+  gamdata <- estimate_relation(gam, length = c(NA, 100))
+
   pred |>
     ggplot(aes_string(x = varstrength, y = "Predicted")) +
     geom_dots(
@@ -256,19 +258,24 @@ plot_model_err <- function(data, model) {
       color = NA,
       alpha = 0.5
     ) +
-    geom_ribbon(aes_string(ymin = "CI_low", ymax = "CI_high", fill = vardiff, group = vardiff), alpha = 0.2) +
+    geom_ribbon(aes_string(ymin = "CI_low", ymax = "CI_high", fill = vardiff, group = vardiff),
+                data=gamdata,
+                alpha = 0.2) +
     geom_vline(xintercept = 0, linetype = "dashed") +
     geom_hline(yintercept = c(0.5), linetype = "dotted", alpha = 0.5) +
-    geom_line(aes_string(color = vardiff, group = vardiff)) +
+    geom_line(aes_string(color = vardiff, group = vardiff), data = gamdata) +
+    geom_line(aes_string(color = vardiff, group = vardiff), linetype="dashed", size=0.5) +
     scale_y_continuous(limits = c(0, 1), expand = c(0, 0), labels = scales::percent) +
     scale_x_continuous(expand = c(0, 0)) +
     scale_color_gradientn(colours = c("#F44336", "#FFC107", "#4CAF50")) +
     scale_fill_gradientn(colours = c("#F44336", "#FFC107", "#4CAF50")) +
     coord_cartesian(xlim = c(min(data[[varstrength]]), max(data[[varstrength]]))) +
     theme_modern() +
+    guides(color = "none") +
     labs(
       title = paste0(data$Illusion_Type[1], " Illusion"),
-      color = "Difficulty", fill = "Difficulty",
+      color = "Difficulty",
+      fill = "Difficulty",
       y = "Probability of Error",
       x = "Illusion Strength"
     ) +
@@ -364,7 +371,8 @@ plot_ppcheck <- function(model) {
   # prior <- update(model, sample_prior="only", silent=2, refresh=0) |>
   # modelbased::estimate_prediction(keep_iterations = 50)
   pred <- modelbased::estimate_prediction(model, keep_iterations = 100)
-  estimate_density(pred$RT) |>
+
+  estimate_density(insight::get_data(model)$RT) |>
     # normalize(select = "y") |>
     ggplot(aes(x = x, y = y)) +
     geom_area(fill = "#9E9E9E") +
@@ -397,13 +405,11 @@ plot_ppcheck <- function(model) {
 
 
 
-plot_model_rt <- function(data, model) {
-  data <- mutate(data, .dots_side = ifelse(Error == 1, "bottom", "top"))
-
+plot_model_rt <- function(data, model, gam) {
   # Get variables
   vars <- insight::find_predictors(model)$conditional
-  vardiff <- vars[1]
-  varstrength <- vars[2]
+  vardiff <- vars[2]
+  varstrength <- vars[3]
 
   # Get predicted
   pred <- estimate_relation(model,
@@ -421,12 +427,15 @@ plot_model_rt <- function(data, model) {
   data$color <- colors[as.character(closest)]
   data$color <- fct_reorder(data$color, closest)
 
-  p <- pred |>
+  gamdata <- estimate_relation(gam, length = c(NA, 100))
+
+  pred |>
     ggplot(aes_string(x = varstrength, y = "Predicted")) +
     ggdist::stat_slab(data = data, aes_string(y = "RT", group = vardiff, fill = vardiff), alpha = 0.5) +
-    geom_ribbon(aes_string(ymin = "CI_low", ymax = "CI_high", fill = vardiff, group = vardiff), alpha = 0.2) +
+    geom_ribbon(data=gamdata, aes_string(ymin = "CI_low", ymax = "CI_high", fill = vardiff, group = vardiff), alpha = 0.2) +
     geom_vline(xintercept = 0, linetype = "dashed") +
-    geom_line(aes_string(color = vardiff, group = vardiff)) +
+    geom_line(data=gamdata, aes_string(color = vardiff, group = vardiff)) +
+    geom_line(aes_string(color = vardiff, group = vardiff), linetype="dashed", size=0.5) +
     scale_y_continuous(expand = c(0, 0)) +
     scale_x_continuous(expand = c(0, 0)) +
     scale_color_gradientn(colours = c("#F44336", "#FFC107", "#4CAF50")) +
@@ -436,6 +445,7 @@ plot_model_rt <- function(data, model) {
       ylim = c(125, 1500) / 1000
     ) +
     theme_modern() +
+    guides(color = "none") +
     labs(
       title = paste0(data$Illusion_Type[1], " Illusion"),
       color = "Difficulty", fill = "Difficulty",
@@ -526,7 +536,7 @@ plot_all <- function(data, p_err, p_rt) {
 
 extract_random <- function(model, illusion = "Delboeuf") {
   random <- as.data.frame(model)
-  random <- random[sample(nrow(random), 200), ]
+  random <- random[sample(nrow(random), 300), ]
   random <- random[str_detect(names(random), regex("^r_Participant"))]
 
   if (insight::model_info(model)$is_logit) {
@@ -539,15 +549,7 @@ extract_random <- function(model, illusion = "Delboeuf") {
     mutate(Draw = 1:nrow(random)) |>
     pivot_longer(-Draw, names_to = "Parameter", values_to = "Value") |>
     mutate(
-      Parameter = str_remove(Parameter, "r_Participant"),
-      Parameter = str_remove(Parameter, "\\]"),
-      Parameter = str_remove(Parameter, "\\["),
-      Parameter = str_remove(Parameter, "logmodabs"),
-      Parameter = str_remove(Parameter, "logmod"),
-      Parameter = str_remove(Parameter, "sqrtabs"),
-      Parameter = str_remove(Parameter, "sqrt"),
-      Parameter = str_remove(Parameter, "cbrtabs"),
-      Parameter = str_remove(Parameter, "cbrt"),
+      Parameter = clean_parameterName(Parameter),
       Parameter = paste0(param, Parameter),
       Parameter = str_replace(Parameter, paste0(param, "__sigma"), "Disp,")
     ) |>
@@ -555,20 +557,50 @@ extract_random <- function(model, illusion = "Delboeuf") {
     mutate(
       Parameter = paste0(Parameter, "_", Component),
       Illusion_Type = illusion
-    ) |>
-    mutate(
-      Parameter = str_replace(Parameter, "Illusion_Strength", "Illu"),
-      Parameter = str_replace(Parameter, "Illusion_Difference", "Diff"),
-      Parameter = str_replace(Parameter, "Illusion_EffectCongruent", "Cong"),
-      Parameter = str_replace_all(Parameter, ":", "")
     )
 }
 
 
-clean_name <- function(x) {
+clean_illusionName <- function(x) {
+  x <- str_replace(x, "Rod-Frame", "RodFrame")
+  x <- str_replace(x, "Vertical-Horizontal", "VerticalHorizontal")
+  x <- str_replace(x, "Zöllner", "Zollner")
+  x <- str_replace(x, "Müller-Lyer", "MullerLyer")
+  x
+}
+
+clean_parameterName <- function(x) {
+  x <- str_remove(x, "r_Participant")
+  x <- str_remove(x, "\\]")
+  x <- str_remove(x, "\\[")
+  x <- str_remove_all(x, "logmodabs")
+  x <- str_remove_all(x, "logmod")
+  x <- str_remove_all(x, "sqrtabs")
+  x <- str_remove_all(x, "sqrt")
+  x <- str_remove_all(x, "sqrtmodabs")
+  x <- str_remove_all(x, "sqrtmod")
+  x <- str_remove_all(x, "cbrtmodabs")
+  x <- str_remove_all(x, "cbrtmod")
+  x <- str_remove_all(x, "cbrtabs")
+  x <- str_remove_all(x, "cbrt")
+  x <- str_remove_all(x, "abs")
+  x <- str_remove_all(x, ":")
+  x <- str_remove_all(x, "\\(")
+  x <- str_remove_all(x, "\\)")
+  x <- str_replace(x, "Illusion_Strength", "Illu")
+  x <- str_replace(x, "Illusion_Difference", "Diff")
+  x <- str_replace(x, "Illusion_EffectCongruent", "Cong")
+  x <- str_replace(x, "Illusion_EffectIncongruent", "")
+  x
+}
+
+
+prettify_parameterName <- function(x) {
   x |>
     str_replace("_Loc", " (loc)") |>
     str_replace("_Disp", " (disp)") |>
     str_replace("_Prob", " (prob)") |>
+    str_replace("_Error", " (Error)") |>
+    str_replace("_RTMean", " (RT Mean)") |>
     str_replace("_", " - ")
 }

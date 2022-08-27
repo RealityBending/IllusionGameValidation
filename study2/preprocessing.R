@@ -95,10 +95,14 @@ preprocess_raw <- function(file) {
   # Correct duration
   df$Duration <- df$Duration - df$Break_Duration
 
-  # Manual fixes
-  # df[df$Sex == "Prefer not to say", "Participant"]
+  # Manual fixes for reported errors (using demographic info from prolific)
+  # df[df$Sex == "Other", "Participant"]
   df[df$Participant == "5d3c6e745602310001bca8aa_6bdtb", "Sex"] <- "Female"
   df[df$Participant == "60f5fa488f7b1381d175ecb5_qwvfs", "Sex"] <- "Male"
+  df[df$Participant == "5d558c262d8a6200172a8b7b_deegh", "Sex"] <- "Male"
+  df[df$Participant == "614a4c9d8172751921452626_mc4l4", "Sex"] <- "Female"
+  df[df$Participant == "61323c38f727b9f84e45a9ef_ls925", "Sex"] <- "Female"
+  df[df$Participant == "61568a59110d8f1cc99558af_8tqre", "Sex"] <- "Female"
 
 
   # Format names
@@ -117,14 +121,15 @@ preprocess_raw <- function(file) {
   df$Ethnicity <- ifelse(df$Ethnicity %in% c("Hispanic", "Hisapanic"), "Latino", df$Ethnicity)
   df$Ethnicity <- ifelse(df$Ethnicity %in% c("Mixed/Latino", "Mexicano"), "Latino", df$Ethnicity)
   df$Ethnicity <- ifelse(df$Ethnicity %in% c("Hispanic/Latino ", "Latin American "), "Latino", df$Ethnicity)
-  df$Ethnicity <- ifelse(df$Ethnicity %in% c("Latin", "Latina", "HISPANIC"), "Latino", df$Ethnicity)
+  df$Ethnicity <- ifelse(df$Ethnicity %in% c("Latin", "Latina", "HISPANIC", "Mexican"), "Latino", df$Ethnicity)
   df$Ethnicity <- ifelse(df$Ethnicity %in% c("Latino American", "Latino/Hispanic"), "Latino", df$Ethnicity)
   df$Ethnicity <- ifelse(df$Ethnicity %in% c("White Middle European (Slavic)", "Greek"), "Caucasian", df$Ethnicity)
   df$Ethnicity <- ifelse(df$Ethnicity %in% c("White - Caucasian", " Caucasian"), "Caucasian", df$Ethnicity)
   df$Ethnicity <- ifelse(df$Ethnicity %in% c("White", "Caucasian ", "German", "English"), "Caucasian", df$Ethnicity)
   df$Ethnicity <- ifelse(df$Ethnicity %in% c("European/White", "WHITE", "White Ethnic"), "Caucasian", df$Ethnicity)
   df$Ethnicity <- ifelse(df$Ethnicity %in% c("White/Caucasian", "British", "White/European"), "Caucasian", df$Ethnicity)
-  df$Ethnicity <- ifelse(df$Ethnicity %in% c("Polish"), "Caucasian", df$Ethnicity)
+  df$Ethnicity <- ifelse(df$Ethnicity %in% c("Polish", "White British", "European"), "Caucasian", df$Ethnicity)
+  df$Ethnicity <- ifelse(df$Ethnicity %in% c("White Caucasian", "Eastern Eurpean"), "Caucasian", df$Ethnicity)
   df$Ethnicity <- ifelse(df$Ethnicity %in% c("Black", "Black African ", "African American"), "African", df$Ethnicity)
   df$Ethnicity <- ifelse(df$Ethnicity %in% c("BLACK", "Black African", "Black "), "African", df$Ethnicity)
   df$Ethnicity <- ifelse(df$Ethnicity %in% c("Cambodian"), "Asian", df$Ethnicity)
@@ -135,12 +140,16 @@ preprocess_raw <- function(file) {
   # unique(df$Nationality)
   df$Nationality <- ifelse(df$Nationality %in% c("Israe;"), "Israel", df$Nationality)
   df$Nationality <- ifelse(df$Nationality %in% c("BRAZIL"), "Brazil", df$Nationality)
-  df$Nationality <- ifelse(df$Nationality %in% c("MEXICO"), "Mexico", df$Nationality)
+  df$Nationality <- ifelse(df$Nationality %in% c("MEXICO", "México", "Mexcio", " Mexico"), "Mexico", df$Nationality)
   df$Nationality <- ifelse(df$Nationality %in% c("ZIMBABWE"), "Zimbabwe", df$Nationality)
-  df$Nationality <- ifelse(df$Nationality %in% c("United Kingdom"), "UK", df$Nationality)
-  df$Nationality <- ifelse(df$Nationality %in% c("United States"), "USA", df$Nationality)
+  df$Nationality <- ifelse(df$Nationality %in% c("United Kingdom", "Northern Ireland"), "UK", df$Nationality)
+  df$Nationality <- ifelse(df$Nationality %in% c("Ukraina"), "Ukraine", df$Nationality)
+  df$Nationality <- ifelse(df$Nationality %in% c("United States", "United States of America"), "USA", df$Nationality)
+  df$Nationality <- ifelse(df$Nationality %in% c("Czechia"), "Czech", df$Nationality)
 
-  df$Nationality <- ifelse(df$Nationality %in% c("Wales", "Germany", "Hungary", "Greece", "Portugal", "UK", "Scotland", "England", "Northern Ireland", "Spain", "Austria", "Poland", "Spain", "Switzerland", "Italy", "USA", "New Zealand", "Estonia"), "Western", df$Nationality)
+  # larger groupings
+  df$Nationality <- ifelse(df$Nationality %in% c("Wales", "Germany", "Greece", "Portugal", "UK", "Scotland", "England", "Ireland", "Spain", "Austria", "Spain", "Switzerland", "Italy", "USA", "New Zealand", "Canada"), "Western", df$Nationality)
+  df$Nationality <- ifelse(df$Nationality %in% c("Poland", "Hungary", "Estonia", "Ukraine", "Czech Republic"), "Eastern", df$Nationality)
   df$Nationality <- ifelse(df$Nationality %in% c("Mexico", "México ", "Chile", "Brazil"), "South American", df$Nationality)
   df$Nationality <- ifelse(df$Nationality %in% c("Nigeria", "Zimbabwe"), "African", df$Nationality)
   df$Nationality <- ifelse(df$Nationality %in% c("South Africa"), "South African", df$Nationality)

@@ -1,0 +1,274 @@
+---
+title: "Illusion Game Validation (Study 3)"
+output: html_document
+date: "`r Sys.Date()`"
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, echo = FALSE, warning=FALSE, message=FALSE}
+options(
+  digits = 3,
+  mc.cores = 4,
+  brms.algorithm = "sampling",
+  brms.backend = "cmdstanr"
+)
+
+cache <- TRUE
+runModels <- FALSE
+bestModels <- FALSE
+fig.width <- see::golden_ratio(7)
+fig.height <- 7
+
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  dpi = 450,
+  fig.path = "./figures/",
+  fig.width = fig.width,
+  fig.height = fig.height
+)
+```
+
+
+# Introduction
+
+
+The goal of study 3 was to...
+
+We have to keep in mind that individual scores are the result of several layers of simplification: 1) the individual coefficient is that of simpler models that sometimes do not perfectly capture the underlying dynamics (especially in the case of ...), 2) the structural equation model from which they are obtained is also constructed on layers of abstractions. Though, as we have seen, these indices to relate to empirical scores, such as the average error rate and RT in the task.
+
+# Methods
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+library(ggdist)
+library(ggside)
+library(easystats)
+library(patchwork)
+library(brms)
+
+# Variables
+DVs <- c("Delboeuf" = "#2196F3", 
+         "Ebbinghaus" = "#3F51B5", 
+         "RodFrame" = "#F44336", 
+         "VerticalHorizontal" = "#FF5722", 
+         "Zollner" = "#FF9800", 
+         "White" = "#9E9E9E", 
+         "MullerLyer" = "#4CAF50", 
+         "Ponzo" = "#009688", 
+         "Poggendorff" = "#795548", 
+         "Contrast" = "#607D8B", 
+         "I" = "#9C27B0")
+
+# Load data
+dfsub <- read.csv("../data/study3.csv") |>
+  mutate(
+    Screen_Refresh = as.numeric(Screen_Refresh),
+    Education = fct_relevel(Education, "High School", "Bachelor", "Master", "Doctorate", "Other", "Prefer not to Say")
+  ) |> 
+  datawizard::standardise(select=names(DVs))
+
+dflong <- dfsub |> 
+  pivot_longer(all_of(names(DVs)), names_to = "Index", values_to = "Score")
+# plot(estimate_density(dfsub[DVs]))
+```
+
+
+## Results 
+
+
+### Contextual
+
+#### Screen Size
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+preds <- data.frame()
+for(i in names(DVs)) {
+  model <- brms::brm(paste0(i, " ~ s(Screen_Size)"), data=dfsub, algorithm = "meanfield", refresh=0)
+  param <- bayestestR::describe_posterior(as.data.frame(model))
+  
+  pred <- estimate_relation(model, length=50)
+  pred$Index <- i
+  pred$sig <- estimate_slopes(model, trend = "Screen_Size")$pd
+  preds <- rbind(preds, pred)
+  
+  if(any(pred$sig > .95)) {
+    print(i)
+  }
+}
+
+preds |> 
+  mutate(sig = format_pd(sig, stars_only = TRUE),
+         sig = ifelse(sig == "", "NS", sig)) |> 
+  ggplot(aes(x = Screen_Size, y = Predicted)) +
+  geom_point2(data=dflong, aes(y = Score, color= Index), alpha=0.1, size=2) +
+  geom_line(aes(color = Index, group = Index, linetype = sig, size = sig)) +
+  scale_x_continuous(expand = c(0, 0)) +
+  scale_size_manual(values = c("NS" = 0.5, "*" = 1, "**" = 1.5)) +
+  scale_linetype_manual(values = c("NS" = "dotted", "*" = "dashed", "**" = "solid")) +
+  scale_color_manual(values = DVs) +
+  coord_cartesian(ylim = c(-2.5, 2.5)) +
+  theme_modern() +
+  labs(y = "Illusion Sensitivity", x = "Screen Size") +
+  ggside::geom_xsidedensity(data=dfsub, fill ="grey", color = "white") +
+  ggside::geom_ysidedensity(data=dflong, aes(y=Score, color = Index)) +
+  ggside::theme_ggside_void() 
+```
+
+#### Refresh Rate
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+sig <- list()
+preds <- data.frame()
+for(i in DVs) {
+  model <- brms::brm(paste0(i, " ~ poly(Screen_Refresh, 2)"), data=dfsub, algorithm = "meanfield", refresh=0)
+  param <- bayestestR::describe_posterior(as.data.frame(model))
+  
+  pred <- estimate_relation(model, length=50)
+  pred$Index <- i
+  pred$sig <- max(param$pd[2:3])
+  preds <- rbind(preds, pred)
+  
+  if(any(max(param$pd[2:3]) > .95)) {
+    print(i)
+  }
+}
+
+preds |> 
+  mutate(sig = format_pd(sig, stars_only = TRUE),
+         sig = ifelse(sig == "", "NS", sig)) |> 
+  ggplot(aes(x = Screen_Refresh, y = Predicted)) +
+  geom_line(aes(color = Index, group = Index, linetype = sig, size = sig)) +
+  scale_size_manual(values = c("NS" = 0.5, "*" = 1, "**" = 1.5)) +
+  scale_linetype_manual(values = c("NS" = "dotted", "*" = "dashed", "**" = "solid"))
+```
+
+
+### Demographics
+
+#### Sex
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+sig <- list()
+params <- data.frame()
+for(i in DVs) {
+  model <- lm(paste0(i, " ~ Sex"), data=dfsub)
+  param <- parameters::parameters(model)
+  param$Index <- i
+  param$ymiddle <- param$Coefficient[1] + diff(param$Coefficient) / 2
+  params <- rbind(params, as.data.frame(param[2, ]))
+  if(param$p[2] < .05) {
+    print(i)
+  }
+}
+
+data <- dfsub |> 
+  pivot_longer(all_of(DVs), names_to = "Index", values_to = "Score") |> 
+  mutate(Index = fct_relevel(Index, arrange(params, p)$Index))
+
+data |> 
+  ggplot(aes(x = Index, y = Score)) +
+  stat_slab(data=filter(data, Sex == "Male"), aes(fill = Sex), side = "right", scale = 0.5, position = "dodge") +
+  stat_slab(data=filter(data, Sex == "Female"), aes(fill = Sex), side = "left", scale = 0.5, position = "dodge") +
+  stat_pointinterval(aes(group = Sex), point_interval = "mean_qi",, position = "dodge") +
+  geom_text(data = mutate(params, sig = insight::format_p(p, stars_only = TRUE)), aes(label = sig, y = ymiddle))
+```
+
+
+#### Ethnicity
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+sig <- list()
+params <- data.frame()
+for(i in DVs) {
+  model <- lm(paste0(i, " ~ Ethnicity"), data=dfsub)
+  param <- estimate_contrasts(model, contrast = "Ethnicity")
+  param$Index <- i
+  params <- rbind(params, as.data.frame(param[2, ]))
+  if(any(param$p < .05)) {
+    print(i)
+  }
+}
+```
+
+
+
+#### Education
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+preds <- data.frame()
+for(i in DVs) {
+  model <- brms::brm(paste0(i, " ~ mo(as.numeric(Education))"), data=filter(dfsub, !Education %in% c("Other", "Prefer not to Say")), algorithm = "meanfield", refresh=0)
+  param <- bayestestR::describe_posterior(as.data.frame(model)["bsp_moas.numericEducation"])
+  
+  pred <- estimate_relation(model)
+  pred$Index <- i
+  pred$sig <- param$pd
+  preds <- rbind(preds, pred)
+  
+  if(any(param$pd > .95)) {
+    print(i)
+  }
+}
+
+preds |> 
+  mutate(sig = format_pd(sig, stars_only = TRUE),
+         sig = ifelse(sig == "", "NS", sig)) |> 
+  ggplot(aes(x = Education, y = Predicted)) +
+  geom_line(aes(color = Index, group = Index, linetype = sig, size = sig)) +
+  scale_size_manual(values = c("NS" = 0.5, "*" = 1, "**" = 1.5)) +
+  scale_linetype_manual(values = c("NS" = "dotted", "*" = "dashed", "**" = "solid"))
+```
+
+
+#### Age
+
+```{r message=FALSE, warning=FALSE, cache=cache}
+sig <- list()
+preds <- data.frame()
+for(i in DVs) {
+  model <- brms::brm(paste0(i, " ~ poly(Age, 2)"), data=dfsub, algorithm = "meanfield", refresh=0)
+  param <- bayestestR::describe_posterior(as.data.frame(model))
+  
+  pred <- estimate_relation(model, length=50)
+  pred$Index <- i
+  pred$sig <- max(param$pd[2:3])
+  preds <- rbind(preds, pred)
+  
+  if(any(max(param$pd[2:3]) > .95)) {
+    print(i)
+  }
+}
+
+preds |> 
+  mutate(sig = format_pd(sig, stars_only = TRUE),
+         sig = ifelse(sig == "", "NS", sig)) |> 
+  ggplot(aes(x = Age, y = Predicted)) +
+  geom_line(aes(color = Index, group = Index, linetype = sig, size = sig)) +
+  scale_size_manual(values = c("NS" = 0.5, "*" = 1, "**" = 1.5)) +
+  scale_linetype_manual(values = c("NS" = "dotted", "*" = "dashed", "**" = "solid"))
+```
+
+### Personality
+
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+r <- correlation::correlation(
+  datawizard::data_select(dfsub, DVs),
+  select(dfsub, starts_with("IPIP") & !ends_with("_SD")),
+  p_adjust = "none",
+  sort=TRUE
+)
+
+
+r |>
+  mutate(label = paste0(format_value(r, zap_small = TRUE), insight::format_p(p, stars_only=TRUE))) |> 
+  ggplot(aes(x = Parameter2, y = Parameter1)) +
+  geom_tile(aes(fill = r)) +
+  geom_text(aes(label=label), size=3) +
+  scale_alpha_continuous(range = c(1, 0.5)) +
+  scale_fill_gradient2(low = "#2196F3", mid = "white", high = "#F44336", midpoint = 0, limit = c(-1, 1), space = "Lab", name = "Correlation", guide = "legend") +
+  # facet_wrap(~Illusion_Type, scales = "free") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust=1))
+```
+
