@@ -35,7 +35,7 @@ knitr::opts_chunk$set(
 
 The goal of study 3 was to...
 
-We have to keep in mind that individual scores are the result of several layers of simplification: 1) the individual coefficient is that of simpler models that sometimes do not perfectly capture the underlying dynamics (especially in the case of ...), 2) the structural equation model from which they are obtained is also constructed on layers of abstractions. Though, as we have seen, these indices to relate to empirical scores, such as the average error rate and RT in the task.
+
 
 # Methods
 
@@ -46,6 +46,8 @@ library(ggside)
 library(easystats)
 library(patchwork)
 library(brms)
+
+source("../study2/functions.R")
 
 # Variables
 DVs <- c("Delboeuf" = "#2196F3", 
@@ -66,20 +68,124 @@ dfsub <- read.csv("../data/study3.csv") |>
     Screen_Refresh = as.numeric(Screen_Refresh),
     Education = fct_relevel(Education, "High School", "Bachelor", "Master", "Doctorate", "Other", "Prefer not to Say")
   ) |> 
-  datawizard::standardise(select=names(DVs))
+  datawizard::standardise(select=names(DVs)) |> 
+  datawizard::change_scale(select=starts_with("IPIP"), to = c(-1, 1), range = c(0, 100)) |> 
+  datawizard::change_scale(select=starts_with("PID"), to = c(-1, 1), range = c(0, 100))
 
 dflong <- dfsub |> 
   pivot_longer(all_of(names(DVs)), names_to = "Index", values_to = "Score")
-# plot(estimate_density(dfsub[DVs]))
 ```
 
 
-## Results 
+## Participants
+
+`r sum(is.na(dfsub$IPIP6_Agreeableness))` participants did not do the personality scales.
+
+```{r demographics, fig.width=20, fig.height=15}
+p_age <- estimate_density(dfsub$Age) |> 
+  ggplot(aes(x = x, y = y)) +
+  geom_area(fill = "#607D8B") +
+  scale_x_continuous(expand = c(0, 0)) +
+  scale_y_continuous(expand = c(0, 0)) +
+  labs(title = "Age", color = NULL) +
+  theme_modern() +
+  theme(
+    plot.title = element_text(face = "bold", hjust = 0.5),
+    plot.subtitle = element_text(face = "italic", hjust = 0.5),
+    axis.line.y = element_blank(),
+    axis.title.y = element_blank(),
+    axis.text.y = element_blank(),
+    axis.title.x = element_blank()
+  ) 
+
+p_sex <- plot_waffle(dfsub, what="Sex", rows = 12) +
+  scale_color_manual(values = c("Male" = "#2196F3", "Female" = "#E91E63")) 
+
+p_edu <- plot_waffle(dfsub, "Education", rows = 12) +
+  scale_color_viridis_d() 
+
+p_race <- plot_waffle(dfsub, "Ethnicity", rows = 12) +
+  scale_color_manual(values = c("Latino" = "#FF5722", "Caucasian" = "#2196F3", "African" = "#4CAF50", "Other" = "#795548")) 
+
+p_nat <- dfsub |> 
+  group_by(Nationality) |> 
+  summarize(n = n()) |> 
+  mutate(Nationality = fct_reorder(Nationality, desc(n))) |> 
+  ggplot(aes(x = Nationality, y = n, fill=Nationality)) +
+  geom_bar(stat = "identity") +
+  labs(y = "Number", title = "Nationality") +
+  scale_fill_material_d(guide = "none") +
+  scale_x_discrete(expand = c(0, 0)) +
+  scale_y_continuous(expand = c(0, 0)) +
+  theme_modern() +
+  theme(
+    plot.title = element_text(face = "bold", hjust = 0.5),
+    plot.subtitle = element_text(face = "italic", hjust = 0.5),
+    axis.line.y = element_blank(),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    axis.text.y = element_blank(),
+    axis.text.x = element_text(size=rel(0.8), angle = 45, hjust=1)
+  )
 
 
-### Contextual
+p_ipip <- dfsub |> 
+  select(starts_with("IPIP") & !ends_with("_SD")) |> 
+  estimate_density() |> 
+  mutate(Parameter = str_remove_all(Parameter, "IPIP6_"),
+         Parameter = str_replace(Parameter, "HonestyHumility", "Honesty-Humility")) |> 
+  ggplot(aes(x = x, y = y, color = Parameter)) +
+  geom_line(size = 1) +
+  scale_x_continuous(expand = c(0, 0)) +
+  scale_y_continuous(expand = c(0, 0)) +
+  scale_color_manual(values=c("Agreeableness" = "#FFC107", "Honesty-Humility" = "#00BCD4", "Extraversion" = "#9C27B0", "Conscientiousness" = "#3F51B5", "Openness" = "#4CAF50", "Neuroticism" = "#E91E63")) +
+  labs(x = "Score", title = "Normal Personality (IPIP-6)", color = NULL) +
+  theme_modern() +
+  theme(
+    plot.title = element_text(face = "bold", hjust = 0.5),
+    plot.subtitle = element_text(face = "italic", hjust = 0.5),
+    axis.title.y = element_blank(),
+    axis.text.y = element_blank(),
+    axis.title.x = element_blank(),
+    legend.position = "top"
+  ) 
+  
+p_pid <- dfsub |> 
+  select(starts_with("PID") & !ends_with("_SD")) |> 
+  estimate_density() |> 
+  mutate(Parameter = str_remove_all(Parameter, "PID5_"),
+         Parameter = str_replace(Parameter, "NegativeAffect", "Negative Affect")) |> 
+  ggplot(aes(x = x, y = y, color = Parameter)) +
+  geom_line(size = 1) +
+  scale_x_continuous(expand = c(0, 0)) +
+  scale_y_continuous(expand = c(0, 0)) +
+  scale_color_manual(values=c("Antagonism" = "#F44336", "Detachment" = "#03A9F4", "Disinhibition" = "#FF5722", "Negative Affect" = "#FF9800", "Psychoticism" = "#673AB7")) +
+  labs(x = "Score", title = "Pathological Personality (PID-5)", color = NULL) +
+  theme_modern() +
+  theme(
+    plot.title = element_text(face = "bold", hjust = 0.5),
+    plot.subtitle = element_text(face = "italic", hjust = 0.5),
+    axis.title.y = element_blank(),
+    axis.text.y = element_blank(),
+    axis.title.x = element_blank(),
+    legend.position = "top"
+  ) 
 
-#### Screen Size
+p <- (p_age / p_nat) | (p_sex / p_edu / p_race) | (p_ipip / p_pid)
+p
+# ggsave("figures/figure_demo.png", width=fig.width, height = fig.height)
+```
+
+
+
+# Results 
+
+
+
+## Contextual
+
+
+### Screen Size
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
 preds <- data.frame()
@@ -112,10 +218,12 @@ preds |>
   labs(y = "Illusion Sensitivity", x = "Screen Size") +
   ggside::geom_xsidedensity(data=dfsub, fill ="grey", color = "white") +
   ggside::geom_ysidedensity(data=dflong, aes(y=Score, color = Index)) +
-  ggside::theme_ggside_void() 
+  ggside::theme_ggside_void() +
+  ggside::scale_ysidex_continuous(expand = c(0, 0)) +
+  ggside::scale_xsidey_continuous(expand = c(0, 0))
 ```
 
-#### Refresh Rate
+### Refresh Rate
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
 sig <- list()
@@ -144,9 +252,9 @@ preds |>
 ```
 
 
-### Demographics
+## Demographics
 
-#### Sex
+### Sex
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
 sig <- list()
@@ -175,7 +283,7 @@ data |>
 ```
 
 
-#### Ethnicity
+### Ethnicity
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
 sig <- list()
@@ -193,7 +301,7 @@ for(i in DVs) {
 
 
 
-#### Education
+### Education
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
 preds <- data.frame()
@@ -221,7 +329,7 @@ preds |>
 ```
 
 
-#### Age
+### Age
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
 sig <- list()
@@ -249,7 +357,9 @@ preds |>
   scale_linetype_manual(values = c("NS" = "dotted", "*" = "dashed", "**" = "solid"))
 ```
 
-### Personality
+## Personality
+
+### IPIP6
 
 ```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
 r <- correlation::correlation(

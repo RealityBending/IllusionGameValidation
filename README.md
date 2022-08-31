@@ -35,3 +35,6 @@ In which we analyze the effect of illusion strength and task difficulty on error
 
 - [**Preregistration**](https://osf.io/5d6xp)
 - [**Pyllusion Software**](https://github.com/RealityBending/Pyllusion)
+
+
+![](figures/Figure1.png)

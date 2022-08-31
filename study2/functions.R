@@ -2,8 +2,43 @@ logmod <- function(x) sign(x) * log(1 + abs(x))
 sqrtmod <- function(x) sign(x) * sqrt(abs(x))
 cbrtmod <- function(x) sign(x) * (abs(x)**(1 / 3))
 
+plot_distribution <- function(dfsub, what = "Age", title = what, subtitle = "", fill = "orange") {
+  dfsub |>
+    ggplot(aes_string(x = what)) +
+    geom_density(fill = fill) +
+    scale_x_continuous(expand = c(0, 0)) +
+    scale_y_continuous(expand = c(0, 0)) +
+    ggtitle(title, subtitle = subtitle) +
+    theme_modern() +
+    theme(
+      plot.title = element_text(face = "bold", hjust = 0.5),
+      plot.subtitle = element_text(face = "italic", hjust = 0.5),
+      axis.title.x = element_blank(),
+      axis.title.y = element_blank(),
+      axis.text.y = element_blank()
+    )
+}
 
-
+plot_waffle <- function(dfsub, what = "Nationality", title = what, rows = 8, size=3) {
+  library(emojifont)
+  ggwaffle::waffle_iron(dfsub, what, rows = rows) |>
+    # mutate(label = emojifont::fontawesome('fa-smiley')) |>
+    # mutate(label = emojifont::emoji('smiley')) |>
+    ggplot(aes(x, y)) +
+    geom_point(aes(color = group), shape = "square", size=size) +
+    # ggwaffle::geom_waffle(color = "white") +
+    # geom_point() +
+    # geom_text(aes(color=group ,label=label), family='fontawesome-webfont', size=4) +
+    # geom_text(aes(color=group ,label=label), family='EmojiOne', size=4) +
+    coord_equal() +
+    ggtitle(title) +
+    labs(fill = "", color = "") +
+    # scale_x_continuous(expand = c(0, 0)) +
+    # scale_y_continuous(expand = c(0, 0)) +
+    theme_void() +
+    # ggwaffle::theme_waffle() +
+    theme(plot.title = element_text(face = "bold", hjust = 0.5))
+}
 
 
 
@@ -231,10 +266,12 @@ plot_model_err <- function(data, model, gam=NULL) {
   data$color <- fct_reorder(data$color, closest)
 
   # Manual jittering
-  xrange <- 0.03 * diff(range(data[[varstrength]]))
+  xrange <- 0.04 * diff(range(data[[varstrength]]))
   data$x <- data[[varstrength]]
-  data$x[data$x > 0] <- data$x[data$x > 0] - runif(sum(data$x > 0), 0, xrange)
-  data$x[data$x < 0] <- data$x[data$x < 0] + runif(sum(data$x < 0), 0, xrange)
+  # data$x[data$x > 0] <- data$x[data$x > 0] - runif(sum(data$x > 0), 0, xrange)
+  # data$x[data$x < 0] <- data$x[data$x < 0] + runif(sum(data$x < 0), 0, xrange)
+  data$x[data$x > 0] <- data$x[data$x > 0] - seq(0, xrange, length.out=sum(data$x > 0))
+  data$x[data$x < 0] <- data$x[data$x < 0] + seq(0, xrange, length.out=sum(data$x < 0))
   data$x[round(data$x, 2) == 0] <- data$x[round(data$x, 2) == 0] + runif(sum(round(data$x, 2) == 0), -xrange / 2, xrange / 2)
 
   # Remove first stim of strength 0
@@ -256,7 +293,7 @@ plot_model_err <- function(data, model, gam=NULL) {
       ),
       fill = data$color,
       color = NA,
-      alpha = 0.5
+      alpha = 2/3
     ) +
     geom_ribbon(aes_string(ymin = "CI_low", ymax = "CI_high", fill = vardiff, group = vardiff),
                 data=gamdata,
@@ -367,28 +404,36 @@ plot_descriptive_rt <- function(data, side = "leftright") {
 
 
 
-plot_ppcheck <- function(model) {
+plot_ppcheck <- function(model, gam) {
   # prior <- update(model, sample_prior="only", silent=2, refresh=0) |>
-  # modelbased::estimate_prediction(keep_iterations = 50)
-  pred <- modelbased::estimate_prediction(model, keep_iterations = 100)
+  #   bayestestR::reshape_iterations() |>
+  #   mutate(iter_group = as.factor(iter_group)) |>
+  #   estimate_density(select = "iter_value", at = "iter_group") |>
+  #   normalize(select = "y")
+
+  pred <- modelbased::estimate_prediction(model, keep_iterations = 100) |>
+    bayestestR::reshape_iterations() |>
+    mutate(iter_group = as.factor(iter_group)) |>
+    estimate_density(select = "iter_value", at = "iter_group")
+
+  predgam <- modelbased::estimate_prediction(gam, keep_iterations = 100) |>
+    bayestestR::reshape_iterations() |>
+    mutate(iter_group = as.factor(iter_group)) |>
+    estimate_density(select = "iter_value", at = "iter_group")
 
   estimate_density(insight::get_data(model)$RT) |>
     # normalize(select = "y") |>
     ggplot(aes(x = x, y = y)) +
     geom_area(fill = "#9E9E9E") +
-    # geom_line(data = prior |>
-    #             bayestestR::reshape_iterations() |>
-    #             mutate(iter_group = as.factor(iter_group)) |>
-    #             estimate_density(select = "iter_value", at = "iter_group") |>
-    #             normalize(select = "y"),
+    # geom_line(data = prior,
     #           aes(group = iter_group), color = "#FF9800", size = 0.1, alpha = 0.5) +
     geom_line(
-      data = pred |>
-        bayestestR::reshape_iterations() |>
-        mutate(iter_group = as.factor(iter_group)) |>
-        estimate_density(select = "iter_value", at = "iter_group"),
-      # normalize(select = "y"),
+      data = predgam,
       aes(group = iter_group), color = "#2196F3", size = 0.1, alpha = 0.5
+    ) +
+    geom_line(
+      data = pred,
+      aes(group = iter_group), color = "#FF5722", size = 0.1, alpha = 0.5
     ) +
     scale_y_continuous(expand = c(0, 0)) +
     scale_x_continuous(expand = c(0, 0)) +
@@ -414,7 +459,7 @@ plot_model_rt <- function(data, model, gam) {
   # Get predicted
   pred <- estimate_relation(model,
     at = vars,
-    length = c(NA, NA)
+    length = c(NA, NA, 1)
   )
 
   # Set colors for lines
@@ -427,11 +472,14 @@ plot_model_rt <- function(data, model, gam) {
   data$color <- colors[as.character(closest)]
   data$color <- fct_reorder(data$color, closest)
 
-  gamdata <- estimate_relation(gam, length = c(NA, 100))
+  # Remove first stim of strength 0
+  data <- filter(data, !(Block == 1 & Illusion_Strength == 0))
+
+  gamdata <- estimate_relation(gam, length = c(NA, 100, 1))
 
   pred |>
     ggplot(aes_string(x = varstrength, y = "Predicted")) +
-    ggdist::stat_slab(data = data, aes_string(y = "RT", group = vardiff, fill = vardiff), alpha = 0.5) +
+    ggdist::stat_slab(data = data, aes_string(y = "RT", group = vardiff, fill = vardiff), alpha = 1/3) +
     geom_ribbon(data=gamdata, aes_string(ymin = "CI_low", ymax = "CI_high", fill = vardiff, group = vardiff), alpha = 0.2) +
     geom_vline(xintercept = 0, linetype = "dashed") +
     geom_line(data=gamdata, aes_string(color = vardiff, group = vardiff)) +

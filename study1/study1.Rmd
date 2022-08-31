@@ -10,10 +10,10 @@ editor_options:
 ```{r, echo = FALSE, warning=FALSE, message=FALSE}
 options(digits = 3,
         mc.cores = 4,
-        brms.algorithm = "meanfield",
+        brms.algorithm = "sampling",
         brms.backend = "cmdstanr")
 
-cache <- FALSE
+cache <- TRUE
 fig.width <- see::golden_ratio(7)
 fig.height <- 7
 
@@ -28,12 +28,8 @@ knitr::opts_chunk$set(
 
 
 
-# Introduction
 
-
-The goal of study 1 was to test and refine the stimuli pool.
-
-# Methods
+# Preprocessing
 
 
 ```{r eval=FALSE, message=FALSE, warning=FALSE, include=FALSE}
@@ -62,6 +58,12 @@ df$Illusion_Difference_cbrt <- round(df$Illusion_Difference**(1/3), 4)
 df$Illusion_Strength_log <- sign(df$Illusion_Strength) * log(1 + abs(df$Illusion_Strength))
 df$Illusion_Strength_sqrt <- sign(df$Illusion_Strength) * sqrt(abs(df$Illusion_Strength))
 df$Illusion_Strength_cbrt <- sign(df$Illusion_Strength) * (abs(df$Illusion_Strength)**(1/3))
+
+# Anonymize
+replacement <- paste0("S", str_pad(1:length(unique(df$Participant)), 2, pad = "0"))
+names(replacement) <- unique(df$Participant)
+df$Participant <- replacement[df$Participant]
+
 
 # Save anonymized data
 write.csv(df, "../data/study1.csv", row.names = FALSE)
@@ -93,22 +95,22 @@ df <- read.csv("../data/study1.csv") |>
 outliers <- c(
   # Half of the trials have very short RT
   # Prolific Status: REJECTED
-  "60684f29dbfe1bb2059e5e27_rkqoy",
+  "S33",
   # Block n2 with very short RTs
   # Prolific Status: RETURNED
-  "5e860198a846e30497df5189_6e43s",
+  "S20",
   # Error rate of 46.2% and short RTs
   # Prolific Status: RETURNED
-  "615f319bb341cf2f306d858d_qsaq5",
+  "S51",
   # Error rate of 46.2%
   # Prolific Status: RETURNED
-  "614f36fd81c78b7a125c4262_6ax4g",
+  "S49",
   # Error rate of 47.9%
   # Prolific Status: REJECTED
-  "61280140171ec546e87ed8cb_qdlgy",
+  "S47",
   # Error rate of 42.1% and very large RT SD
   # Prolific Status: REJECTED
-  "5d398380b37ab1000111fac3_2nxxh"
+  "S12"
 )
 ```
 
@@ -344,9 +346,7 @@ p9 <- plot_waffle(dfsub, "Device_OS") +
 (p1 / p2 / p3) | (p4 / p5 / p6) | (p7 / p8 / p9)
 ```
 
-## Data Analysis
 
-The analysis of study focused on the probability of errors as the main outcome variable. For each illusion, we started by visualizing the average effect of task difficulty and illusion strength to gain some insight on the underlying generative model. Next, we tested the performance of various models differing in their specifications, such as: with or without a log-transform on the task difficulty, with or without a 2nd order polynomial term of the illusion strength, and with or without the illusion side (up *vs.* down or left *vs.* right) as an additional predictor. We then fitted the best performing model under a Bayesian model, and compared its predicted links with that of a General Additive Model (GAM), which has an increased ability of mapping underlying potentially non-linear relationships at the expense of model simplicity. Finally, we used these models to estimate different values of task difficulty that would lead to similar error rates (2.5, 5 and 25%) when the illusion strength is null.
 
 
 
@@ -672,11 +672,11 @@ gam$p
 
 
 
-### Parameter Standardization
 
 
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+# Parameter Standardization
 
-```{r message=FALSE, warning=FALSE, cache=cache}
 std_params <- function(model, min=0, max=2) {
   estimate_relation(
   model,
@@ -751,11 +751,10 @@ gam <- make_gam(data)
 gam$p
 ```
 
-### Parameter Standardization
 
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+# Parameter Standardization
 
-
-```{r message=FALSE, warning=FALSE, cache=cache}
 # range(data$Illusion_Difference)
 # range(data$Illusion_Strength)
 
@@ -792,7 +791,7 @@ best_models(data)
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
 formula <- brms::bf(
-  Error ~ poly(Illusion_Difference, 2) * poly(Illusion_Strength, 2) + 
+  Error ~ sqrt(Illusion_Difference) * poly(Illusion_Strength, 2) + 
     (1 | Participant),
   family = "bernoulli"
 )
@@ -818,10 +817,10 @@ gam$p
 ```
 
 
-### Parameter Standardization
 
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+# Parameter Standardization
 
-```{r message=FALSE, warning=FALSE, cache=cache}
 # range(data$Illusion_Difference)
 # range(data$Illusion_Strength)
 
@@ -883,10 +882,10 @@ gam$p
 ```
 
 
-### Parameter Standardization
 
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+# Parameter Standardization
 
-```{r message=FALSE, warning=FALSE, cache=cache}
 # range(data$Illusion_Difference)
 # range(data$Illusion_Strength)
 
@@ -922,7 +921,7 @@ best_models(data)
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
 formula <- brms::bf(
-  Error ~ poly(Illusion_Difference, 2) * Illusion_Strength + 
+  Error ~ cbrt(Illusion_Difference) * Illusion_Strength + 
     (1 | Participant),
   family = "bernoulli"
 )
@@ -944,7 +943,9 @@ plot_model(data, model)
 ### Parameter Standardization
 
 
-```{r message=FALSE, warning=FALSE, cache=cache}
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+# Parameter Standardization
+
 # range(data$Illusion_Difference)
 # range(data$Illusion_Strength)
 
@@ -1001,10 +1002,8 @@ gam$p
 ```
 
 
-### Parameter Standardization
 
-
-```{r message=FALSE, warning=FALSE, cache=cache}
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
 # range(data$Illusion_Difference)
 # range(data$Illusion_Strength)
 # unique(data$Illusion_Strength)
@@ -1065,10 +1064,8 @@ gam$p
 ```
 
 
-### Parameter Standardization
 
-
-```{r message=FALSE, warning=FALSE, cache=cache}
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
 # range(data$Illusion_Difference)
 # range(data$Illusion_Strength)
 
@@ -1126,10 +1123,8 @@ gam$p
 ```
 
 
-### Parameter Standardization
 
-
-```{r message=FALSE, warning=FALSE, cache=cache}
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
 # range(data$Illusion_Difference)
 # range(data$Illusion_Strength)
 
@@ -1167,7 +1162,7 @@ best_models(data)
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
 formula <- brms::bf(
-  Error ~ log(Illusion_Difference) * poly(Illusion_Strength, 2) + 
+  Error ~ cbrt(Illusion_Difference) * poly(Illusion_Strength, 2) + 
     (1 | Participant),
   family = "bernoulli"
 )
@@ -1193,10 +1188,7 @@ gam$p
 ```
 
 
-### Parameter Standardization
-
-
-```{r message=FALSE, warning=FALSE, cache=cache}
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
 # range(data$Illusion_Difference)
 # range(data$Illusion_Strength)
 
@@ -1253,10 +1245,10 @@ gam$p
 ```
 
 
-### Parameter Standardization
 
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+# Parameter Standardization
 
-```{r message=FALSE, warning=FALSE, cache=cache}
 # range(data$Illusion_Difference)
 # range(data$Illusion_Strength)
 
@@ -1265,11 +1257,3 @@ std_params(gam$model, min=0, max=25)
 ```
 
 
-
-# Discussion
-
-This study allowed to elaborate a more precise prior idea regarding the magnitude of the effects at stake and the type of interaction between them. Crucially, it allowed us to refine the range of task difficulty and illusion strength for the stimuli of the next study to maximize the information gain.
-
-One thing that stood out was Zöller, which seems to exhibit a non-linear relationship of illusion effect. Next study, by generating a wider range of illusion strength, will attempt at clarifying this point.
-
-Perceptual decisions often exhibit a non-linear relationship with the objective physical values (e.g., a logarithmic relationship. In order to spread the difficulty levels based on the behavioral performance (to maximize the diversity of the stimuli in regards to perceptual processes), we generated, for study 2, stimuli with the difficulty levels spaced non-linearly, depending on the best underlying model (i.e., with an exponential, square or cubic spacing if the best model was *log*, *square root* or *cube root*). For instance, a linear space of [0.1, 0.3, 0.5, 0.7] can be transformed to an exponential space of [0.1, 0.27, 0.47, 0.7].
