@@ -80,7 +80,7 @@ This opens the door of an experimental task in which participants have to make p
 <!-- Goals -->
 In the present set of preregistered studies, we will first test this novel paradigm by investigate if the effect of illusion and task difficulty can be manipulated continuously and separated statistically. Then, we will use the paradigm to assess whether 10 different historical illusions (Delboeuf, Ebbinghaus, Rod and Frame, Vertical-Horizontal, Zöllner, White, Müller-Lyer, Ponzo, Poggendorff, Contrast) share a common latent factor (a long-standing debate). Finally, we will investigate how the the inter-individual sensitivity to illusions relates to other characteristics, such as demographic variables and personality.
 
-In line with our full open-access standards, all the material (stimuli generation code, experiment code, raw data, analysis script with complementary figures and analyses, preregistration, etc.) is available at **https://github.com/RealityBending/IllusionGameValidation**.
+In line with our open-science standards, all the material (stimuli generation code, experiment code, raw data, analysis script with complementary figures and analyses, preregistration, etc.) is available and open-source at **https://github.com/RealityBending/IllusionGameValidation**.
 
 
 # Study 1
