@@ -949,7 +949,6 @@ load("models/model_verticalhorizontal_err.RData")
 load("models/gam_verticalhorizontal_err.RData")
 
 # parameters::parameters(model_verticalhorizontal_err)
-
 ```
 
 
@@ -1014,6 +1013,14 @@ plot_ppcheck(model_verticalhorizontal_rt)
 ```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
 p_verticalhorizontal_rt <- plot_model_rt(data, model_verticalhorizontal_rt, gam_verticalhorizontal_rt)
 p_verticalhorizontal_rt
+```
+
+
+#### Visualization
+
+```{r message=FALSE, warning=FALSE, cache=cache, fig.height=fig.height*2, eval=FALSE}
+p_verticalhorizontal <- plot_all(data, p_verticalhorizontal_err, p_verticalhorizontal_rt)
+p_verticalhorizontal
 ```
 
 
