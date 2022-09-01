@@ -411,12 +411,12 @@ plot_ppcheck <- function(model, gam) {
   #   estimate_density(select = "iter_value", at = "iter_group") |>
   #   normalize(select = "y")
 
-  pred <- modelbased::estimate_prediction(model, keep_iterations = 100) |>
+  pred <- modelbased::estimate_prediction(model, keep_iterations = 50) |>
     bayestestR::reshape_iterations() |>
     mutate(iter_group = as.factor(iter_group)) |>
     estimate_density(select = "iter_value", at = "iter_group")
 
-  predgam <- modelbased::estimate_prediction(gam, keep_iterations = 100) |>
+  predgam <- modelbased::estimate_prediction(gam, keep_iterations = 50) |>
     bayestestR::reshape_iterations() |>
     mutate(iter_group = as.factor(iter_group)) |>
     estimate_density(select = "iter_value", at = "iter_group")

@@ -71,14 +71,14 @@ knitr::include_graphics("figures/Figure1.png")
 
  
 <!-- Target, strength, difficulty -->
-Indeed, many visual illusions can be seen as made of *targets* (e.g., same-length lines), which perception is biased by the *context* (e.g., in the Müller-Lyer illusion, the segments appear of different lengths when they end with inwards or outwards pointing arrows). While most of the paradigms used in the literature prompt the subjective extent the context biases the perception ("how much does the circle appear bigger", e.g., **REFS**), *Pyllusions* allows to create illusions in which the targets are actually more or less different (i.e., one segment is longer than the other), and in which the illusion is of varying strength (the arrows are more or less pointy). 
+Indeed, many visual illusions can be seen as made of *targets* (e.g., same-length lines), which perception is biased by the *context* (e.g., in the Müller-Lyer illusion, the segments appear of different lengths when they end with inwards or outwards pointing arrows). While most of the paradigms used in the literature prompt the subjective extent the context biases the perception (e.g."how much doe the line appear different"; **REFS**), *Pyllusions* allows to create illusions in which the targets are actually more or less different (e.g., one segment is truly longer than the other), and in which the illusion varies in strength (the arrows are more or less pointy). 
 
 
 <!-- Paradigm -->
-This opens the door of an experimental task in which participants have to make perceptual judgments about the targets (e.g., which segment in the longest) under different conditions of objective difficulty and illusion strength. Moreover, the illusion effect can be either "incongruent" (making the task even harder by biasing the perception in the opposite way) or "congruent" (making the task easier). Although visual illusions are inherently tied to subjective perception, this framework allows a reversal of the traditional paradigm that could quantify the "objective" effect of illusions by measuring its behavioral effect (error rate and reaction times) on the performance in a perceptual task.
+This opens the door of an experimental task in which participants have to make perceptual judgments about the targets (e.g., which segment in the longest) under different conditions of objective difficulty and illusion strength. Moreover, the illusion effect can be either "incongruent" (making the task even harder by biasing the perception in the opposite way) or "congruent" (making the task easier by making for instance the longer segment look even longer). Although visual illusions are inherently tied to subjective and conscious perception (**REF about whether illusion can work on a subconscious level, in which case we need to remove "conscious"**), this framework allows a reversal of the traditional paradigm that could quantify the "objective" effect of illusions by measuring its behavioral effect (error rate and reaction times) on the performance in a perceptual task.
 
 <!-- Goals -->
-In the present set of preregistered studies, we will first test this novel paradigm by investigate if the effect of illusion and task difficulty can be manipulated continuously and separated statistically. Then, we will use the paradigm to assess whether 10 different historical illusions (Delboeuf, Ebbinghaus, Rod and Frame, Vertical-Horizontal, Zöllner, White, Müller-Lyer, Ponzo, Poggendorff, Contrast) share a common latent factor (a long-standing debate). Finally, we will investigate how the the inter-individual sensitivity to illusions relates to other characteristics, such as demographic variables and personality.
+In the present set of preregistered studies, we will first test this novel paradigm by investigating if the effect of illusion and task difficulty can be manipulated continuously and statistically discriminated. Then, we will use the paradigm to assess whether 10 different historical illusions (Delboeuf, Ebbinghaus, Rod and Frame, Vertical-Horizontal, Zöllner, White, Müller-Lyer, Ponzo, Poggendorff, Contrast) share a common latent factor (a long-standing debate; *REF*). Finally, we will investigate how the the inter-individual sensitivity to illusions relates to other characteristics, such as demographic variables and personality (*REF*).
 
 In line with our open-science standards, all the material (stimuli generation code, experiment code, raw data, analysis script with complementary figures and analyses, preregistration, etc.) is available and open-source at **https://github.com/RealityBending/IllusionGameValidation**.
 
@@ -147,16 +147,12 @@ We will then extract the inter-individual variability (specified as random slope
 
 ## Results
 
-The best models were $log(diff)*strength$ for Delboeuf; $sqrt(diff)*strength$ for Ebbinghaus; $log(diff)*log(strength)$ for Rod and Frame; $sqrt(diff)*sqrt(strength)$ for Vertical-Horizontal; .... In all of these models, the effect of illusion strength, task difficulty and their interaction were significant.
+The best models were $log(diff)*strength$ for Delboeuf; $sqrt(diff)*strength$ for Ebbinghaus; $log(diff)*log(strength)$ for Rod and Frame; $sqrt(diff)*sqrt(strength)$ for Vertical-Horizontal; $cbrt(diff)*strength$ for Zöllner; $diff*sqrt(strength)$ and $log(diff)*strength$ respectively for errors and RT in White; $sqrt(diff)*sqrt(strength)$ and $sqrt(diff)*strength$ respectively for errors and RT in Müller-Lyer; $cbrt(diff)*strength$ for Ponzo; $cbrt(diff)*sqrt(strength)$ and $cbrt(diff)*strength$ respectively for errors and RT in Poggendorff; $sqrt(diff)*sqrt(strength)$ for Contrast. In all of these models, the effect of illusion strength, task difficulty and their interaction were significant.
 
-For errors, most of the models closely matched their GAMs counterpart, with the exception of Delboeuf for which the GAM suggested a non-monotonic effect of illusion strength with a local minimum at 0. 
-
-
-
-However, for reaction times, the GAMs suggested a consistent non-linear relationship between the mean RT and illusion strength: as the illusion strength gets very strong, the reaction times are faster. While this is is not surprising (strong illusions are so biasing that it is "easier", i.e., faster, to make the wrong decision), the linear models were not designed to capture this pattern and hence are not good representatives of the underlying dynamics. Because the random-slopes models for RT did not appear to capture well the underlying, likely quadratic, relationship, we decided not to use add them for the individual scores analysis.
+For errors, most of the models closely matched their GAMs counterpart, with the exception of Delboeuf for which the GAM suggested a non-monotonic effect of illusion strength with a local minimum at 0. However, for RTs, the GAMs suggested a consistent non-linear relationship between the mean RT and illusion strength: as the illusion strength gets very strong, the participants respond faster. While this is is not surprising (strong illusions are likely so biasing that it is "easier", i.e., faster, to make the wrong decision), the linear models were not designed to capture this pattern and hence are not good representatives of the underlying dynamics. Because these random-slopes models for RT did not appear to capture well the underlying - likely quadratic - relationship, we decided not to use add them for the individual scores analysis.
 <!-- Additionally, it would have increased the parameter space from 20 to 40 variables, which was deemed as statistically unreasonable given our sample size). -->
 
-Though imperfect, we believe that these models capture inter-individual differences more accurately than basic empirical scores (e.g., the total amount of errors, or the average RT). Thus, for each illusion, we have extracted the effect of illusion strength and its interaction with task difficulty (when the illusion incongruent) within each participants. These twenty participant-level scores were subjected to exploratory factor analysis (EFA), which suggested that ...
+Though imperfect, we believe that the logistic mixed models capture inter-individual differences more accurately than basic empirical scores (e.g., the total amount of errors). Thus, for each illusion, we have extracted the effect of illusion strength and its interaction with task difficulty (when the illusion incongruent) within each participants. These twenty participant-level scores were subjected to exploratory factor analysis (EFA), which suggested that ...
 
 
 
@@ -164,7 +160,9 @@ Though imperfect, we believe that these models capture inter-individual differen
 
 ## Discussion
 
-<!-- This is likely to be caused by the outline. It will be fixed in the next release of the Pyllusion software. -->
+<!-- This is likely an artifact caused by the outline. It will be fixed in the next release of the Pyllusion software. -->
+
+
 Future studies should investigate reaction times to find the most appropriate models, and / or use models that integrate errors and reaction time (e.g., drift diffusion models).
 
 # Study 3
@@ -185,7 +183,7 @@ Thus opening the door for new illusions-based paradigms and tasks, we have shown
 
 # Future Directions
 
-We strongly invite researchers to explore and re-analyze our dataset with other approaches and methods to push the understanding further.
+We strongly invite researchers to explore and re-analyze our dataset with other approaches and methods to push the understanding of visual illusions and illusion sensitivity further. The task, data and analysis script are available in open-access at **https://github.com/RealityBending/IllusionGameValidation**.
 
 \newpage
 

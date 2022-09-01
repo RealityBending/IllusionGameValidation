@@ -16,7 +16,7 @@ options(
 
 cache <- TRUE
 runModels <- FALSE
-bestModels <- TRUE
+bestModels <- FALSE
 fig.width <- see::golden_ratio(7)
 fig.height <- 7
 
@@ -224,7 +224,7 @@ p <- df |>
   theme(axis.text.y = element_blank()) +
   facet_wrap(~Participant) +
   labs(y = "", x = "Reaction Time (ms)")
-p
+# p
 # ggsave("figures/outliers.png", p, width=25, height=25)
 
 # Filter out
@@ -547,6 +547,10 @@ model_delboeuf_err <- brms::brm(formula,
 
 save(model_delboeuf_err, file="models/model_delboeuf_err.Rdata")
 ```
+
+##### Model Inspection
+
+
 ```{r message=FALSE, warning=FALSE, eval=TRUE}
 load("models/model_delboeuf_err.RData")
 load("models/gam_delboeuf_err.RData")
@@ -554,13 +558,8 @@ load("models/gam_delboeuf_err.RData")
 # parameters::parameters(model_delboeuf_err)
 ```
 
-
-##### Model Visualization
-
-
 ```{r message=FALSE, warning=FALSE, cache=cache}
 p_delboeuf_err <- plot_model_err(data, model_delboeuf_err, gam_delboeuf_err)
-p_delboeuf_err
 ```
 
 
@@ -617,7 +616,11 @@ model_delboeuf_rt <- brms::brm(formula,
 
 save(model_delboeuf_rt, file="models/model_delboeuf_rt.Rdata")
 ```
-```{r message=FALSE, warning=FALSE, cache=cache, eval=TRUE}
+
+##### Model Inspection
+
+
+```{r message=FALSE, warning=FALSE, cache=cache}
 load("models/model_delboeuf_rt.RData")
 load("models/gam_delboeuf_rt.RData")
 
@@ -626,10 +629,7 @@ load("models/gam_delboeuf_rt.RData")
 ```
 
 
-##### Model Visualization
-
-
-```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+```{r message=FALSE, warning=FALSE, cache=cache}
 plot_ppcheck(model_delboeuf_rt, gam_delboeuf_rt)
 
 p_delboeuf_rt <- plot_model_rt(data, model_delboeuf_rt, gam_delboeuf_rt)
@@ -639,7 +639,7 @@ p_delboeuf_rt
 
 #### Visualization
 
-```{r message=FALSE, warning=FALSE, cache=cache, fig.height=fig.height*2, eval=FALSE}
+```{r message=FALSE, warning=FALSE, cache=cache, fig.height=fig.height*2}
 p_delboeuf <- plot_all(data, p_delboeuf_err, p_delboeuf_rt)
 p_delboeuf
 ```
@@ -695,6 +695,10 @@ model_ebbinghaus_err <- brms::brm(formula,
 
 save(model_ebbinghaus_err, file="models/model_ebbinghaus_err.Rdata")
 ```
+
+##### Model Inspection
+
+
 ```{r message=FALSE, warning=FALSE, cache=cache}
 load("models/model_ebbinghaus_err.RData")
 load("models/gam_ebbinghaus_err.RData")
@@ -703,12 +707,8 @@ load("models/gam_ebbinghaus_err.RData")
 ```
 
 
-##### Model Visualization
-
-
 ```{r message=FALSE, warning=FALSE, cache=cache}
 p_ebbinghaus_err <- plot_model_err(data, model_ebbinghaus_err, gam_ebbinghaus_err)
-p_ebbinghaus_err
 ```
 
 
@@ -726,7 +726,7 @@ plot_descriptive_rt(data)
 
 ##### Model Specification
 
-```{r m_rt_ebbinghaus, message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+```{r m_rt_ebbinghaus, message=FALSE, warning=FALSE, cache=cache, eval=runModels}
 formula <- brms::bf(
   RT ~ Illusion_Effect / (sqrt(Illusion_Difference) * abs(Illusion_Strength)) +
     poly(ISI, 2) + 
@@ -747,6 +747,10 @@ model_ebbinghaus_rt <- brms::brm(formula,
 
 save(model_ebbinghaus_rt, file="models/model_ebbinghaus_rt.Rdata")
 ```
+
+##### Model Inspection
+
+
 ```{r message=FALSE, warning=FALSE, cache=cache, eval=TRUE}
 load("models/model_ebbinghaus_rt.RData")
 load("models/gam_ebbinghaus_rt.RData")
@@ -756,20 +760,16 @@ load("models/gam_ebbinghaus_rt.RData")
 ```
 
 
-##### Model Visualization
-
-
-```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+```{r message=FALSE, warning=FALSE, cache=cache, eval=TRUE}
 plot_ppcheck(model_ebbinghaus_rt, gam_ebbinghaus_rt)
 
 p_ebbinghaus_rt <- plot_model_rt(data, model_ebbinghaus_rt, gam_ebbinghaus_rt)
-p_ebbinghaus_rt
 ```
 
 
 #### Visualization
 
-```{r message=FALSE, warning=FALSE, cache=cache, fig.height=fig.height*2, eval=FALSE}
+```{r message=FALSE, warning=FALSE, cache=cache, fig.height=fig.height*2, eval=TRUE}
 p_ebbinghaus <- plot_all(data, p_ebbinghaus_err, p_ebbinghaus_rt)
 p_ebbinghaus
 ```
@@ -825,18 +825,19 @@ model_rodframe_err <- brms::brm(formula,
 
 save(model_rodframe_err, file="models/model_rodframe_err.Rdata")
 ```
+
+##### Model Inspection
+
+
 ```{r message=FALSE, warning=FALSE, cache=cache}
 load("models/model_rodframe_err.RData")
 load("models/gam_rodframe_err.RData")
 ```
 
 
-##### Model Visualization
-
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
 p_rodframe_err <- plot_model_err(data, model_rodframe_err, gam_rodframe_err)
-p_rodframe_err
 ```
 
 
@@ -853,7 +854,7 @@ plot_descriptive_rt(data)
 
 ##### Model Specification
 
-```{r m_rt_rodframe, message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+```{r m_rt_rodframe, message=FALSE, warning=FALSE, cache=cache, eval=runModels}
 formula <- brms::bf(
   RT ~ Illusion_Effect / (logmod(Illusion_Difference) * logmod(abs(Illusion_Strength))) +
     poly(ISI, 2) + 
@@ -874,6 +875,10 @@ model_rodframe_rt <- brms::brm(formula,
 
 save(model_rodframe_rt, file="models/model_rodframe_rt.Rdata")
 ```
+
+##### Model Inspection
+
+
 ```{r message=FALSE, warning=FALSE, cache=cache, eval=TRUE}
 load("models/model_rodframe_rt.RData")
 load("models/gam_rodframe_rt.RData")
@@ -882,21 +887,16 @@ load("models/gam_rodframe_rt.RData")
 # parameters::parameters(model)
 ```
 
-
-##### Model Visualization
-
-
-```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+```{r message=FALSE, warning=FALSE, cache=cache, eval=TRUE}
 plot_ppcheck(model_rodframe_rt, gam_rodframe_rt)
 
 p_rodframe_rt <- plot_model_rt(data, model_rodframe_rt, gam_rodframe_rt)
-p_rodframe_rt
 ```
 
 
 #### Visualization
 
-```{r message=FALSE, warning=FALSE, cache=cache, fig.height=fig.height*2, eval=FALSE}
+```{r message=FALSE, warning=FALSE, cache=cache, fig.height=fig.height*2, eval=TRUE}
 p_rodframe <- plot_all(data, p_rodframe_err, p_rodframe_rt)
 p_rodframe
 ```
@@ -944,6 +944,9 @@ model_verticalhorizontal_err <- brms::brm(formula,
 
 save(model_verticalhorizontal_err, file="models/model_verticalhorizontal_err.Rdata")
 ```
+
+##### Model Inspection
+
 ```{r message=FALSE, warning=FALSE, cache=cache}
 load("models/model_verticalhorizontal_err.RData")
 load("models/gam_verticalhorizontal_err.RData")
@@ -951,13 +954,8 @@ load("models/gam_verticalhorizontal_err.RData")
 # parameters::parameters(model_verticalhorizontal_err)
 ```
 
-
-##### Model Visualization
-
-
 ```{r message=FALSE, warning=FALSE, cache=cache}
 p_verticalhorizontal_err <- plot_model_err(data, model_verticalhorizontal_err, gam_verticalhorizontal_err)
-p_verticalhorizontal_err
 ```
 
 
@@ -975,7 +973,7 @@ plot_descriptive_rt(data)
 
 ##### Model Specification
 
-```{r m_rt_verticalhorizontal, message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+```{r m_rt_verticalhorizontal, message=FALSE, warning=FALSE, cache=cache, eval=runModels}
 formula <- brms::bf(
   RT ~ Illusion_Effect / (sqrt(Illusion_Difference) * sqrt(abs(Illusion_Strength))) +
     poly(ISI, 2) + 
@@ -996,7 +994,11 @@ model_verticalhorizontal_rt <- brms::brm(formula,
 
 save(model_verticalhorizontal_rt, file="models/model_verticalhorizontal_rt.Rdata")
 ```
-```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+
+##### Model Inspection
+
+
+```{r message=FALSE, warning=FALSE, cache=cache, eval=TRUE}
 load("models/model_verticalhorizontal_rt.RData")
 load("models/gam_verticalhorizontal_rt.RData")
 
@@ -1006,19 +1008,14 @@ plot_ppcheck(model_verticalhorizontal_rt)
 ```
 
 
-
-##### Model Visualization
-
-
-```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+```{r message=FALSE, warning=FALSE, cache=cache, eval=TRUE}
 p_verticalhorizontal_rt <- plot_model_rt(data, model_verticalhorizontal_rt, gam_verticalhorizontal_rt)
-p_verticalhorizontal_rt
 ```
 
 
 #### Visualization
 
-```{r message=FALSE, warning=FALSE, cache=cache, fig.height=fig.height*2, eval=FALSE}
+```{r message=FALSE, warning=FALSE, cache=cache, fig.height=fig.height*2, eval=TRUE}
 p_verticalhorizontal <- plot_all(data, p_verticalhorizontal_err, p_verticalhorizontal_rt)
 p_verticalhorizontal
 ```
@@ -1062,25 +1059,25 @@ formula <- brms::bf(
 
 model_zollner_err <- brms::brm(formula,
   data = data,
-  refresh = 0
+  refresh = 100
 )
-
-# parameters::parameters(model_zollner_err)
 
 save(model_zollner_err, file="models/model_zollner_err.Rdata")
 ```
+
+##### Model Inspection
+
+
 ```{r message=FALSE, warning=FALSE, cache=cache}
 load("models/model_zollner_err.RData")
 load("models/gam_zollner_err.RData")
+
+# parameters::parameters(model_zollner_err)
 ```
-
-
-##### Model Visualization
 
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
 p_zollner_err <- plot_model_err(data, model_zollner_err, gam_zollner_err)
-p_zollner_err
 ```
 
 
@@ -1098,7 +1095,7 @@ plot_descriptive_rt(data)
 
 ##### Model Specification
 
-```{r m_rt_zollner, message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+```{r m_rt_zollner, message=FALSE, warning=FALSE, cache=cache, eval=runModels}
 formula <- brms::bf(
   RT ~  Illusion_Effect / (cbrtmod(Illusion_Difference) * abs(Illusion_Strength)) +
     poly(ISI, 2) + 
@@ -1119,7 +1116,11 @@ model_zollner_rt <- brms::brm(formula,
 
 save(model_zollner_rt, file="models/model_zollner_rt.Rdata")
 ```
-```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+
+##### Model Inspection
+
+
+```{r message=FALSE, warning=FALSE, cache=cache, eval=TRUE}
 load("models/model_zollner_rt.RData")
 load("models/gam_zollner_rt.RData")
 
@@ -1129,13 +1130,16 @@ plot_ppcheck(model_zollner_rt)
 
 ```
 
-
-##### Model Visualization
-
-
-```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+```{r message=FALSE, warning=FALSE, cache=cache, eval=TRUE}
 p_zollner_rt <- plot_model_rt(data, model_zollner_rt, gam_zollner_rt)
-p_zollner_rt
+```
+
+
+#### Visualization
+
+```{r message=FALSE, warning=FALSE, cache=cache, fig.height=fig.height*2, eval=TRUE}
+p_zollner <- plot_all(data, p_zollner_err, p_zollner_rt)
+p_zollner
 ```
 
 
@@ -1181,18 +1185,17 @@ model_white_err <- brms::brm(formula,
 
 save(model_white_err, file="models/model_white_err.Rdata")
 ```
+
+##### Model Inspection
+
 ```{r message=FALSE, warning=FALSE, cache=cache}
 load("models/model_white_err.RData")
 load("models/gam_white_err.RData")
 ```
 
 
-##### Model Visualization
-
-
 ```{r message=FALSE, warning=FALSE, cache=cache}
 p_white_err <- plot_model_err(data, model_white_err, gam_white_err)
-p_white_err
 ```
 
 
@@ -1211,12 +1214,12 @@ plot_descriptive_rt(data)
 
 ```{r m_rt_white, message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
 formula <- brms::bf(
-  RT ~ Illusion_Effect / (Illusion_Difference * sqrt(abs(Illusion_Strength))) +
+  RT ~ Illusion_Effect / (logmod(Illusion_Difference) * abs(Illusion_Strength)) +
     poly(ISI, 2) + 
-    (1 + Illusion_Effect / (Illusion_Difference * sqrt(abs(Illusion_Strength))) | Participant),
-  sigma ~ Illusion_Effect / (Illusion_Difference * sqrt(abs(Illusion_Strength))) +
+    (1 + Illusion_Effect / (logmod(Illusion_Difference) * abs(Illusion_Strength)) | Participant),
+  sigma ~ Illusion_Effect / (logmod(Illusion_Difference) * abs(Illusion_Strength)) +
     poly(ISI, 2) + (1 | Participant),
-  beta ~ Illusion_Effect / (Illusion_Difference * sqrt(abs(Illusion_Strength))) +
+  beta ~ Illusion_Effect / (logmod(Illusion_Difference) * abs(Illusion_Strength)) +
     poly(ISI, 2) + (1 | Participant),
   family = "exgaussian"
 )
@@ -1230,7 +1233,10 @@ model_white_rt <- brms::brm(formula,
 
 save(model_white_rt, file="models/model_white_rt.Rdata")
 ```
-```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+
+##### Model Inspection
+
+```{r message=FALSE, warning=FALSE, cache=cache, eval=TRUE}
 load("models/model_white_rt.RData")
 load("models/gam_white_rt.RData")
 
@@ -1239,14 +1245,17 @@ plot_ppcheck(model_white_rt)
 # parameters::parameters(model)
 ```
 
-
-##### Model Visualization
-
-
-```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+```{r message=FALSE, warning=FALSE, cache=cache, eval=TRUE}
 p_white_rt <- plot_model_rt(data, model_white_rt, gam_white_rt)
-p_white_rt
 ```
+
+#### Visualization
+
+```{r message=FALSE, warning=FALSE, cache=cache, fig.height=fig.height*2, eval=TRUE}
+p_white <- plot_all(data, p_white_err, p_white_rt)
+p_white
+```
+
 
 
 ### Müller-Lyer
@@ -1292,17 +1301,17 @@ model_mullerlyer_err <- brms::brm(formula,
 
 save(model_mullerlyer_err, file="models/model_mullerlyer_err.Rdata")
 ```
+
+##### Model Inspection
+
+
 ```{r message=FALSE, warning=FALSE, cache=cache}
 load("models/model_mullerlyer_err.RData")
 load("models/gam_mullerlyer_err.RData")
 ```
 
-##### Model Visualization
-
-
 ```{r message=FALSE, warning=FALSE, cache=cache}
 p_mullerlyer_err <- plot_model_err(data, model_mullerlyer_err, gam_mullerlyer_err)
-p_mullerlyer_err
 ```
 
 #### Reaction Time
@@ -1320,12 +1329,12 @@ plot_descriptive_rt(data, side = "updown")
 
 ```{r m_rt_mullerlyer, message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
 formula <- brms::bf(
-  RT ~ Illusion_Effect / (sqrt(Illusion_Difference) * sqrt(abs(Illusion_Strength))) +
+  RT ~ Illusion_Effect / (sqrt(Illusion_Difference) * abs(Illusion_Strength)) +
     poly(ISI, 2) + 
-    (1 + Illusion_Effect / (sqrt(Illusion_Difference) * sqrt(abs(Illusion_Strength))) | Participant),
-  sigma ~ Illusion_Effect / (sqrt(Illusion_Difference) * sqrt(abs(Illusion_Strength))) +
+    (1 + Illusion_Effect / (sqrt(Illusion_Difference) * abs(Illusion_Strength)) | Participant),
+  sigma ~ Illusion_Effect / (sqrt(Illusion_Difference) * abs(Illusion_Strength)) +
     poly(ISI, 2) + (1 | Participant),
-  beta ~ Illusion_Effect / (sqrt(Illusion_Difference) * sqrt(abs(Illusion_Strength))) + 
+  beta ~ Illusion_Effect / (sqrt(Illusion_Difference) * abs(Illusion_Strength)) + 
     poly(ISI, 2) + (1 | Participant),
   family = "exgaussian"
 )
@@ -1340,7 +1349,11 @@ model_mullerlyer_rt <- brms::brm(formula,
 save(model_mullerlyer_rt, file="models/model_mullerlyer_rt.Rdata")
 # parameters::parameters(model_white_err)
 ```
-```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+
+##### Model Inspection
+
+
+```{r message=FALSE, warning=FALSE, cache=cache, eval=TRUE}
 load("models/model_mullerlyer_rt.RData")
 load("models/gam_mullerlyer_rt.RData")
 
@@ -1349,12 +1362,9 @@ plot_ppcheck(model_mullerlyer_rt)
 # parameters::parameters(model)
 ```
 
-##### Model Visualization
 
-
-```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+```{r message=FALSE, warning=FALSE, cache=cache, eval=TRUE}
 p_mullerlyer_rt <- plot_model_rt(data, model_mullerlyer_rt, gam_mullerlyer_rt)
-p_mullerlyer_rt
 ```
 
 
@@ -1401,17 +1411,16 @@ model_ponzo_err <- brms::brm(formula,
 
 save(model_ponzo_err, file="models/model_ponzo_err.Rdata")
 ```
+
+##### Model Inspection
+
 ```{r message=FALSE, warning=FALSE, cache=cache}
 load("models/model_ponzo_err.RData")
 load("models/gam_ponzo_err.RData")
 ```
 
-##### Model Visualization
-
-
 ```{r message=FALSE, warning=FALSE, cache=cache}
 p_ponzo_err <- plot_model_err(data, model_ponzo_err, gam_ponzo_err)
-p_ponzo_err
 ```
 
 
@@ -1450,7 +1459,11 @@ model_ponzo_rt <- brms::brm(formula,
 save(model_ponzo_rt, file="models/model_ponzo_rt.Rdata")
 # parameters::parameters(model_white_err)
 ```
-```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+
+##### Model Inspection
+
+
+```{r message=FALSE, warning=FALSE, cache=cache, eval=TRUE}
 load("models/model_ponzo_rt.RData")
 load("models/gam_ponzo_rt.RData")
 
@@ -1459,12 +1472,9 @@ plot_ppcheck(model_ponzo_rt)
 # parameters::parameters(model)
 ```
 
-##### Model Visualization
 
-
-```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+```{r message=FALSE, warning=FALSE, cache=cache, eval=TRUE}
 p_ponzo_rt <- plot_model_rt(data, model_ponzo_rt, gam_ponzo_rt)
-p_ponzo_rt
 ```
 
 
@@ -1510,17 +1520,17 @@ model_poggendorff_err <- brms::brm(formula,
 
 save(model_poggendorff_err, file="models/model_poggendorff_err.Rdata")
 ```
+
+##### Model Inspection
+
 ```{r message=FALSE, warning=FALSE, cache=cache}
 load("models/model_poggendorff_err.RData")
 load("models/gam_poggendorff_err.RData")
 ```
 
-##### Model Visualization
-
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
 p_poggendorff_err <- plot_model_err(data, model_poggendorff_err, gam_poggendorff_err)
-p_poggendorff_err
 ```
 
 
@@ -1538,12 +1548,12 @@ plot_descriptive_rt(data, side = "updown")
 
 ```{r m_rt_poggendorff, message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
 formula <- brms::bf(
-  RT ~ Illusion_Effect / (cbrtmod(Illusion_Difference) * sqrt(abs(Illusion_Strength))) +
+  RT ~ Illusion_Effect / (cbrtmod(Illusion_Difference) * abs(Illusion_Strength)) +
     poly(ISI, 2) + 
-    (1 + Illusion_Effect / (cbrtmod(Illusion_Difference) * sqrt(abs(Illusion_Strength))) | Participant),
-  sigma ~ Illusion_Effect / (cbrtmod(Illusion_Difference) * sqrt(abs(Illusion_Strength))) + 
+    (1 + Illusion_Effect / (cbrtmod(Illusion_Difference) * abs(Illusion_Strength)) | Participant),
+  sigma ~ Illusion_Effect / (cbrtmod(Illusion_Difference) * abs(Illusion_Strength)) + 
     poly(ISI, 2) + (1 | Participant),
-  beta ~ Illusion_Effect / (cbrtmod(Illusion_Difference) * sqrt(abs(Illusion_Strength))) + 
+  beta ~ Illusion_Effect / (cbrtmod(Illusion_Difference) * abs(Illusion_Strength)) + 
     poly(ISI, 2) + (1 | Participant),
   family = "exgaussian"
 )
@@ -1557,7 +1567,11 @@ model_poggendorff_rt <- brms::brm(formula,
 
 save(model_ponzo_rt, file="models/model_poggendorff_rt.Rdata")
 ```
-```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+
+##### Model Inspection
+
+
+```{r message=FALSE, warning=FALSE, cache=cache, eval=TRUE}
 load("models/model_poggendorff_rt.RData")
 load("models/gam_poggendorff_rt.RData")
 
@@ -1566,12 +1580,9 @@ plot_ppcheck(model_poggendorff_rt)
 # parameters::parameters(model)
 ```
 
-##### Model Visualization
 
-
-```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+```{r message=FALSE, warning=FALSE, cache=cache, eval=TRUE}
 p_poggendorff_rt <- plot_model_rt(data, model_poggendorff_rt, gam_poggendorff_rt)
-p_poggendorff_rt
 ```
 
 
@@ -1615,24 +1626,23 @@ formula <- brms::bf(
 
 model_contrast_err <- brms::brm(formula,
   data = data,
-  refresh = 50
+  refresh = 100
 )
 
 # parameters::parameters(model_contrast_err)
 
 save(model_contrast_err, file="models/model_contrast_err.Rdata")
 ```
+
+##### Model Inspection
+
 ```{r message=FALSE, warning=FALSE, cache=cache}
 load("models/model_contrast_err.RData")
 load("models/gam_contrast_err.RData")
 ```
 
-##### Model Visualization
-
-
 ```{r message=FALSE, warning=FALSE, cache=cache}
 p_contrast_err <- plot_model_err(data, model_contrast_err, gam_contrast_err)
-p_contrast_err
 ```
 
 
@@ -1670,7 +1680,10 @@ model_contrast_rt <- brms::brm(formula,
 
 save(model_contrast_rt, file="models/model_contrast_rt.Rdata")
 ```
-```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+
+##### Model Inspection
+
+```{r message=FALSE, warning=FALSE, cache=cache, eval=TRUE}
 load("models/model_contrast_rt.RData")
 load("models/gam_contrast_rt.RData")
 
@@ -1679,12 +1692,9 @@ plot_ppcheck(model_contrast_rt)
 # parameters::parameters(model)
 ```
 
-##### Model Visualization
 
-
-```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+```{r message=FALSE, warning=FALSE, cache=cache, eval=TRUE}
 p_contrast_rt <- plot_model_rt(data, model_contrast_rt, gam_contrast_rt)
-p_contrast_rt
 ```
 
 
