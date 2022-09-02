@@ -584,7 +584,7 @@ plot_all <- function(data, p_err, p_rt) {
 
 extract_random <- function(model, illusion = "Delboeuf") {
   random <- as.data.frame(model)
-  random <- random[sample(nrow(random), 300), ]
+  # random <- random[sample(nrow(random), 300), ]
   random <- random[str_detect(names(random), regex("^r_Participant"))]
 
   if (insight::model_info(model)$is_logit) {
@@ -593,9 +593,24 @@ extract_random <- function(model, illusion = "Delboeuf") {
     param <- "Loc,"
   }
 
+  # All draws
+  # random |>
+  #   mutate(Draw = 1:nrow(random)) |>
+  #   pivot_longer(-Draw, names_to = "Parameter", values_to = "Value") |>
+  #   mutate(
+  #     Parameter = clean_parameterName(Parameter),
+  #     Parameter = paste0(param, Parameter),
+  #     Parameter = str_replace(Parameter, paste0(param, "__sigma"), "Disp,")
+  #   ) |>
+  #   separate(Parameter, into = c("Component", "Participant", "Parameter"), sep = ",") |>
+  #   mutate(
+  #     Parameter = paste0(Parameter, "_", Component),
+  #     Illusion_Type = illusion
+  #   )
+
+  # Summary
   random |>
-    mutate(Draw = 1:nrow(random)) |>
-    pivot_longer(-Draw, names_to = "Parameter", values_to = "Value") |>
+    describe_posterior(test=NULL) |>
     mutate(
       Parameter = clean_parameterName(Parameter),
       Parameter = paste0(param, Parameter),
@@ -610,11 +625,11 @@ extract_random <- function(model, illusion = "Delboeuf") {
 
 
 clean_illusionName <- function(x) {
-  x <- str_replace(x, "Rod-Frame", "RodFrame")
-  x <- str_replace(x, "Vertical-Horizontal", "VerticalHorizontal")
-  x <- str_replace(x, "Zöllner", "Zollner")
-  x <- str_replace(x, "Müller-Lyer", "MullerLyer")
-  x
+  x |>
+    str_replace("Rod-Frame", "RodFrame") |>
+    str_replace("Vertical-Horizontal", "VerticalHorizontal") |>
+    str_replace("Zöllner", "Zollner") |>
+    str_replace("Müller-Lyer", "MullerLyer")
 }
 
 clean_parameterName <- function(x) {
@@ -635,10 +650,11 @@ clean_parameterName <- function(x) {
   x <- str_remove_all(x, ":")
   x <- str_remove_all(x, "\\(")
   x <- str_remove_all(x, "\\)")
-  x <- str_replace(x, "Illusion_Strength", "Illu")
+  x <- str_replace(x, "Illusion_Strength", "Strength")
   x <- str_replace(x, "Illusion_Difference", "Diff")
   x <- str_replace(x, "Illusion_EffectCongruent", "Cong")
   x <- str_replace(x, "Illusion_EffectIncongruent", "")
+  x <- str_replace(x, "DiffStrength", "Interaction")
   x
 }
 
@@ -650,5 +666,9 @@ prettify_parameterName <- function(x) {
     str_replace("_Prob", " (prob)") |>
     str_replace("_Error", " (Error)") |>
     str_replace("_RTMean", " (RT Mean)") |>
-    str_replace("_", " - ")
+    str_replace("_", " - ") |>
+    str_replace( "RodFrame", "Rod-Frame") |>
+    str_replace("VerticalHorizontal", "Vertical-Horizontal") |>
+    str_replace("Zollner", "Zöllner") |>
+    str_replace("MullerLyer", "Müller-Lyer")
 }

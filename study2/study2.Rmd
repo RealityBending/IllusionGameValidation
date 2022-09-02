@@ -1701,9 +1701,20 @@ p_contrast_rt <- plot_model_rt(data, model_contrast_rt, gam_contrast_rt)
 
 ## Individual Scores
 
-### Model-based Descriptors
+### Extraction
 
 ```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+load("models/model_delboeuf_err.RData")
+load("models/model_ebbinghaus_err.RData")
+load("models/model_rodframe_err.RData")
+load("models/model_verticalhorizontal_err.RData")
+load("models/model_zollner_err.RData")
+load("models/model_white_err.RData")
+load("models/model_mullerlyer_err.RData")
+load("models/model_ponzo_err.RData")
+load("models/model_poggendorff_err.RData")
+load("models/model_contrast_err.RData")
+
 data <- rbind(
   extract_random(model_delboeuf_err, "Delboeuf"),
   # extract_random(model_delboeuf_rt, "Delboeuf"),
@@ -1731,43 +1742,431 @@ data <- rbind(
     !str_detect(Parameter, "Cong"),
     !str_detect(Parameter, "Cong_Prob"),
     !str_detect(Parameter, "Null_"),
-    !str_detect(Parameter, "Diff_"))
-# unique(data$Parameter)
-
-# data |>
-#   # group_by(Illusion_Type, Parameter) |> 
-#   # standardize(select="Value") |> 
-#   # ungroup() |> 
-#   # mutate(order = mean(Value)) |> 
-#   # ungroup() |> 
-#   # mutate(Participant = fct_reorder(Participant, order)) |> 
-#   ggplot(aes(y = Participant, x = Value)) +
-#   # ggdist::stat_slabinterval(aes(fill = Illusion_Type, color=Illusion_Type), alpha=0.5) +
-#   ggdist::stat_pointinterval(aes(fill = Illusion_Type, color=Illusion_Type), alpha=0.5) +
-#   # coord_cartesian(xlim=c(-4, 4)) +
-#   facet_wrap(~Parameter, scales = "free_x") +
-#   theme(axis.text.y = element_blank())
+    !str_detect(Parameter, "Diff_"))  |> 
+  mutate(Parameter = str_remove(Parameter, "_Prob"))
 
 
+data |>
+  ggplot(aes(y = Median, x = Participant)) +
+  geom_pointrange(aes(ymin=CI_low, ymax=CI_high, color=Parameter), size=0.5) +
+  geom_hline(yintercept = 0, linetype = "dotted") +
+  facet_wrap(Parameter~Illusion_Type, scales = "free") +
+  theme(axis.text.y = element_blank(),
+        axis.ticks.y = element_blank()) +
+  coord_flip()
 
-# df[df$Illusion_Type == "Poggendorff" & df$Participant == "5cbb77bf418c540001641e67_sp53j", ]
 
 random <- data |>
   mutate(Parameter = paste0(Illusion_Type, "_", Parameter),
          Parameter = clean_illusionName(Parameter)) |>
-  group_by(Participant, Parameter) |>
-  summarize(Score = median(Value, na.rm = TRUE), .groups = "drop") |>
-  ungroup() |>
-  group_by(Parameter) |>
-  mutate(Score = Score / sd(Score, na.rm = TRUE)) |>  # Scale
-  ungroup()  |>
-  pivot_wider(names_from = Parameter, values_from = Score)
+  select(Participant, Parameter, Median) |> 
+  pivot_wider(names_from = Parameter, values_from = Median) |> 
+  mutate_if(is.numeric, function(x) x / sd(x, na.rm=TRUE)) 
 
-# plot(estimate_density(select(random, -Participant)))
+random[is.na(random)] <- 0
 ```
 
 
 
+### Correlation 
+
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+cor <- correlation::correlation(random, redundant = TRUE, p_adjust = "none")
+
+p_data <- cor |>
+  mutate(
+    Parameter1 = prettify_parameterName(Parameter1),
+    Parameter2 = prettify_parameterName(Parameter2)
+  ) |>
+  correlation::cor_sort(hclust_method = "ward.D2") |>
+  cor_lower() |>
+  mutate(
+    Text = insight::format_value(r, zap_small = TRUE, digits = 3),
+    Text = str_replace(str_remove(Text, "^0+"), "^-0+", "-"),
+    Text = paste0(Text, insight::format_p(p, stars_only = TRUE)),
+    Parameter2 = fct_rev(Parameter2)
+  )
+
+
+p_data |>
+  ggplot(aes(x = Parameter2, y = Parameter1)) +
+  geom_tile(aes(fill = r)) +
+  geom_text(aes(label = Text), size = rel(2), alpha=2/3) +
+  scale_fill_gradient2(low = "#2196F3", mid = "white", high = "#F44336", midpoint = 0, limit = c(-1, 1), space = "Lab", name = "Correlation", guide = "legend") +
+  scale_x_discrete(expand = c(0, 0)) +
+  scale_y_discrete(expand = c(0, 0)) +
+  labs(title = "Correlation Matrix", x = NULL, y = NULL) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 90, hjust = 1),
+    plot.title = element_text(hjust = 0.5, face = "bold"),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank()
+  )
+
+# estimate_density(p_data$r, at=as.character(sign(p_data$r))) |> 
+#   ggplot(aes(x=x, y=y, color=Group)) +
+#   geom_line()
+```
+
+
+### Factor Analysis
+
+#### First Level
+
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+data <- select(random, -Participant)
+
+rez <- parameters::n_factors(data, n_max=15)
+plot(rez)
+
+
+fa <- parameters::factor_analysis(data,
+  cor = as.matrix(cor),
+  n = 7,
+  rotation = "oblimin",
+  fm = "mle",
+  sort = TRUE
+)
+
+insight::print_md(fa)
+
+plot(fa) +
+  theme_minimal()
+# psych::omega(data, fm = "mle", nfactors=7)
+# fa <- psych::fa.multi(as.matrix(cor), nfactors = 3, nfact2 = 1, n.obs = nrow(random))
+# psych::fa.multi.diagram(fa)
+```
+
+#### Second Level
+
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+data <- predict(fa)
+
+rez <- parameters::n_factors(data, rotation = "varimax")
+plot(rez)
+
+fa2 <- parameters::factor_analysis(data,
+  n = 2,
+  rotation = "varimax",
+  fm = "mle",
+  sort = TRUE
+)
+
+insight::print_md(fa2)
+```
+
+
+### Sructural Equation Model
+
+
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+library(lavaan)
+
+names <- names(select(random, -Participant))
+data <- setNames(as.data.frame(str_split_fixed(names, "_", 2)), c("Illusion_Type", "Parameter"))
+data$Name <- names
+
+# Model 0 - EFA
+model <- "
+I2 =~ RodFrame_Strength + RodFrame_Interaction + VerticalHorizontal_Strength + VerticalHorizontal_Interaction + MullerLyer_Strength + MullerLyer_Interaction + Ponzo_Strength + Ponzo_Interaction
+Zollner =~ Zollner_Strength + Zollner_Interaction
+White =~ White_Strength + White_Interaction
+Ebbinghaus =~ Ebbinghaus_Strength + Ebbinghaus_Interaction
+Poggendorff =~ Poggendorff_Strength + Poggendorff_Interaction
+Contrast =~ Contrast_Strength + Contrast_Interaction
+Delboeuf =~ Delboeuf_Strength + Delboeuf_Interaction
+I =~ I2 + Zollner + White + Ebbinghaus + Poggendorff + Contrast
+"
+
+m0 <- sem(model = model,
+          data  = random,
+          bounds = "standard",
+          estimator = "ML",
+          ) 
+
+# Model 1 - by Illusion
+lvl1 <- paste(data$Illusion_Type, "=~", data$Name)
+lvl2 <- paste("I =~", unique(data$Illusion_Type))
+resid <- as.data.frame(t(utils::combn(x=unique(data$Illusion_Type), 2)))
+resid <- paste(resid$V1, "~~", resid$V2)
+
+m1 <- sem(model = paste0(c(lvl1, lvl2), collapse = "\n"),
+          data  = random,
+          bounds = "standard",
+          estimator = "ML",
+          ) 
+
+
+# Model 1b - without Delboeuf
+m1b <- sem(model = paste0(c(lvl1, lvl2[lvl2 != "I =~ Delboeuf"]), collapse = "\n"),
+          data  = random,
+          bounds = "standard",
+          estimator = "ML",
+          ) 
+
+
+# Model 2 - by type
+model <- "
+Lines =~ MullerLyer_Strength + MullerLyer_Interaction + Ponzo_Strength + Ponzo_Interaction + VerticalHorizontal_Strength + VerticalHorizontal_Interaction
+Circles =~ Ebbinghaus_Strength + Ebbinghaus_Interaction + Delboeuf_Strength + Delboeuf_Interaction
+Contrast =~ Contrast_Strength + Contrast_Interaction + White_Strength + White_Interaction
+Angle =~ Zollner_Strength + Zollner_Interaction + Poggendorff_Strength + Poggendorff_Interaction  + RodFrame_Strength + RodFrame_Interaction
+I =~ Lines + Circles + Contrast + Angle 
+"
+
+m2 <- sem(model = model,
+          data  = random,
+          bounds = "standard",
+          estimator = "ML"
+          )
+
+
+# Model 3 - by Parameter
+lvl1 <- paste(data$Parameter, "=~", data$Name)
+lvl2 <- paste("I =~", unique(data$Parameter))
+resid <- as.data.frame(t(utils::combn(x=unique(data$Parameter), 2)))
+resid <- paste(resid$V1, "~~", resid$V2)
+
+m3 <- sem(model = paste0(c(lvl1, lvl2), collapse = "\n"),
+          data  = random,
+          bounds = "standard",
+          estimator = "ML"
+          )
+
+
+
+anova(m0, m1, m2)
+
+summary(m1, standardize = TRUE, fit.measures = TRUE)
+```
+
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+# https://cjvanlissa.github.io/tidySEM/articles/sem_graph.html
+library(ggraph)
+library(tidySEM)
+
+colors <- c("I" = "#9C27B0", 
+            "Delboeuf"="#F44336", "Ebbinghaus"="#E91E63",
+            "Rod-Frame"="#4CAF50", "Rod\nFrame"="#4CAF50", 
+            "Vertical-Horizontal"="#FF9800", "Vertical\nHorizontal"="#FF9800",
+            "Zöllner"="#FF5722",
+            "White"="#616161", 
+             "Müller-Lyer" = "#3F51B5", "Müller\n-Lyer" = "#3F51B5",
+            "Ponzo" = "#2196F3",
+            "Poggendorff"="#795548",
+            "Contrast"="#607D8B", 
+            "black"="black")
+
+edges <- tidySEM::get_edges(m1) |> 
+  mutate(color = ifelse(sign(as.numeric(est)) >= 0, "1", "-1"),
+         width = abs(as.numeric(est)),
+         type = ifelse(from == "I", "curved", "straight")) |> 
+  filter(lhs != rhs)
+
+nodes <- tidySEM::get_nodes(m1) |> 
+  mutate(label = prettify_parameterName(name),
+         angle = ifelse(grepl("_", name), 90, 0),
+         hjust = case_when(
+           grepl("_", name) ~ 1.15,
+           name == "I" ~ 0.5,
+           TRUE ~ 0.5),
+         size = case_when(
+           grepl("_", name) ~ 1,
+           name == "I" ~ 7,
+           TRUE ~ 6),
+         textsize = case_when(
+           grepl("_", name) ~ 1,
+           name == "I" ~ 3,
+           TRUE ~ 1.1),
+         face = case_when(
+           grepl("_", name) ~ "italic",
+           name == "I" ~ "bold",
+           TRUE ~ "plain"),
+         color = str_remove_all(label, " - .*"),
+         textcolor = ifelse(grepl("_", name), "black", "white"),
+         label = str_remove_all(label, ".* - "),
+         label = str_replace(label, "Müller-Lyer", "Müller\n-Lyer"),
+         label = str_replace(label, "Rod-Frame", "Rod\nFrame"),
+         label = str_replace(label, "Vertical-Horizontal", "Vertical\nHorizontal"),
+         family = ifelse(name == "I", "serif", "sans"))
+
+
+p <- tidygraph::tbl_graph(nodes = nodes, edges = edges) |> 
+  ggraph(layout = "sugiyama") +
+  geom_edge_arc(aes(filter=type!="straight",
+                    edge_width = width,
+                    color = color,
+                    label=est_std),
+                strength = 0.03 * c(-1, -1, 1, 1, 1, 1, -1, -1, -1, -1),
+                angle_calc="along",
+                label_dodge=unit(-0.015, "npc")) +
+  geom_edge_link(aes(filter=type=="straight",
+                     edge_width = width, 
+                     color = color,
+                     label=est_std), 
+                 angle_calc="along", 
+                 label_dodge=unit(-0.015, "npc")) +
+  geom_node_point(aes(shape = shape, color=color, size=size)) +
+  geom_node_text(aes(label = label, angle = angle, hjust=hjust),
+                 color=nodes$textcolor, 
+                 fontface=nodes$face,
+                 size = rel(nodes$textsize*3),
+                 family=nodes$family) +
+  scale_y_continuous(expand = expansion(c(.6, .1))) +
+  scale_edge_width_continuous(range=c(0.1, 1.5)) +
+  scale_edge_color_manual(values=c("1"="#263238", "-1"="#B71C1C")) +
+  scale_color_manual(values=colors, guide="none") +
+  scale_shape_manual(values=c("oval"="circle", "rect"="square"), guide="none") +
+  scale_size_continuous(range = c(2, 27), guide="none") +
+  guides(edge_colour = "none", edge_width = "none") + 
+  labs(title = "Structural Equation Model")  +
+  theme_graph() +
+  theme(plot.title = element_text(hjust=0.5))
+p
+save(p, file="models/sem.Rdata")
+
+dfsem <- mutate(as.data.frame(predict(m1)), Participant = random$Participant)
+```
+
+
+
+### Empirical Descriptors
+
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+# Average for 4 higher level of task difficulty
+empirical <- df |>
+  filter(Illusion_Effect == "Incongruent") |> 
+  group_by(Participant, Illusion_Type, Illusion_Strength) |>
+  arrange(Illusion_Difference) |> 
+  slice(0:2) |> 
+  # select(Illusion_Strength, Illusion_Difference)
+  group_by(Participant, Illusion_Type) |>
+  summarize(
+    TaskHard_Error = sum(Error, na.rm=TRUE) / n(),
+    TaskHard_RTMean = mean(ifelse(Error == 0, RT, NA), na.rm=TRUE)
+    # Illu_RTSpread = sd(ifelse(Error == 0, RT, NA), na.rm=TRUE),
+  ) |>
+  ungroup() |> 
+  mutate(Illusion_Type = clean_illusionName(Illusion_Type))  |> 
+  pivot_wider(names_from = c("Illusion_Type"), values_from = c("TaskHard_Error", "TaskHard_RTMean"), names_glue = "{Illusion_Type}_{.value}") 
+
+# Average for 4 higher level of illusion strength
+empirical <- df |>
+  filter(Illusion_Effect == "Incongruent") |> 
+  group_by(Participant, Illusion_Type, Illusion_Difference) |>
+  arrange(desc(Illusion_Strength)) |> 
+  slice(0:2) |> 
+  # select(Illusion_Strength, Illusion_Difference)
+  group_by(Participant, Illusion_Type) |>
+  summarize(
+    IlluStrong_Error = sum(Error, na.rm=TRUE) / n(),
+    IlluStrong_RTMean = mean(ifelse(Error == 0, RT, NA), na.rm=TRUE)
+    # Diff_RTSpread = sd(ifelse(Error == 0, RT, NA), na.rm=TRUE),
+  ) |>
+  ungroup() |> 
+  mutate(Illusion_Type = clean_illusionName(Illusion_Type))  |> 
+  pivot_wider(names_from = c("Illusion_Type"), values_from = c("IlluStrong_Error", "IlluStrong_RTMean"), names_glue = "{Illusion_Type}_{.value}") |> 
+  full_join(empirical, by = "Participant") 
+```
+
+
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+r <- correlation(arrange(dfsem, Participant), 
+                 arrange(empirical, Participant), 
+                 sort=TRUE, p_adjust="none")
+
+r |>
+  mutate(label = insight::format_p(p, stars_only=TRUE),
+         Type = ifelse(str_detect(Parameter2, "_Error"), "Error", "RT")) |> 
+  ggplot(aes(x = Parameter1, y = Parameter2)) +
+  geom_tile(aes(fill = r)) +
+  geom_text(aes(label=label)) +
+  scale_alpha_continuous(range = c(1, 0.5)) +
+  scale_fill_gradient2(low = "#2196F3", mid = "white", high = "#F44336", midpoint = 0, limit = c(-1, 1), space = "Lab", name = "Correlation", guide = "legend") +
+  facet_wrap(~Type, scales="free") +
+  theme_minimal() + 
+  theme(axis.text.x = element_text(angle = 45, hjust=1)) 
+```
+
+
+
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+# Correlation
+r <- data.frame()
+for(ill in c("Delboeuf", 
+             "Ebbinghaus",
+             "RodFrame",
+             "VerticalHorizontal",
+             "Zollner",
+             "White",
+             "MullerLyer",
+             "Ponzo",
+             "Poggendorff",
+             "Contrast"
+             )) {
+  r <- correlation::correlation(
+    data = dfsem |> 
+      arrange(Participant),
+    data2 = empirical |>
+      data_select(select=ill, regex=TRUE),
+    p_adjust="none"
+    ) |> 
+    mutate(Illusion_Type = ill,
+           Parameter1 = prettify_parameterName(Parameter1),
+           Parameter2 = prettify_parameterName(Parameter2)) |> 
+    select(Illusion_Type, Parameter1, Parameter2, r, p) |> 
+    rbind(r)
+}
+
+r |>
+  mutate(label = insight::format_p(p, stars_only=TRUE)) |> 
+  ggplot(aes(x = Parameter1, y = Parameter2)) +
+  geom_tile(aes(fill = r)) +
+  geom_text(aes(label=label)) +
+  scale_alpha_continuous(range = c(1, 0.5)) +
+  scale_fill_gradient2(low = "#2196F3", mid = "white", high = "#F44336", midpoint = 0, limit = c(-1, 1), space = "Lab", name = "Correlation", guide = "legend") +
+  # facet_wrap(~Illusion_Type, scales = "free") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust=1))
+```
+
+
+### GARBAGE
+<!-- ```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE} -->
+<!-- rez <- parameters::n_factors(select(empirical, -Participant), n_max=30) -->
+<!-- plot(rez) -->
+
+<!-- r <- correlation::correlation(empirical, p_adjust = "none", sort=TRUE) -->
+
+
+<!-- r |> -->
+<!--   ggplot(aes(x = Parameter2, y = Parameter1)) + -->
+<!--   geom_tile(aes(fill = r)) + -->
+<!--   # geom_text(aes(label = Text), size = 2) + -->
+<!--   scale_fill_gradient2(low = "#2196F3", mid = "white", high = "#F44336", midpoint = 0, limit = c(-1, 1), space = "Lab", name = "Correlation", guide = "legend") + -->
+<!--   scale_x_discrete(expand = c(0, 0)) + -->
+<!--   scale_y_discrete(expand = c(0, 0)) + -->
+<!--   labs(title = "Correlation Matrix", x = NULL, y = NULL) + -->
+<!--   theme_minimal() + -->
+<!--   theme( -->
+<!--     axis.text.x = element_text(angle = 90, hjust = 1), -->
+<!--     plot.title = element_text(hjust = 0.5, face = "bold"), -->
+<!--     panel.grid.major = element_blank(), -->
+<!--     panel.grid.minor = element_blank() -->
+<!--   ) -->
+
+<!-- fa <- parameters::factor_analysis(select(empirical, -Participant), -->
+<!--   n = 13, -->
+<!--   rotation = "oblimin", -->
+<!--   fm = "mle", -->
+<!--   sort = TRUE -->
+<!-- ) -->
+
+
+<!-- print(tibble::as_tibble(fa), n=30) -->
+<!-- plot(fa) -->
+<!-- ``` -->
 
 <!-- ### Approximation -->
 
@@ -1857,91 +2256,6 @@ r |>
 ```
 
 
-## Structure
-
-### Correlation 
-
-```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
-cor <- correlation::correlation(random, redundant = TRUE)
-
-p_data <- cor |>
-  mutate(
-    Parameter1 = prettify_parameterName(Parameter1),
-    Parameter2 = prettify_parameterName(Parameter2)
-  ) |>
-  correlation::cor_sort(hclust_method = "ward.D2") |>
-  cor_lower() |>
-  mutate(
-    Text = insight::format_value(r, zap_small = TRUE, digits = 3),
-    Text = str_replace(str_remove(Text, "^0+"), "^-0+", "-"),
-    Parameter2 = fct_rev(Parameter2)
-  )
-
-
-p_data |>
-  ggplot(aes(x = Parameter2, y = Parameter1)) +
-  geom_tile(aes(fill = r)) +
-  # geom_text(aes(label = Text), size = 2) +
-  scale_fill_gradient2(low = "#2196F3", mid = "white", high = "#F44336", midpoint = 0, limit = c(-1, 1), space = "Lab", name = "Correlation", guide = "legend") +
-  scale_x_discrete(expand = c(0, 0)) +
-  scale_y_discrete(expand = c(0, 0)) +
-  labs(title = "Correlation Matrix", x = NULL, y = NULL) +
-  theme_minimal() +
-  theme(
-    axis.text.x = element_text(angle = 90, hjust = 1),
-    plot.title = element_text(hjust = 0.5, face = "bold"),
-    panel.grid.major = element_blank(),
-    panel.grid.minor = element_blank()
-  )
-```
-
-### Factor Analysis
-
-#### First Level
-
-```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
-data <- select(random, -Participant)
-
-rez <- parameters::n_factors(data, n_max=15)
-plot(rez)
-
-
-fa <- parameters::factor_analysis(data,
-  cor = as.matrix(cor),
-  n = 9,
-  rotation = "oblimin",
-  fm = "mle",
-  sort = TRUE
-)
-
-
-print(tibble::as_tibble(fa), n=30)
-plot(fa)
-# psych::omega(data, fm = "mle", nfactors=9)
-# fa <- psych::fa.multi(as.matrix(cor), nfactors = 3, nfact2 = 1, n.obs = nrow(random))
-# psych::fa.multi.diagram(fa)
-```
-
-#### Second Level
-
-```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
-data <- predict(fa)
-
-rez <- parameters::n_factors(data, rotation = "oblimin")
-plot(rez)
-
-fa2 <- parameters::factor_analysis(data,
-  n = 1,
-  rotation = "varimax",
-  fm = "mle",
-  sort = TRUE
-)
-
-# psych::schmid(attributes(fa)$model, nfactors = 1)
-```
-
-
-#### Visualization
 ```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
 library(ggraph)
 
@@ -2018,221 +2332,9 @@ dat |>
   ggraph::theme_graph()
 ```
 
-### SEM
-
-```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
-library(lavaan)
-library(tidySEM)
-library(ggraph)
-
-
-names <- names(select(random, -Participant))
-data <- setNames(as.data.frame(str_split_fixed(names, "_", 3)), c("Illusion_Type", "Parameter", "Model"))
-data$Name <- names
-
-# Model 1 - by Illusion
-lvl1 <- paste(data$Illusion_Type, "=~", data$Name)
-lvl2 <- paste("I =~", unique(data$Illusion_Type))
-resid <- as.data.frame(t(utils::combn(x=unique(data$Illusion_Type), 2)))
-resid <- paste(resid$V1, "~~", resid$V2)
-
-m1 <- sem(model = paste0(c(lvl1, lvl2), collapse = "\n"),
-          data  = random,
-          estimator = "ML",
-          missing = "ml",
-          bounds = TRUE)  # robust.two.stage
-
-
-# Model 2 - by Parameter
-lvl1 <- paste(data$Parameter, "=~", data$Name)
-lvl2 <- paste("I =~", unique(data$Parameter))
-resid <- as.data.frame(t(utils::combn(x=unique(data$Parameter), 2)))
-resid <- paste(resid$V1, "~~", resid$V2)
-
-m2 <- sem(model = paste0(c(lvl1, lvl2), collapse = "\n"),
-          data  = random)
-
-# # Model 3
-# lvl1 <- paste(data$Model, "=~", data$Name)
-# lvl2 <- paste("G =~", unique(data$Model))
-# 
-# m2 <- sem(model = paste0(c(lvl1, lvl2), collapse = "\n"),
-#            data  = random)
 
 
 
-anova(m1, m2)
-
-summary(m1, standardize = TRUE)
-```
-
-```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
-# https://cjvanlissa.github.io/tidySEM/articles/sem_graph.html
-edges <- tidySEM::get_edges(m1) |> 
-  mutate(color = ifelse(sign(as.numeric(est)) >= 0, "1", "-1"),
-         width = abs(as.numeric(est))) |> 
-  filter(lhs != rhs)
-
-nodes <- tidySEM::get_nodes(m1) |> 
-  mutate(label = prettify_parameterName(name),
-         angle = ifelse(grepl("_", name), 90, 0),
-         hjust = ifelse(grepl("_", name), 1.01, 0))
-
-tidygraph::tbl_graph(nodes = nodes,
-                     edges = edges) |> 
-  ggraph(layout = "sugiyama") +
-  geom_edge_link(aes(edge_width = width, 
-                             color = color,
-                             label=est_sig_std), angle_calc="along", label_dodge=unit(-0.015, "npc")) +
-  geom_node_point() +
-  geom_node_text(aes(label = label, angle = angle, hjust=hjust)) +
-  scale_edge_color_manual(values=c("#F44336", "#2196F3"))  +
-  scale_y_continuous(expand = expansion(c(.6, .1))) +
-  scale_edge_width_continuous(range=c(0.1, 1.5)) +
-  guides(edge_colour = "none", edge_width = "none") +
-  theme_graph() 
-
-dfsem <- mutate(as.data.frame(predict(m1)), Participant = random$Participant)
-```
-
-```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
-r <- correlation(arrange(dfsem, Participant), arrange(empirical, Participant), sort=TRUE, p_adjust="none")
-
-r |>
-  mutate(label = insight::format_p(p, stars_only=TRUE)) |> 
-  ggplot(aes(x = Parameter1, y = Parameter2)) +
-  geom_tile(aes(fill = r)) +
-  geom_text(aes(label=label)) +
-  scale_alpha_continuous(range = c(1, 0.5)) +
-  scale_fill_gradient2(low = "#2196F3", mid = "white", high = "#F44336", midpoint = 0, limit = c(-1, 1), space = "Lab", name = "Correlation", guide = "legend") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust=1))
-```
-
-
-
-
-
-### Empirical Descriptors
-
-
-We have to keep in mind that individual scores are the result of several layers of simplification: 1) the individual coefficient is that of simpler models that sometimes do not perfectly capture the underlying dynamics (especially in the case of ...), 2) the structural equation model from which they are obtained is also constructed on layers of abstractions. Thus, we wanted to test wether these indices relate to some simple empirical scores, such as the average error rate and RT in the task.
-
-```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
-# Average for 4 higher level of task difficulty
-empirical <- df |>
-  filter(Illusion_Effect == "Incongruent") |> 
-  group_by(Participant, Illusion_Type, Illusion_Strength) |>
-  arrange(Illusion_Difference) |> 
-  slice(0:4) |> 
-  # select(Illusion_Strength, Illusion_Difference)
-  group_by(Participant, Illusion_Type) |>
-  summarize(
-    TaskHard_Error = sum(Error, na.rm=TRUE) / n(),
-    TaskHard_RTMean = mean(ifelse(Error == 0, RT, NA), na.rm=TRUE)
-    # Illu_RTSpread = sd(ifelse(Error == 0, RT, NA), na.rm=TRUE),
-  ) |>
-  ungroup() |> 
-  mutate(Illusion_Type = clean_illusionName(Illusion_Type))  |> 
-  pivot_wider(names_from = c("Illusion_Type"), values_from = c("TaskHard_Error", "TaskHard_RTMean"), names_glue = "{Illusion_Type}_{.value}") 
-
-# Average for 4 higher level of illusion strength
-empirical <- df |>
-  filter(Illusion_Effect == "Incongruent") |> 
-  group_by(Participant, Illusion_Type, Illusion_Difference) |>
-  arrange(desc(Illusion_Strength)) |> 
-  slice(0:4) |> 
-  # select(Illusion_Strength, Illusion_Difference)
-  group_by(Participant, Illusion_Type) |>
-  summarize(
-    IlluStrong_Error = sum(Error, na.rm=TRUE) / n(),
-    IlluStrong_RTMean = mean(ifelse(Error == 0, RT, NA), na.rm=TRUE)
-    # Diff_RTSpread = sd(ifelse(Error == 0, RT, NA), na.rm=TRUE),
-  ) |>
-  ungroup() |> 
-  mutate(Illusion_Type = clean_illusionName(Illusion_Type))  |> 
-  pivot_wider(names_from = c("Illusion_Type"), values_from = c("IlluStrong_Error", "IlluStrong_RTMean"), names_glue = "{Illusion_Type}_{.value}") |> 
-  full_join(empirical, by = "Participant") 
-```
-
-
-<!-- ```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE} -->
-<!-- rez <- parameters::n_factors(select(empirical, -Participant), n_max=30) -->
-<!-- plot(rez) -->
-
-<!-- r <- correlation::correlation(empirical, p_adjust = "none", sort=TRUE) -->
-
-
-<!-- r |> -->
-<!--   ggplot(aes(x = Parameter2, y = Parameter1)) + -->
-<!--   geom_tile(aes(fill = r)) + -->
-<!--   # geom_text(aes(label = Text), size = 2) + -->
-<!--   scale_fill_gradient2(low = "#2196F3", mid = "white", high = "#F44336", midpoint = 0, limit = c(-1, 1), space = "Lab", name = "Correlation", guide = "legend") + -->
-<!--   scale_x_discrete(expand = c(0, 0)) + -->
-<!--   scale_y_discrete(expand = c(0, 0)) + -->
-<!--   labs(title = "Correlation Matrix", x = NULL, y = NULL) + -->
-<!--   theme_minimal() + -->
-<!--   theme( -->
-<!--     axis.text.x = element_text(angle = 90, hjust = 1), -->
-<!--     plot.title = element_text(hjust = 0.5, face = "bold"), -->
-<!--     panel.grid.major = element_blank(), -->
-<!--     panel.grid.minor = element_blank() -->
-<!--   ) -->
-
-<!-- fa <- parameters::factor_analysis(select(empirical, -Participant), -->
-<!--   n = 13, -->
-<!--   rotation = "oblimin", -->
-<!--   fm = "mle", -->
-<!--   sort = TRUE -->
-<!-- ) -->
-
-
-<!-- print(tibble::as_tibble(fa), n=30) -->
-<!-- plot(fa) -->
-<!-- ``` -->
-
-
-
-```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
-# Correlation
-r <- data.frame()
-for(ill in c("Delboeuf", 
-             "Ebbinghaus",
-             "RodFrame",
-             "VerticalHorizontal",
-             "Zollner",
-             "White",
-             "MullerLyer",
-             "Ponzo",
-             "Poggendorff",
-             "Contrast"
-             )) {
-  r <- correlation::correlation(
-    data = random |> 
-      arrange(Participant) |> 
-      data_select(select=ill, regex=TRUE),
-    data2 = empirical |>
-      data_select(select=ill, regex=TRUE),
-    p_adjust="none"
-    ) |> 
-    mutate(Illusion_Type = ill,
-           Parameter1 = prettify_parameterName(Parameter1),
-           Parameter2 = prettify_parameterName(Parameter2)) |> 
-    select(Illusion_Type, Parameter1, Parameter2, r, p) |> 
-    rbind(r)
-}
-
-r |>
-  mutate(label = insight::format_p(p, stars_only=TRUE)) |> 
-  ggplot(aes(x = Parameter2, y = Parameter1)) +
-  geom_tile(aes(fill = r)) +
-  geom_text(aes(label=label)) +
-  scale_alpha_continuous(range = c(1, 0.5)) +
-  scale_fill_gradient2(low = "#2196F3", mid = "white", high = "#F44336", midpoint = 0, limit = c(-1, 1), space = "Lab", name = "Correlation", guide = "legend") +
-  # facet_wrap(~Illusion_Type, scales = "free") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust=1))
-```
 
 
 
@@ -2240,7 +2342,6 @@ r |>
 # Save
 dfsub |> 
   merge(dfsem, by = "Participant") |> 
-  merge(empirical, by = "Participant") |> 
   write.csv("../data/study3.csv", row.names = FALSE)
 ```
 

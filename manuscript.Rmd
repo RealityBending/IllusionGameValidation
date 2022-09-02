@@ -152,6 +152,9 @@ However, regarding the effect on reaction times, the GAMs suggested a consistent
 
 Though imperfect, we believe that these models capture inter-individual differences more accurately than basic empirical scores (e.g., the total number of errors, or the average RT). Thus, for each illusion, we extracted the effect of illusion strength and its interaction with task difficulty (when the illusion effect was incongruent) within each participant. These twenty participant-level scores were subjected to exploratory factor analysis (EFA), which suggested that ...
 
+
+We have to keep in mind that individual scores are the result of several layers of simplification: 1) the individual coefficient is that of simpler models that sometimes do not perfectly capture the underlying dynamics (especially in the case of ...), 2) the structural equation model from which they are obtained is also constructed on layers of abstractions. Thus, we wanted to test wether these indices relate to some simple empirical scores, such as the average error rate and RT in the task.
+
 ## Discussion
 
 <!-- This is likely to be caused by the outline. It will be fixed in the next release of the Pyllusion software. -->
