@@ -29,7 +29,9 @@ In which we analyze the effect of illusion strength and task difficulty on error
 
 ## Download Data
 
-- [**Study 2**](data/study2.csv)
+- [**Study 2** (part 1)](data/study2_part1.csv): Can be assembled with `rbind(read.csv("study2_part1.csv"), read.csv("study2_part2.csv"))`
+- [**Study 2** (part 2)](data/study2_part2.csv)
+- [**Study 3**](data/study3.csv)
 
 ## Other
 

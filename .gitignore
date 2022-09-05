@@ -31,6 +31,7 @@ study1/data/*
 study2/data/*
 study1/study1_cache/*
 study2/study2_cache/*
+study3/study3_cache/*
 study2/models/*
 
 # PyInstaller

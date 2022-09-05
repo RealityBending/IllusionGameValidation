@@ -20,7 +20,7 @@ plot_distribution <- function(dfsub, what = "Age", title = what, subtitle = "", 
 }
 
 plot_waffle <- function(dfsub, what = "Nationality", title = what, rows = 8, size=3) {
-  library(emojifont)
+  # library(emojifont)
   ggwaffle::waffle_iron(dfsub, what, rows = rows) |>
     # mutate(label = emojifont::fontawesome('fa-smiley')) |>
     # mutate(label = emojifont::emoji('smiley')) |>
@@ -37,7 +37,10 @@ plot_waffle <- function(dfsub, what = "Nationality", title = what, rows = 8, siz
     # scale_y_continuous(expand = c(0, 0)) +
     theme_void() +
     # ggwaffle::theme_waffle() +
-    theme(plot.title = element_text(face = "bold", hjust = 0.5))
+    theme(plot.title = element_text(face = "bold", hjust = 0.5),
+          # legend.margin=margin(l=-5),
+          legend.key.height = unit(1, "mm"),
+          legend.key.width = unit(1, "mm"))
 }
 
 
@@ -490,7 +493,7 @@ plot_model_rt <- function(data, model, gam) {
     scale_fill_gradientn(colours = c("#F44336", "#FFC107", "#4CAF50")) +
     coord_cartesian(
       xlim = c(min(data[[varstrength]]), max(data[[varstrength]])),
-      ylim = c(125, 1500) / 1000
+      ylim = c(125, 1400) / 1000
     ) +
     theme_modern() +
     guides(color = "none") +
@@ -510,11 +513,12 @@ plot_model_rt <- function(data, model, gam) {
 
 
 plot_all <- function(data, p_err, p_rt) {
+  illname <- unique(data$Illusion_Type)
   # Get stimuli
   dat <- df |>
     filter(Error == 0) |>
     filter(
-      Illusion_Type == unique(data$Illusion_Type),
+      Illusion_Type == illname,
       Answer %in% c("arrowleft", "arrowup")
     ) |>
     select(Stimulus, Illusion_Strength, Illusion_Difference)
@@ -566,7 +570,10 @@ plot_all <- function(data, p_err, p_rt) {
     grid::rasterGrob(interpolate = TRUE) |>
     patchwork::wrap_elements()
 
-  p <- ((p_err + labs(x = "")) / (p_rt + labs(title = "")) + patchwork::plot_layout(guides = "collect"))
+  p <- ((p_err + theme(axis.title.x = element_blank(),
+                       plot.title = element_blank())) /
+          (p_rt + theme(plot.title = element_blank()))) +
+    patchwork::plot_layout(guides = "collect")
 
   # (
   #   (img_leftup / patchwork::plot_spacer() / img_leftdown + patchwork::plot_layout(heights = c(0.5, 2, 0.5))) |
@@ -575,8 +582,10 @@ plot_all <- function(data, p_err, p_rt) {
   #   ) +
   #   patchwork::plot_layout(widths = c(0.5, 1, 0.5))
 
-  (img_leftup | patchwork::plot_spacer() | img_rightup) / p / (img_leftdown | patchwork::plot_spacer() | img_rightdown) +
-    patchwork::plot_layout(heights = c(0.5, 1.5, 0.5))
+  wrap_elements(((img_leftup | patchwork::plot_spacer() | img_rightup) / p / (img_leftdown | patchwork::plot_spacer() | img_rightdown) +
+    patchwork::plot_layout(heights = c(0.5, 1.5, 0.5)) +
+    patchwork::plot_annotation(title = paste(illname, "Illusion"),
+                               theme = theme(plot.title = element_text(size=rel(1.75), face="bold", hjust=0.5)))))
 }
 
 
@@ -667,8 +676,57 @@ prettify_parameterName <- function(x) {
     str_replace("_Error", " (Error)") |>
     str_replace("_RTMean", " (RT Mean)") |>
     str_replace("_", " - ") |>
-    str_replace( "RodFrame", "Rod-Frame") |>
+    str_replace("RodFrame", "Rod-Frame") |>
     str_replace("VerticalHorizontal", "Vertical-Horizontal") |>
     str_replace("Zollner", "Zöllner") |>
     str_replace("MullerLyer", "Müller-Lyer")
+}
+
+
+
+prettify_itemName <- function(x) {
+  x |>
+    str_remove("IPIP6_") |>
+    str_remove("PID5_") |>
+    str_replace("RodFrame", "Rod-Frame") |>
+    str_replace("VerticalHorizontal", "Vertical-Horizontal") |>
+    str_replace("Zollner", "Zöllner") |>
+    str_replace("MullerLyer", "Müller-Lyer") |>
+    str_replace("HonestyHumility", "Honesty-Humility")
+}
+
+
+plot_correlation <- function(dfsub, x="I", y="IPIP6_Agreeableness", fill="grey") {
+  param <- cor_test(dfsub, x, y, bayesian = TRUE)
+
+  # Format stat output
+  r <- str_replace(str_remove(insight::format_value(param$rho), "^0+"), "^-0+", "-")
+  CI_low <- str_replace(str_remove(insight::format_value(param$CI_low), "^0+"), "^-0+", "-")
+  CI_high <- str_replace(str_remove(insight::format_value(param$CI_high), "^0+"), "^-0+", "-")
+
+  stat <- paste0("italic(r)~'= ", r, ", 95% CI [", CI_low, ", ", CI_high, "], BF'['10']~'", paste0(insight::format_bf(param$BF, name = "")), "'")
+
+  label <- data.frame(x = min(dfsub[[x]], na.rm=TRUE),
+                      y = max(dfsub[[y]], na.rm=TRUE),
+                      label = stat)
+
+  # Plot
+  dfsub |>
+    ggplot(aes_string(x=x, y=y)) +
+    geom_point2(size=3,
+                color = fill,
+                # color = DVs[x],
+                alpha=2/3) +
+    geom_smooth(method="lm", color="black", formula="y ~ x", alpha=0.3)  +
+    labs(y = prettify_itemName(y),
+         x = ifelse(x == "I",
+                    expression("Factor"~ italic(i)),
+                    prettify_parameterName(x))) +
+    geom_label(data=label, aes(x=x, y=y), label=str2expression(label$label), hjust=0, vjust=1) +
+    theme_modern() +
+    ggside::geom_xsidedensity(fill=DVs[x], color="white") +
+    ggside::geom_ysidedensity(fill=fill, color="white") +
+    ggside::theme_ggside_void() +
+    ggside::scale_ysidex_continuous(expand = c(0, 0)) +
+    ggside::scale_xsidey_continuous(expand = c(0, 0))
 }

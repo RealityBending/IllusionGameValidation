@@ -22,7 +22,7 @@ fig.height <- 7
 
 knitr::opts_chunk$set(
   collapse = TRUE,
-  dpi = 450,
+  dpi = 300,
   fig.path = "./figures/",
   fig.width = fig.width,
   fig.height = fig.height
@@ -66,11 +66,15 @@ DVs <- c("Delboeuf" = "#2196F3",
 dfsub <- read.csv("../data/study3.csv") |>
   mutate(
     Screen_Refresh = as.numeric(Screen_Refresh),
+    Ethnicity = ifelse(Ethnicity == "Latino", "Hispanic", Ethnicity),
     Education = fct_relevel(Education, "High School", "Bachelor", "Master", "Doctorate", "Other", "Prefer not to Say")
   ) |> 
   datawizard::standardise(select=names(DVs)) |> 
-  datawizard::change_scale(select=starts_with("IPIP"), to = c(-1, 1), range = c(0, 100)) |> 
-  datawizard::change_scale(select=starts_with("PID"), to = c(-1, 1), range = c(0, 100))
+  datawizard::change_scale(select=starts_with("IPIP"), to = c(0, 1), range = c(0, 100)) |> 
+  datawizard::change_scale(select=starts_with("PID"), to = c(0, 1), range = c(0, 100)) 
+
+# Remove outliers (p < 0.0001)
+dfsub[names(DVs)][abs(dfsub[names(DVs)]) > qnorm(0.9999)] <- NA 
 
 dflong <- dfsub |> 
   pivot_longer(all_of(names(DVs)), names_to = "Index", values_to = "Score")
@@ -81,7 +85,7 @@ dflong <- dfsub |>
 
 `r sum(is.na(dfsub$IPIP6_Agreeableness))` participants did not do the personality scales.
 
-```{r demographics, fig.width=20, fig.height=15}
+```{r demographics}
 p_age <- estimate_density(dfsub$Age) |> 
   ggplot(aes(x = x, y = y)) +
   geom_area(fill = "#607D8B") +
@@ -90,22 +94,14 @@ p_age <- estimate_density(dfsub$Age) |>
   labs(title = "Age", color = NULL) +
   theme_modern() +
   theme(
-    plot.title = element_text(face = "bold", hjust = 0.5),
+    plot.title = element_text(size=rel(1), face = "bold", hjust = 0.5),
     plot.subtitle = element_text(face = "italic", hjust = 0.5),
-    axis.line.y = element_blank(),
+    # axis.line.y = element_blank(),
     axis.title.y = element_blank(),
     axis.text.y = element_blank(),
+    axis.text.x = element_text(size=rel(0.6)),
     axis.title.x = element_blank()
   ) 
-
-p_sex <- plot_waffle(dfsub, what="Sex", rows = 12) +
-  scale_color_manual(values = c("Male" = "#2196F3", "Female" = "#E91E63")) 
-
-p_edu <- plot_waffle(dfsub, "Education", rows = 12) +
-  scale_color_viridis_d() 
-
-p_race <- plot_waffle(dfsub, "Ethnicity", rows = 12) +
-  scale_color_manual(values = c("Latino" = "#FF5722", "Caucasian" = "#2196F3", "African" = "#4CAF50", "Other" = "#795548")) 
 
 p_nat <- dfsub |> 
   group_by(Nationality) |> 
@@ -119,14 +115,34 @@ p_nat <- dfsub |>
   scale_y_continuous(expand = c(0, 0)) +
   theme_modern() +
   theme(
-    plot.title = element_text(face = "bold", hjust = 0.5),
+    plot.title = element_text(size=rel(1), face = "bold", hjust = 0.5),
     plot.subtitle = element_text(face = "italic", hjust = 0.5),
-    axis.line.y = element_blank(),
+    # axis.line.y = element_blank(),
     axis.title.x = element_blank(),
     axis.title.y = element_blank(),
-    axis.text.y = element_blank(),
-    axis.text.x = element_text(size=rel(0.8), angle = 45, hjust=1)
+    axis.text.y = element_text(size=rel(0.6)),
+    axis.text.x = element_text(size=rel(0.5), angle = 45, hjust=1)
   )
+
+ggsave("figures/figure_dem1.png", 
+       patchwork::wrap_elements(p_age / p_nat), 
+       width=0.5*(fig.height), 
+       height=1*(fig.height), dpi=1000, bg="white")
+
+
+p_sex <- plot_waffle(dfsub, what="Sex", rows = 10, size=5) +
+  scale_color_manual(values = c("Male" = "#2196F3", "Female" = "#E91E63")) 
+
+p_edu <- plot_waffle(dfsub, "Education", rows = 10, size=5) +
+  scale_color_viridis_d() 
+
+p_race <- plot_waffle(dfsub, "Ethnicity", rows = 10, size=5) +
+  scale_color_manual(values = c("Hispanic" = "#FF5722", "Caucasian" = "#2196F3", "African" = "#4CAF50", "Other" = "#795548")) 
+
+
+ggsave("figures/figure_dem2.png", 
+       patchwork::wrap_elements(p_sex / p_edu / p_race), width=1*(fig.height), height=1*(fig.height), dpi=1000, bg="white")
+
 
 
 p_ipip <- dfsub |> 
@@ -139,15 +155,16 @@ p_ipip <- dfsub |>
   scale_x_continuous(expand = c(0, 0)) +
   scale_y_continuous(expand = c(0, 0)) +
   scale_color_manual(values=c("Agreeableness" = "#FFC107", "Honesty-Humility" = "#00BCD4", "Extraversion" = "#9C27B0", "Conscientiousness" = "#3F51B5", "Openness" = "#4CAF50", "Neuroticism" = "#E91E63")) +
-  labs(x = "Score", title = "Normal Personality (IPIP-6)", color = NULL) +
+  labs(x = "Score", title = "Normal Personality", color = NULL) +
   theme_modern() +
   theme(
-    plot.title = element_text(face = "bold", hjust = 0.5),
-    plot.subtitle = element_text(face = "italic", hjust = 0.5),
+    plot.title = element_text(size=rel(1), face = "bold", hjust = 0.5),
     axis.title.y = element_blank(),
     axis.text.y = element_blank(),
+    axis.text.x = element_text(size=rel(0.6)),
     axis.title.x = element_blank(),
-    legend.position = "top"
+    legend.text = element_text(size=rel(0.8))
+    # legend.position = "top",
   ) 
   
 p_pid <- dfsub |> 
@@ -159,21 +176,37 @@ p_pid <- dfsub |>
   geom_line(size = 1) +
   scale_x_continuous(expand = c(0, 0)) +
   scale_y_continuous(expand = c(0, 0)) +
-  scale_color_manual(values=c("Antagonism" = "#F44336", "Detachment" = "#03A9F4", "Disinhibition" = "#FF5722", "Negative Affect" = "#FF9800", "Psychoticism" = "#673AB7")) +
-  labs(x = "Score", title = "Pathological Personality (PID-5)", color = NULL) +
+  scale_color_manual(values=c("Antagonism" = "#FF9800", "Detachment" = "#03A9F4", "Disinhibition" = "#FF5722", "Negative Affect" = "#F44336", "Psychoticism" = "#673AB7")) +
+  labs(x = "Score", title = "Pathological Personality", color = NULL) +
   theme_modern() +
   theme(
-    plot.title = element_text(face = "bold", hjust = 0.5),
-    plot.subtitle = element_text(face = "italic", hjust = 0.5),
+    plot.title = element_text(size=rel(1), face = "bold", hjust = 0.5),
     axis.title.y = element_blank(),
     axis.text.y = element_blank(),
+    axis.text.x = element_text(size=rel(0.6)),
     axis.title.x = element_blank(),
-    legend.position = "top"
+    legend.text = element_text(size=rel(0.8))
+    # legend.position = "top",
   ) 
 
-p <- (p_age / p_nat) | (p_sex / p_edu / p_race) | (p_ipip / p_pid)
-p
-# ggsave("figures/figure_demo.png", width=fig.width, height = fig.height)
+
+ggsave("figures/figure_dem3.png", 
+       patchwork::wrap_elements(p_ipip / p_pid), width=2/3*(fig.height), height=1*(fig.height), dpi=1000, bg="white")
+
+
+
+p_dem <- (
+  patchwork::wrap_elements(grid::rasterGrob(png::readPNG("figures/figure_dem1.png"), interpolate = TRUE)) | 
+    patchwork::wrap_elements(grid::rasterGrob(png::readPNG("figures/figure_dem2.png"), interpolate = TRUE)) | 
+    patchwork::wrap_elements(grid::rasterGrob(png::readPNG("figures/figure_dem3.png"), interpolate = TRUE))
+) + 
+  patchwork::plot_layout(widths=c(1/2, 1, 2/3)) + 
+  patchwork::plot_annotation(title = "Participants (n = 250)", 
+                             theme = theme(plot.title = element_text(size = rel(1.5), face="bold", hjust=0.5, vjust=-5)))
+
+ggsave("figures/figure_dem.png", p_dem, dpi=1000)
+
+p_dem
 ```
 
 
@@ -190,32 +223,32 @@ p
 ```{r message=FALSE, warning=FALSE, cache=cache}
 preds <- data.frame()
 for(i in names(DVs)) {
-  model <- brms::brm(paste0(i, " ~ s(Screen_Size)"), data=dfsub, algorithm = "meanfield", refresh=0)
-  param <- bayestestR::describe_posterior(as.data.frame(model))
+  # model <- brms::brm(paste0(i, " ~ s(Screen_Size)"), data=dfsub, algorithm = "meanfield", refresh=0)
+  # param <- bayestestR::describe_posterior(as.data.frame(model))
+  model <- lm(as.formula(paste0(i, " ~ Screen_Size")), 
+              data=dfsub)
+  param <- parameters::parameters(model)
   
   pred <- estimate_relation(model, length=50)
   pred$Index <- i
-  pred$sig <- estimate_slopes(model, trend = "Screen_Size")$pd
+  pred$sig <- param$p[2]
   preds <- rbind(preds, pred)
-  
-  if(any(pred$sig > .95)) {
-    print(i)
-  }
+
 }
 
 preds |> 
-  mutate(sig = format_pd(sig, stars_only = TRUE),
+  mutate(sig = format_p(sig, stars_only = TRUE),
          sig = ifelse(sig == "", "NS", sig)) |> 
   ggplot(aes(x = Screen_Size, y = Predicted)) +
   geom_point2(data=dflong, aes(y = Score, color= Index), alpha=0.1, size=2) +
   geom_line(aes(color = Index, group = Index, linetype = sig, size = sig)) +
   scale_x_continuous(expand = c(0, 0)) +
-  scale_size_manual(values = c("NS" = 0.5, "*" = 1, "**" = 1.5)) +
-  scale_linetype_manual(values = c("NS" = "dotted", "*" = "dashed", "**" = "solid")) +
+  scale_size_manual(values = c("NS" = 0.5, "*" = 1)) +
+  scale_linetype_manual(values = c("NS" = "dotted", "*" = "solid")) +
   scale_color_manual(values = DVs) +
   coord_cartesian(ylim = c(-2.5, 2.5)) +
   theme_modern() +
-  labs(y = "Illusion Sensitivity", x = "Screen Size") +
+  labs(y = "Illusion Sensitivity", x = "Screen Size", linetype="Significance", size="Significance") +
   ggside::geom_xsidedensity(data=dfsub, fill ="grey", color = "white") +
   ggside::geom_ysidedensity(data=dflong, aes(y=Score, color = Index)) +
   ggside::theme_ggside_void() +
@@ -226,29 +259,39 @@ preds |>
 ### Refresh Rate
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
-sig <- list()
 preds <- data.frame()
-for(i in DVs) {
-  model <- brms::brm(paste0(i, " ~ poly(Screen_Refresh, 2)"), data=dfsub, algorithm = "meanfield", refresh=0)
-  param <- bayestestR::describe_posterior(as.data.frame(model))
+for(i in names(DVs)) {
+  # model <- brms::brm(paste0(i, " ~ s(Screen_Refresh)"), data=dfsub, algorithm = "meanfield", refresh=0)
+  # param <- bayestestR::describe_posterior(as.data.frame(model))
+  model <- lm(as.formula(paste0(i, " ~ Screen_Refresh")), 
+              data=dfsub)
+  param <- parameters::parameters(model)
   
   pred <- estimate_relation(model, length=50)
   pred$Index <- i
-  pred$sig <- max(param$pd[2:3])
+  pred$sig <- param$p[2]
   preds <- rbind(preds, pred)
-  
-  if(any(max(param$pd[2:3]) > .95)) {
-    print(i)
-  }
+
 }
 
 preds |> 
-  mutate(sig = format_pd(sig, stars_only = TRUE),
+  mutate(sig = format_p(sig, stars_only = TRUE),
          sig = ifelse(sig == "", "NS", sig)) |> 
   ggplot(aes(x = Screen_Refresh, y = Predicted)) +
+  geom_point2(data=dflong, aes(y = Score, color= Index), alpha=0.1, size=2) +
   geom_line(aes(color = Index, group = Index, linetype = sig, size = sig)) +
-  scale_size_manual(values = c("NS" = 0.5, "*" = 1, "**" = 1.5)) +
-  scale_linetype_manual(values = c("NS" = "dotted", "*" = "dashed", "**" = "solid"))
+  scale_x_continuous(expand = c(0, 0)) +
+  scale_size_manual(values = c("NS" = 0.5, "*" = 1)) +
+  scale_linetype_manual(values = c("NS" = "dotted", "*" = "solid")) +
+  scale_color_manual(values = DVs) +
+  coord_cartesian(ylim = c(-2.5, 2.5)) +
+  theme_modern() +
+  labs(y = "Illusion Sensitivity", x = "Screen Refresh Rate", linetype="Significance", size="Significance") +
+  ggside::geom_xsidedensity(data=dfsub, fill ="grey", color = "white") +
+  ggside::geom_ysidedensity(data=dflong, aes(y=Score, color = Index)) +
+  ggside::theme_ggside_void() +
+  ggside::scale_ysidex_continuous(expand = c(0, 0)) +
+  ggside::scale_xsidey_continuous(expand = c(0, 0))
 ```
 
 
@@ -259,45 +302,40 @@ preds |>
 ```{r message=FALSE, warning=FALSE, cache=cache}
 sig <- list()
 params <- data.frame()
-for(i in DVs) {
+for(i in names(DVs)) {
   model <- lm(paste0(i, " ~ Sex"), data=dfsub)
   param <- parameters::parameters(model)
   param$Index <- i
   param$ymiddle <- param$Coefficient[1] + diff(param$Coefficient) / 2
+  param$BF <- parameters::parameters(BayesFactor::ttestBF(formula=as.formula(paste0(i, " ~ Sex")), data=dfsub[!is.na(dfsub[[i]]), ]))$BF
   params <- rbind(params, as.data.frame(param[2, ]))
-  if(param$p[2] < .05) {
-    print(i)
-  }
 }
 
 data <- dfsub |> 
-  pivot_longer(all_of(DVs), names_to = "Index", values_to = "Score") |> 
-  mutate(Index = fct_relevel(Index, arrange(params, p)$Index))
+  pivot_longer(all_of(names(DVs)), names_to = "Index", values_to = "Score") |> 
+  mutate(Index = fct_relevel(Index, names(DVs)),
+         Index = fct_relabel(Index, ~prettify_itemName(.x)))  # arrange(params, p)$Index 
 
-data |> 
+p_gender <- data |> 
   ggplot(aes(x = Index, y = Score)) +
-  stat_slab(data=filter(data, Sex == "Male"), aes(fill = Sex), side = "right", scale = 0.5, position = "dodge") +
-  stat_slab(data=filter(data, Sex == "Female"), aes(fill = Sex), side = "left", scale = 0.5, position = "dodge") +
-  stat_pointinterval(aes(group = Sex), point_interval = "mean_qi",, position = "dodge") +
-  geom_text(data = mutate(params, sig = insight::format_p(p, stars_only = TRUE)), aes(label = sig, y = ymiddle))
+  stat_slab(data=filter(data, Sex == "Male"), aes(fill = Sex), side = "left", scale = 0.5, position = "dodge") +
+  stat_slab(data=filter(data, Sex == "Female"), aes(fill = Sex), side = "right", scale = 0.5, position = "dodge") +
+  stat_pointinterval(aes(group = fct_rev(Sex)), point_interval = "mean_qi", position = "dodge") +
+  geom_text(data = mutate(params, sig = insight::format_p(p, stars_only = TRUE), Index = prettify_itemName(Index)), aes(label = sig, y = ymiddle)) +
+    geom_label(data = mutate(params, label = insight::format_bf(BF), Index = prettify_itemName(Index)), 
+             aes(label = label), y=2.7) +
+  scale_fill_manual(values = c("Male" = "#2196F3", "Female" = "#E91E63")) +
+  theme_minimal() +
+  labs(title = "Illusion Sensitivity and Demographics", fill = "") +
+  theme(legend.position = "top",
+        axis.title = element_blank(),
+        plot.title = element_text(face = "bold", hjust=0.5)) 
+
+p_gender
+ggsave("figures/figure_sex.png", p_gender, width=2*(fig.height), height=0.8*(fig.height), dpi=600, bg="white")
 ```
 
 
-### Ethnicity
-
-```{r message=FALSE, warning=FALSE, cache=cache}
-sig <- list()
-params <- data.frame()
-for(i in DVs) {
-  model <- lm(paste0(i, " ~ Ethnicity"), data=dfsub)
-  param <- estimate_contrasts(model, contrast = "Ethnicity")
-  param$Index <- i
-  params <- rbind(params, as.data.frame(param[2, ]))
-  if(any(param$p < .05)) {
-    print(i)
-  }
-}
-```
 
 
 
@@ -305,47 +343,45 @@ for(i in DVs) {
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
 preds <- data.frame()
-for(i in DVs) {
-  model <- brms::brm(paste0(i, " ~ mo(as.numeric(Education))"), data=filter(dfsub, !Education %in% c("Other", "Prefer not to Say")), algorithm = "meanfield", refresh=0)
+for(i in names(DVs)) {
+  model <- brms::brm(paste0(i, " ~ mo(as.numeric(Education)) + Sex"), data=filter(dfsub, !Education %in% c("Other", "Prefer not to Say")), algorithm = "meanfield", refresh=0)
   param <- bayestestR::describe_posterior(as.data.frame(model)["bsp_moas.numericEducation"])
   
-  pred <- estimate_relation(model)
+  pred <- estimate_relation(model) 
   pred$Index <- i
   pred$sig <- param$pd
   preds <- rbind(preds, pred)
-  
-  if(any(param$pd > .95)) {
-    print(i)
-  }
 }
 
 preds |> 
+  filter(Sex == "Male") |> 
   mutate(sig = format_pd(sig, stars_only = TRUE),
          sig = ifelse(sig == "", "NS", sig)) |> 
   ggplot(aes(x = Education, y = Predicted)) +
   geom_line(aes(color = Index, group = Index, linetype = sig, size = sig)) +
-  scale_size_manual(values = c("NS" = 0.5, "*" = 1, "**" = 1.5)) +
-  scale_linetype_manual(values = c("NS" = "dotted", "*" = "dashed", "**" = "solid"))
+  scale_size_manual(values = c("NS" = 0.5, "*" = 1)) +
+  scale_linetype_manual(values = c("NS" = "dotted", "*" = "solid")) + 
+  theme_modern()
 ```
 
 
 ### Age
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
-sig <- list()
 preds <- data.frame()
-for(i in DVs) {
-  model <- brms::brm(paste0(i, " ~ poly(Age, 2)"), data=dfsub, algorithm = "meanfield", refresh=0)
-  param <- bayestestR::describe_posterior(as.data.frame(model))
+for(i in names(DVs)) {
+  # model <- brms::brm(paste0(i, " ~ poly(Age, 2)"), data=dfsub, algorithm = "meanfield", refresh=0)
+  # param <- bayestestR::describe_posterior(as.data.frame(model))
+  model <- lm(paste0(i, " ~ poly(Age, 2) + Sex + Education"), data=dfsub)
+  param <- parameters::parameters(model)
   
-  pred <- estimate_relation(model, length=50)
+  pred <- get_datagrid(model, at = "Age", length=50)
+  pred$Predicted <- get_predicted(model, data=pred)
+  
   pred$Index <- i
   pred$sig <- max(param$pd[2:3])
   preds <- rbind(preds, pred)
-  
-  if(any(max(param$pd[2:3]) > .95)) {
-    print(i)
-  }
+
 }
 
 preds |> 
@@ -353,8 +389,9 @@ preds |>
          sig = ifelse(sig == "", "NS", sig)) |> 
   ggplot(aes(x = Age, y = Predicted)) +
   geom_line(aes(color = Index, group = Index, linetype = sig, size = sig)) +
-  scale_size_manual(values = c("NS" = 0.5, "*" = 1, "**" = 1.5)) +
-  scale_linetype_manual(values = c("NS" = "dotted", "*" = "dashed", "**" = "solid"))
+  scale_size_manual(values = c("NS" = 0.5, "*" = 1)) +
+  scale_linetype_manual(values = c("NS" = "dotted", "*" = "solid")) +
+  theme_modern()
 ```
 
 ## Personality
@@ -362,23 +399,120 @@ preds |>
 ### IPIP6
 
 ```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
-r <- correlation::correlation(
-  datawizard::data_select(dfsub, DVs),
+ripip <- correlation::correlation(
+  datawizard::data_select(dfsub, names(DVs)),
   select(dfsub, starts_with("IPIP") & !ends_with("_SD")),
   p_adjust = "none",
+  bayesian=TRUE,
   sort=TRUE
 )
 
 
-r |>
-  mutate(label = paste0(format_value(r, zap_small = TRUE), insight::format_p(p, stars_only=TRUE))) |> 
+ripip |>
+  mutate(label = paste0(format_value(rho, zap_small = TRUE), insight::format_bf(BF, stars_only=TRUE))) |> 
   ggplot(aes(x = Parameter2, y = Parameter1)) +
-  geom_tile(aes(fill = r)) +
+  geom_tile(aes(fill = rho)) +
+  geom_text(aes(label=label), size=3) +
+  scale_alpha_continuous(range = c(1, 0.5)) +
+  scale_fill_gradient2(low = "#2196F3", mid = "white", high = "#F44336", midpoint = 0, limit = c(-1, 1), space = "Lab", name = "Correlation", guide = "legend") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust=1))
+
+p_ipip1 <- plot_correlation(dfsub, x="I", y="IPIP6_Agreeableness", fill="#FFC107") + 
+  labs(x = "") +
+  theme(axis.title.y = element_text(face = "bold"))
+p_ipip2 <- plot_correlation(dfsub, x="I", y="IPIP6_HonestyHumility", fill="#00BCD4") + 
+  labs(x = "") +
+  theme(axis.title.y = element_text(face = "bold"))
+
+plot_correlation(dfsub, x="Zollner", y="IPIP6_HonestyHumility", fill="#00BCD4")
+plot_correlation(dfsub, x="VerticalHorizontal", y="IPIP6_Agreeableness", fill="#FFC107")
+plot_correlation(dfsub, x="VerticalHorizontal", y="IPIP6_HonestyHumility", fill="#00BCD4")
+```
+
+### PID-5
+
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+rpid <- correlation::correlation(
+  datawizard::data_select(dfsub, names(DVs)),
+  select(dfsub, starts_with("PID") & !ends_with("_SD")),
+  p_adjust = "none",
+  bayesian=TRUE,
+  sort=TRUE
+)
+
+
+rpid |>
+  mutate(label = paste0(format_value(rho, zap_small = TRUE), insight::format_bf(BF, stars_only=TRUE))) |> 
+  ggplot(aes(x = Parameter2, y = Parameter1)) +
+  geom_tile(aes(fill = rho)) +
   geom_text(aes(label=label), size=3) +
   scale_alpha_continuous(range = c(1, 0.5)) +
   scale_fill_gradient2(low = "#2196F3", mid = "white", high = "#F44336", midpoint = 0, limit = c(-1, 1), space = "Lab", name = "Correlation", guide = "legend") +
   # facet_wrap(~Illusion_Type, scales = "free") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust=1))
+
+p_pid1 <- plot_correlation(dfsub, x="I", y="PID5_Antagonism", fill="#FF9800") + 
+  labs(x = "") +
+  theme(axis.title.y = element_text(face = "bold"))
+p_pid2 <- plot_correlation(dfsub, x="I", y="PID5_Disinhibition", fill="#FF5722") +
+  theme(axis.title.y = element_text(face = "bold"))
+p_pid3 <- plot_correlation(dfsub, x="I", y="PID5_Psychoticism", fill="#673AB7") + 
+  labs(x = "") +
+  theme(axis.title.y = element_text(face = "bold"))
+p_pid4 <- plot_correlation(dfsub, x="I", y="PID5_NegativeAffect", fill="#F44336") + 
+  labs(x = "") +
+  theme(axis.title.y = element_text(face = "bold"))
+
+plot_correlation(dfsub, x="VerticalHorizontal", y="PID5_Antagonism", fill="#FF9800")
+plot_correlation(dfsub, x="Ponzo", y="PID5_Antagonism", fill="#FF9800")
 ```
 
+
+## Table and Figure
+
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+table1 <- ripip |> 
+  rbind(rpid) |> 
+  data_remove(c("ROPE_Percentage", "Prior_Distribution", "Prior_Location", "Prior_Scale", "pd")) |>  
+  separate(Parameter2, "_", into = c("Scale", "Dimension")) |> 
+  arrange(Scale, desc(BF)) |> 
+  filter(BF > 3)
+
+table1 |> 
+  print_md()
+
+table1 |> 
+  format_table() |> 
+  select(-Method, -n_Obs) |> 
+  rename(Factor=Parameter1) |> 
+  write.csv("table1.csv", row.names = FALSE)
+```
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+p_pers <- wrap_elements((p_ipip1 / p_ipip2) | (p_pid1 / p_pid2) | (p_pid3 / p_pid4)) +
+  patchwork::plot_annotation(title = "Illusion Sensitivity and Personality", 
+                             theme = theme(plot.title = element_text(size = rel(1.5), face="bold", hjust=0.5, vjust=0)))
+
+ggsave("figures/figure_pers.png", p_pers, dpi=600, width=2*(fig.height), height=1.3*(fig.height), bg="white")
+
+p <- (patchwork::wrap_elements(grid::rasterGrob(png::readPNG("figures/figure_dem.png"), interpolate = TRUE)) /
+        patchwork::wrap_elements(grid::rasterGrob(png::readPNG("figures/figure_sex.png"), interpolate = TRUE)) / 
+        patchwork::wrap_elements(grid::rasterGrob(png::readPNG("figures/figure_pers.png"), interpolate = TRUE))) 
+
+p <- gridExtra::grid.arrange(
+  grid::rasterGrob(png::readPNG("figures/figure_dem.png"), interpolate = TRUE, width=10),
+  grid::rasterGrob(png::readPNG("figures/figure_sex.png"), interpolate = TRUE, width=10),
+  grid::rasterGrob(png::readPNG("figures/figure_pers.png"), interpolate = TRUE, width=10), ncol=1)
+p <- cowplot::plot_grid(
+  patchwork::wrap_elements(grid::rasterGrob(png::readPNG("figures/figure_dem.png"), interpolate = TRUE)),
+  patchwork::wrap_elements(grid::rasterGrob(png::readPNG("figures/figure_sex.png"), interpolate = TRUE)),
+  patchwork::wrap_elements(grid::rasterGrob(png::readPNG("figures/figure_pers.png"), interpolate = TRUE)), 
+  ncol=1)
+p <- patchwork::wrap_elements(grid::rasterGrob(png::readPNG("figures/figure_dem.png"), interpolate = TRUE)) /
+  patchwork::wrap_elements(grid::rasterGrob(png::readPNG("figures/figure_sex.png"), interpolate = TRUE)) /
+  patchwork::wrap_elements(grid::rasterGrob(png::readPNG("figures/figure_pers.png"), interpolate = TRUE)) +
+  plot_layout(widths = c(1, 1, 1))
+
+ggsave("../figures/figure3.png", p, dpi=600, height=1.1*fig.width, width=fig.height)
+```
