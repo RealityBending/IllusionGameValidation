@@ -16,7 +16,7 @@ options(
 
 cache <- TRUE
 runModels <- FALSE
-bestModels <- FALSE
+bestModels <- TRUE
 fig.width <- see::golden_ratio(7)
 fig.height <- 7
 
@@ -966,7 +966,7 @@ save(model_verticalhorizontal_rt, file="models/model_verticalhorizontal_rt.Rdata
 load("models/model_verticalhorizontal_rt.RData")
 load("models/gam_verticalhorizontal_rt.RData")
 
-plot_ppcheck(model_verticalhorizontal_rt)
+plot_ppcheck(model_verticalhorizontal_rt, gam_verticalhorizontal_rt)
 # performance::check_model(model_verticalhorizontal_rt)
 # parameters::parameters(model)
 ```
@@ -1088,7 +1088,7 @@ save(model_zollner_rt, file="models/model_zollner_rt.Rdata")
 load("models/model_zollner_rt.RData")
 load("models/gam_zollner_rt.RData")
 
-plot_ppcheck(model_zollner_rt)
+plot_ppcheck(model_zollner_rt, gam_zollner_rt)
 # performance::check_model(model_zollner_rt)
 # parameters::parameters(model)
 
@@ -1204,7 +1204,7 @@ save(model_white_rt, file="models/model_white_rt.Rdata")
 load("models/model_white_rt.RData")
 load("models/gam_white_rt.RData")
 
-plot_ppcheck(model_white_rt)
+plot_ppcheck(model_white_rt, gam_white_rt)
 # performance::check_model(model_white_rt)
 # parameters::parameters(model)
 ```
@@ -1322,7 +1322,7 @@ save(model_mullerlyer_rt, file="models/model_mullerlyer_rt.Rdata")
 load("models/model_mullerlyer_rt.RData")
 load("models/gam_mullerlyer_rt.RData")
 
-plot_ppcheck(model_mullerlyer_rt)
+plot_ppcheck(model_mullerlyer_rt, gam_mullerlyer_rt)
 # performance::check_model(model_mullerlyer_rt)
 # parameters::parameters(model)
 ```
@@ -1439,7 +1439,7 @@ save(model_ponzo_rt, file="models/model_ponzo_rt.Rdata")
 load("models/model_ponzo_rt.RData")
 load("models/gam_ponzo_rt.RData")
 
-plot_ppcheck(model_ponzo_rt)
+plot_ppcheck(model_ponzo_rt, gam_ponzo_rt)
 # performance::check_model(model_ponzo_rt)
 # parameters::parameters(model)
 ```
@@ -1554,7 +1554,7 @@ save(model_poggendorff_rt, file="models/model_poggendorff_rt.Rdata")
 load("models/model_poggendorff_rt.RData")
 load("models/gam_poggendorff_rt.RData")
 
-plot_ppcheck(model_poggendorff_rt)
+plot_ppcheck(model_poggendorff_rt, gam_poggendorff_rt)
 # performance::check_model(model_poggendorff_rt)
 # parameters::parameters(model)
 ```
@@ -1809,6 +1809,7 @@ p_data |>
 data <- select(random, -Participant)
 
 rez <- parameters::n_factors(data, n_max=15)
+rez
 plot(rez)
 
 
@@ -1926,8 +1927,16 @@ m3 <- sem(model = paste0(c(lvl1, lvl2), collapse = "\n"),
           )
 
 
+# Model 4 - No middle level
+lvl1 <- paste("i =~", data$Name)
 
-anova(m0, m1, m1b, m2)
+m4 <- sem(model = paste0(c(lvl1), collapse = "\n"),
+          data  = random,
+          bounds = "standard",
+          estimator = "ML"
+          )
+
+anova(m0, m1, m1b, m2, m4)
 
 summary(m1, standardize = TRUE, fit.measures = TRUE)
 ```
@@ -2027,6 +2036,26 @@ dfsem <- mutate(as.data.frame(predict(m1)), Participant = random$Participant)
 ```
 
 
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+# Variance Explained
+SumCy <- sum(cov(random[-1]), na.rm = TRUE)
+
+get_r2 <- function(data, dat, SumCy) {
+  Cx <- cov(data)
+  Cxy <- cov(data, dat)
+  solved <- tryCatch(solve(Cx), error = function(e) NULL)
+  if (is.null(solved)) {
+    return(NA)
+    next
+  } else {
+    VAF <- t(Cxy) %*% solved %*% Cxy
+    return(sum(VAF, na.rm = TRUE) / SumCy)
+  }
+}
+var <- get_r2(data=dfsem["i"], dat=random[-1], SumCy)
+```
+
+Factor *i* explained `r insight::format_percent(var)` of the variance of the dataset.
 
 ### Empirical Descriptors
 
