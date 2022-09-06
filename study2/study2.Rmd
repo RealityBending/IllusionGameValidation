@@ -617,7 +617,7 @@ p_delboeuf
 data <- filter(df, Illusion_Type == "Ebbinghaus") 
 ```
 
-```{r message=FALSE, warning=FALSE, cache=cache, eval=bestModels}
+```{r bestmodels_ebbinghaus, message=FALSE, warning=FALSE, cache=cache, eval=bestModels}
 best_models(data)
 
 # m1 <- glmmTMB::glmmTMB(Error ~ sqrt(Illusion_Difference) * logmod(abs(Illusion_Strength)) * Illusion_Effect +
@@ -747,7 +747,7 @@ p_ebbinghaus
 data <- filter(df, Illusion_Type == "Rod-Frame")
 ```
 
-```{r message=FALSE, warning=FALSE, cache=cache, eval=bestModels}
+```{r bestmodels_rodframe, message=FALSE, warning=FALSE, cache=cache, eval=bestModels}
 best_models(data)
 
 m1 <- glmmTMB::glmmTMB(Error ~ logmod(Illusion_Difference) * logmod(abs(Illusion_Strength)) * Illusion_Effect +
@@ -875,7 +875,7 @@ p_rodframe
 data <- filter(df, Illusion_Type == "Vertical-Horizontal") 
 ```
 
-```{r message=FALSE, warning=FALSE, cache=cache, eval=bestModels}
+```{r bestmodels_verticalhorizontal, message=FALSE, warning=FALSE, cache=cache, eval=bestModels}
 best_models(data)
 ```
 
@@ -995,7 +995,7 @@ p_verticalhorizontal
 data <- filter(df, Illusion_Type == "Zöllner")
 ```
 
-```{r message=FALSE, warning=FALSE, cache=cache, eval=bestModels}
+```{r bestmodels_zollner, message=FALSE, warning=FALSE, cache=cache, eval=bestModels}
 best_models(data)
 ```
 
@@ -1115,7 +1115,7 @@ p_zollner
 data <- filter(df, Illusion_Type == "White")
 ```
 
-```{r message=FALSE, warning=FALSE, cache=cache, eval=bestModels}
+```{r bestmodels_white, message=FALSE, warning=FALSE, cache=cache, eval=bestModels}
 best_models(data)
 ```
 
@@ -1231,7 +1231,7 @@ p_white
 data <- filter(df, Illusion_Type == "Müller-Lyer")
 ```
 
-```{r message=FALSE, warning=FALSE, cache=cache, eval=bestModels}
+```{r bestmodels_mullerlyer, message=FALSE, warning=FALSE, cache=cache, eval=bestModels}
 best_models(data)
 ```
 
@@ -1348,7 +1348,7 @@ p_mullerlyer
 data <- filter(df, Illusion_Type == "Ponzo")
 ```
 
-```{r message=FALSE, warning=FALSE, cache=FALSE, eval=bestModels}
+```{r bestmodels_ponzo, message=FALSE, warning=FALSE, cache=cache, eval=bestModels}
 best_models(data)
 ```
 
@@ -1465,7 +1465,7 @@ p_ponzo
 data <- filter(df, Illusion_Type == "Poggendorff")
 ```
 
-```{r message=FALSE, warning=FALSE, cache=cache, eval=bestModels}
+```{r bestmodels_poggendorff, message=FALSE, warning=FALSE, cache=cache, eval=bestModels}
 best_models(data)
 ```
 
@@ -1583,7 +1583,7 @@ p_poggendorff
 data <- filter(df, Illusion_Type == "Contrast")
 ```
 
-```{r message=FALSE, warning=FALSE, cache=cache, eval=bestModels}
+```{r bestmodels_contrast, message=FALSE, warning=FALSE, cache=cache, eval=bestModels}
 best_models(data)
 ```
 
@@ -1729,7 +1729,7 @@ data <- rbind(
   mutate(Parameter = str_remove(Parameter, "_Prob"))
 
 
-data |>
+data |> 
   ggplot(aes(y = Median, x = Participant)) +
   geom_pointrange(aes(ymin=CI_low, ymax=CI_high, color=Parameter), size=0.5) +
   geom_hline(yintercept = 0, linetype = "dotted") +
@@ -1761,7 +1761,7 @@ random[is.na(random)] <- 0
 
 ### Correlation 
 
-```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+```{r message=FALSE, warning=FALSE, cache=cache, eval=TRUE}
 cor <- correlation::correlation(random, redundant = TRUE, p_adjust = "none")
 
 p_data <- cor |>
@@ -1805,7 +1805,7 @@ p_data |>
 
 #### First Level
 
-```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+```{r message=FALSE, warning=FALSE, cache=cache, eval=TRUE}
 data <- select(random, -Participant)
 
 rez <- parameters::n_factors(data, n_max=15)
@@ -1832,7 +1832,7 @@ plot(fa) +
 
 #### Second Level
 
-```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+```{r message=FALSE, warning=FALSE, cache=cache, eval=TRUE}
 data <- predict(fa)
 
 rez <- parameters::n_factors(data, rotation = "varimax")
@@ -1852,7 +1852,7 @@ insight::print_md(fa2)
 ### Sructural Equation Model
 
 
-```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+```{r message=FALSE, warning=FALSE, cache=cache, eval=TRUE}
 library(lavaan)
 
 names <- names(select(random, -Participant))
@@ -2036,7 +2036,7 @@ dfsem <- mutate(as.data.frame(predict(m1)), Participant = random$Participant)
 ```
 
 
-```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+```{r message=FALSE, warning=FALSE, cache=cache, eval=TRUE}
 # Variance Explained
 SumCy <- sum(cov(random[-1]), na.rm = TRUE)
 
@@ -2059,7 +2059,7 @@ Factor *i* explained `r insight::format_percent(var)` of the variance of the dat
 
 ### Empirical Descriptors
 
-```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+```{r message=FALSE, warning=FALSE, cache=cache, eval=TRUE}
 # Average for 4 higher level of task difficulty
 empirical <- df |>
   # filter(Participant == "S01", Illusion_Type == "Poggendorff", Illusion_Difference <= 0.03) |> 
@@ -2104,7 +2104,7 @@ empirical <- df |>
 ```
 
 
-```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+```{r message=FALSE, warning=FALSE, cache=cache, eval=TRUE}
 r <- correlation(arrange(dfsem, as.character(Participant)), 
                  arrange(empirical, as.character(Participant)), 
                  sort=TRUE, p_adjust="none")
@@ -2127,17 +2127,14 @@ r |>
 
 
 
-### Figure
-
-
-
 ```{r message=FALSE, warning=FALSE, cache=cache, eval=TRUE}
-# Save
+# Save data
 dfsub |> 
   merge(dfsem, by = "Participant") |> 
   write.csv("../data/study3.csv", row.names = FALSE)
+```
 
-
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
 # Figure 1a
 # -----------
 for(i in c("delboeuf", "ebbinghaus", "rodframe", "verticalhorizontal", "zollner", "white", "mullerlyer", "ponzo", "poggendorff", "contrast")) {
@@ -2199,7 +2196,7 @@ p_ill <-
      p_poggendorff + p_contrast) + 
     patchwork::plot_layout(ncol= 2, nrow=5) 
 
-ggsave("figures/figure_ill2.png", p_ill, height = 30, width = 20, dpi=300)
+ggsave("figures/figure_ill2.png", p_ill, height = 40, width = 20, dpi=300)
 
 # Horizontal
 p_ill <- 

@@ -159,7 +159,7 @@ The best models were $log(diff)*strength$ for Delboeuf; $sqrt(diff)*strength$ fo
 For errors, most of the models closely matched their GAMs counterpart (see **Figure 2**), with the exception of Delboeuf (for which the GAM suggested a non-monotonic effect of illusion strength with a local minimum at 0) and Zöllner, in which theoretically congruent illusion effects were related to increased error rate.
 
 
-```{r message=FALSE, warning=FALSE, fig.cap="CAPTION."}
+```{r message=FALSE, warning=FALSE, out.width="100%", fig.cap="Top: the effect of illusion strength and task difficulty on the error rage and reaction time (RT) for each individual illusions. The solid line represent the General Additive Model (GAM), and the dashed line correspond to its approximation via linear models. Descriptive data is shown with stacked dots (errors are hanging from the top) and distributions for RTs. Negative values for illusion strength correspond to congruent (i.e., facilitating) illusion effects. Task difficulty (the objective difference between the targets of perceptual decision) levels are shown as colors, with lowest values corresponding to harder trials. Each illusion type is surrounded by 4 extreme examples of stimuli, corresponding to the hardest difficutly (on top) and the strongest illusion (on the right for incongruent illusions). Bottom: We extracted the effect slope of the illusion strength and its interaction with task difficulty for each participant. We fitted a Structural Equation Model (SEM) suggesting that these manifest variables group to first-level illusion-specific latent factors, which then load on a general factor of illusion sensitivity (Factor \\textit{i})."}
 knitr::include_graphics("figures/Figure2.png")
 ```
 
@@ -191,7 +191,7 @@ Finally, this study provided evidence for both the existence of illusion-specifi
 
 ## Aim
 
-Study 3 aimed at investigating the links between the inter-individual scores of illusion sensitivity (obtained in study 2), and demographic and dispositional variables.
+Study 3 aimed at investigating the links between the inter-individual scores of illusion sensitivity (obtained in study 2), and demographic and dispositional variables. **Insert a bit of litterature about why and some findings justifying what we did**.
 
 
 
@@ -201,12 +201,23 @@ This study was based on the data collected in study 2. The variables of interest
 
 
 ```{r message=FALSE, warning=FALSE, fig.cap="CAPTION."}
-knitr::include_graphics("figures/Figure2.png")
+knitr::include_graphics("figures/Figure3.png")
 ```
 
 ## Data Analysis
 
+For each of the individual illusion sensitivity scores (10 illusion-specific factors and the general Factor *i*), we tested the effect of contextual variables (screen size, screen refresh rate), demographic variables (sex, education, age) and personality. As the supplementary material contains the detailed results, we will here only report the significant results [based on the Bayes Factor *BF* or the Probability of Direction *pd*, see @makowski2019indices].
+
 ## Results
+
+The Bayesian correlation analysis (with narrow priors centered around a null effect) between the illusion scores and contextual variables (screen size and refresh rate) provided weak evidence in favor of an absence of effect, with the exception of the two contrast-based illusions. Anecdotal ($BF_{10} = 2.05$) and moderate evidence ($BF_{10} = 4.11$) was found for a negative correlation between screen size and the sensitivity to the White and the Contrast illusion, respectively. To test whether this result could be an artifact related to the highly skewed screen size distribution (caused by very few participants with extreme screen sizes), we re-ran a robust correlation (with rank-transformed values), which provided even stronger evidence in favor of the effect existence ($BF_{10} = 28.19$, $BF_{10} = 4.31$ for White and Contrast, respectively).
+
+The Bayesian t-tests on the effect of sex suggested anecdotal to moderate evidence in favour of the null effect for all scores, with the exception of the sensitivity to the Zöllner illusion, which was higher in males as compared to females ($\Delta=-0.37$, 95\% CI [-0.62, -0.13], $BF_{10} = 12.74$). We fitted Bayesian linear models with the education level entered as a monotonic predictor [appropriate for ordinal variables, @burkner2020modelling], which yielded no significant effects. For age, we fitted two types of models for each score, one general additive models (GAM) and a 2nd order polynomial model. These consistently suggested a significant positive linear relationship between age and Factor *i* ($pd=100\%$), as well as the sensitivity to Müller-Lyer ($pd=100\%$), Vertical-Horizontal ($pd=100\%$), Zöllner ($pd=100\%$) and Ebbinghaus ($pd=99\%$) illusions.
+
+Regarding "normal" personality traits, Bayesian correlations suggested substantial evidence in favor of a positive relationship between *Honesty-Humility* and Zöllner ($BF_{10} > 100$), Vertical-Horizontal ($BF_{10} = 9.78$) and the Factor *i* ($BF_{10} = 4.00$); as well as between *Agreeableness* and Vertical-Horizontal ($BF_{10} = 25.06$), Ponzo ($BF_{10} = 4.88$) and the Factor *i* ($BF_{10} = 19.65$).
+
+Regarding "pathological" personality traits, the results yielded strong evidence in favor of a negative relationship between multiple illusion scores and multiple traits. *Antagonism* was associated with the sensitivity to Vertical-Horizontal ($BF_{10} > 100$), Müller-Lyer ($BF_{10} = 21.57$), Ponzo ($BF_{10} = 17.97$) illusions, and the Factor *i* ($BF_{10} = 55.45$); *Psychoticism* was associated with the sensitivity to Vertical-Horizontal ($BF_{10} = 66.63$) and Müller-Lyer ($BF_{10} = 35.59$) illusions, and the Factor *i* ($BF_{10} = 35.02$); *Disinhibition* was associated with the sensitivity to Vertical-Horizontal ($BF_{10} = 25.38$), Zöllner ($BF_{10} = 7.59$), Müller-Lyer ($BF_{10} = 5.89$) illusions, and the Factor *i* ($BF_{10} = 31.42$); and *Negative Affect* was associated with Zöllner ($BF_{10} = 62.04$), Vertical-Horizontal ($BF_{10} = 12.65$), Müller-Lyer ($BF_{10} = 3.17$), and the Factor *i* ($BF_{10} = 6.39$). The last remaining trait, *Detachment*, did not share any relationship with illusion sensitivity.
+
 
 ## Discussion
 
@@ -216,7 +227,7 @@ knitr::include_graphics("figures/Figure2.png")
 
 Using the parametric illusion generation framework we developed, Pyllusion [@makowski2021a], we have hence shown that illusions can be manipulated continuously across several different visual illusions. This opens the door for new illusions-based paradigms and tasks, therefore making it possible for future researchers to directly manipulate specific features and parameters of the illusion that are of interest. The validation of this novel framework also affords future illusion scientists a standardized measure of illusion susceptibility, instead of relying on conventional methods that depend upon participants' subjective perceptions. In our paradigm, in which we apply this approach to a reaction-time task, we were able to measure inter-individual scores of objective illusion sensitivity.
 
-
+Notably, the general sensitivity to illusions Factor *i* was negatively associated with *Antagonism*, *Psychoticism*, *Disinhibition* and *Negative Affect*.
 
 <!-- Dump  -->
 Most notably, there is currently no universally agreed upon neurocognitive mechanism that explains individuals' susceptibility to visual illusions [@mylniec2016]. For instance, while some researchers have tried to explain our sensitivity to illusory effects as a result of deficits in the low-level visual processing system [@cretenoud2019; @gori2016], others have provided a compelling case using a top-down approach, suggesting that such visual phenomena occur as a result of a conflict between our visual input and our prior beliefs[@teufel2018; @caporuscio2022]. 
