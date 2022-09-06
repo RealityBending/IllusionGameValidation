@@ -1,5 +1,5 @@
 ---
-title             : "**The Illusion Game: A Novel Experimental Paradigm provides Evidence in Favour of a General Factor of Visual Illusion Sensitivity and Pathological Personality Correlates**"
+title             : "**The Illusion Game: A Novel Experimental Paradigm Provides Evidence in Favour of a General Factor of Visual Illusion Sensitivity and Personality Correlates**"
 shorttitle        : "Illusion Game"
 author:
   - name          : "Dominique Makowski"
@@ -59,9 +59,9 @@ cache <- TRUE
 
 <!-- Intro  & Gaps-->
 
-Visual illusions are fascinating stimuli capturing a key feature of our neurocognitive systems. 
+Visual illusions are fascinating stimuli, capturing a key feature of our neurocognitive systems. 
 They eloquently show that our brains did not evolve to be perfect perceptual devices providing veridical accounts of physical reality, but to integrate prior knowledge and contextual information - blended together in our subjective conscious experience [@carbon2014].
-Despite the historical and intensive interest within the fields of visual perception [@day1972; @eagleman2001; @gomez-villa2022], consciousness science [@caporuscio2022, @lamme2020], and psychiatry [@notredame2014; @gori2016; @razeghi2022; @teufel2015], several important issues remain open. 
+Despite the historical and intensive interest within the fields of visual perception [@day1972; @eagleman2001; @gomez-villa2022], consciousness science [@caporuscio2022; @lamme2020], and psychiatry [@notredame2014; @gori2016; @razeghi2022; @teufel2015], several important issues remain open. 
 
 Notably, the presence of a common mechanism underlying the effect of different illusions has been contested [@hamburger2016; @cretenoud2019a; @teufel2018a; @cretenoud2020]; and the nature of the underlying processes - whether related to low-level features of the visual processing system [@cretenoud2019; @gori2016] or to top-down influences of prior beliefs [@teufel2018; @caporuscio2022] are strongly debated. The existence of dispositional correlates of illusion sensitivity - for example, higher illusion resistance has been reported in schizophrenia and autism [@notredame2014; @park2022; @giaouri2011; @keane2014] or **Insert some demographic / personality feature** [**REF**] - is another area of controversy.
 
@@ -69,7 +69,7 @@ Notably, the presence of a common mechanism underlying the effect of different i
 
 One key challenge hindering the further development of illusion research is the relative difficulty in adapting visual illusions to an experimental setting, which typically requires the controlled modulation of the specific variables of interest. 
 To address this issue, we first developed a parametric framework to manipulate visual illusions, which we implemented and made accessible in the open-source software *Pyllusion* [@makowski2021]. 
-This software allows us to generate different types of classic visual illusions (e.g., Müller-Lyer, Ponzo, Delboeuf, Ebbinghaus) with a continuous and independent modulation of two parameters, *illusion strength* and *task difficulty* (see **Figure 1**).
+This software allows us to generate different types of classic visual illusions (e.g., Müller-Lyer, Ponzo, Delboeuf, Ebbinghaus) with a continuous and independent modulation of two parameters: *illusion strength* and *task difficulty* (see **Figure 1**).
 
 ```{r message=FALSE, warning=FALSE, fig.cap="The parametric framework for visual illusions (Makowski et al., 2021) applied to the Müller-Lyer illusion (above). Below are examples of stimuli showcasing the manipulation of two parameters, task difficulty and illusion strength."}
 knitr::include_graphics("figures/Figure1.png")
@@ -78,7 +78,7 @@ knitr::include_graphics("figures/Figure1.png")
 <!-- Target, strength, difficulty -->
 
 Indeed, many visual illusions can be seen as being composed of *targets* (e.g., same-length lines), of which perception is biased by the *context* (e.g., in the Müller-Lyer illusion, the same-length line segments appear to have different lengths when they end with inwards or outwards pointing arrows). 
-Past illusion studies traditionally employed paradigms focusing on participants' subjective experience, by asking them to what extent they perceive two identical targets as different (*REF*), or having them adjust the targets to a reference stimulus relying only on their perception [@mylniec2016a; @grzeczkowski2018]. Alternatively, *Pyllusions* allows to create illusions in which the targets are objectively different (e.g., one segment is truly more or less longer than the other), and in which the illusion varies in strength (the biasing angle of the arrows is more or less acute). 
+Past illusion studies traditionally employed paradigms focusing on participants' subjective experience, by asking them to what extent they perceive two identical targets as different (*REF*), or having them adjust the targets to a reference stimulus relying only on their perception [@mylniec2016a; @grzeczkowski2018]. Alternatively, *Pyllusions* allows the creation of illusions in which the targets are objectively different (e.g., one segment is truly more or less longer than the other), and in which the illusion varies in strength (the biasing angle of the arrows is more or less acute). 
 
 
 <!-- Paradigm -->
@@ -95,7 +95,7 @@ In line with total open-science standards, all the material (stimuli generation 
 
 ## Aim
 
-Study 1 can be seen as a pilot experiment aiming at gathering some preliminary data to assess if the stimuli generated by *Pyllusion* behaves as expected for each of the 10 illusion types (i.e., whether an increase of task difficulty and illusion strength leads to an increase of errors); and develop an intuition about the magnitude of effects, to refine for the next study the stimuli parameters to a more sensible range (i.e., not overly easy and not impossibly hard).
+Study 1 can be seen as a pilot experiment aiming to gather some preliminary data to assess if the stimuli generated by *Pyllusion* behaves as expected for each of the 10 illusion types (i.e., whether an increase of task difficulty and illusion strength leads to an increase of errors); and develop an intuition about the magnitude of effects, to refine the stimuli parameters to a more sensible range (i.e., not overly easy and not impossibly hard) for the next study.
 
 ## Procedure
 
@@ -142,7 +142,7 @@ Additionally, instead of repeating each stimulus two times, we generated illusio
 
 ## Participants
 
-Using the same recruitment procedure as in study 1, we recruited 256 participants, within which 6 were identified as outliers and excluded, leaving a final sample of 250 participants (Mean age = 26.5, SD = 7.6, range: [18, 69]; Sex: 48% females, 52% males). Please see study 3 for the full demographic breakdown. We discarded blocks with more than 50% of errors (2.16% of trials) and 0.76% trials with extreme response times (\< 125 ms or \> 4 SD above mean).
+Using the same recruitment procedure as in study 1, we recruited 256 participants, out of which 6 were identified as outliers and excluded, leaving a final sample of 250 participants (Mean age = 26.5, SD = 7.6, range: [18, 69]; Sex: 48% females, 52% males). Please see study 3 for the full demographic breakdown. We discarded blocks with more than 50% of errors (2.16% of trials) and 0.76% trials with extreme response times (\< 125 ms or \> 4 SD above mean).
 
 ## Data Analysis
 
@@ -164,10 +164,10 @@ knitr::include_graphics("figures/Figure2.png")
 ```
 
 
-For RTs, the GAMs suggested a consistent non-linear relationship between RT and illusion strength: as the illusion strength increase beyond a certain threshold, the participants respond faster. While this is is not surprising (strong illusions are likely so effective in biasing perception that it is "easier", i.e., faster, to make the wrong decision), the linear models were not designed to capture this - likely quadratic - pattern and hence are not good representatives of the underlying dynamics. As such, we decided not to use add them for the individual scores analysis.
+For RTs, the GAMs suggested a consistent non-linear relationship between RT and illusion strength: as the illusion strength increase beyond a certain threshold, the participants respond faster. While this is is not surprising (strong illusions are likely so effective in biasing perception that it is "easier", i.e., faster, to make the wrong decision), the linear models were not designed to capture this - likely quadratic - pattern and hence are not good representatives of the underlying dynamics. As such, we decided not to use them for the individual scores analysis.
 <!-- Additionally, it would have increased the parameter space from 20 to 40 variables, which was deemed as statistically unreasonable given our sample size). -->
 
-Though imperfect, we believe that the random-slope models capture inter-individual differences with more accuracy than basic empirical scores, such as the total number of errors, or the average RT. Thus, for each illusion and within each participant, we extracted the effect of illusion strength and its interaction with task difficulty when the illusion effect was incongruent. These twenty participant-level scores were subjected to exploratory factor analysis (EFA). The Method Agreement Procedure [@parametersArticle] suggested the presence of 7 latent factors. An oblique (*oblimin* rotation) factor solution explaining 66.69% of variance suggested separate dimensions for the effect of Zöllner, White, Poggendorff, Contrast, Ebbinghaus, Delboeuf, and a common factor for the parameters related to Müller-Lyer, Vertical-Horizontal, Ponzo and Rod and Frame. We submitted these factors to a second-level analysis and extracted two orthogonal (*varimax* rotation) factors. The first factor was loaded by all the previous dimensions with the exception of Delboeuf, which formed its own separate factor.
+Though imperfect, we believe that the random-slope models capture inter-individual differences with more accuracy (and are also more conservative estimates due shrinkage) than basic empirical scores, such as the total number of errors, or the average RT. Thus, for each illusion and within each participant, we extracted the effect of illusion strength and its interaction with task difficulty when the illusion effect was incongruent. These twenty participant-level scores were subjected to exploratory factor analysis (EFA). The Method Agreement Procedure [@parametersArticle] suggested the presence of 7 latent factors. An oblique (*oblimin* rotation) factor solution explaining 66.69% of variance suggested separate dimensions for the effect of Zöllner, White, Poggendorff, Contrast, Ebbinghaus, Delboeuf, and a common factor for the parameters related to Müller-Lyer, Vertical-Horizontal, Ponzo and Rod and Frame. We submitted these factors to a second-level analysis and extracted two orthogonal (*varimax* rotation) factors. The first factor was loaded by all the previous dimensions with the exception of Delboeuf, which formed its own separate factor.
 
 
 Finally, we tested this data-driven model (*m0*) against four other structural models using structural equation modelling (SEM): one in which the two parameters of each of the 10 illusions (illusion strength and interaction with task difficulty) loaded on separate factors, which then all loaded on a common factor (*m1*); one which the parameters were grouped by illusion type (lines, circles, contrast and angle) before loading on a common factor (*m2*); one in which all the parameters related to strength, and all the parameters related to the interaction loaded onto two respective factors, which then loaded on a common factor (*m3*); and one in which there was no intermediate level: all 20 parameters loaded directly on a common factor (*m4*). 
@@ -179,10 +179,10 @@ We have to keep in mind that these individual scores are the result of several l
 
 ## Discussion
 
-This study confirmed that it was possible to manipulate continuously the effect of illusion strength for 10 classical illusions. Increasing the illusion strength increased the likelihood of errors, as well as the average and spread of RTs (but only up to a point, after which participants become faster at responding with the wrong answer). Future studies are needed to explore reaction times and try to identify the most appropriate models, and / or use models that integrate errors and reaction time (e.g., drift diffusion models).
+This study confirmed that it was possible to continuously manipulate the effect of illusion strength for 10 classical illusions. Increasing the illusion strength increased the likelihood of errors, as well as the average and spread of RTs (but only up to a point, after which participants become faster at responding with the wrong answer). Future studies are needed to explore reaction times and try to identify the most appropriate models, and / or use models that integrate errors and reaction time (e.g., drift diffusion models).
 
 
-The effect on errors was monotonic for most illusions, but Delboeuf and Zöllner. For both of them, mildly congruent illusion strengths (which theoretically were supposed to be associated with less errors than incongruent effects) were related to a slight and strong increase of errors, respectively. For Delboeuf, we believe that it was an artifact caused by illusion generation algorithm: the outline of the target circles was always created as slightly bigger, which made the difference between them more obvious at an illusion strength of 0. This was fixed in latest release of *Pyllusion* (v1.2), which now generate outlines of the same size as the target circle. For Zöllner, however, we did not find a good explanation of the pattern. **TODO: is there some explanation that we can find in the literature?** 
+The effect on errors was monotonic for most illusions, with the exception of Delboeuf and Zöllner. For both of them, mildly congruent illusion strengths (which theoretically were supposed to be associated with less errors than incongruent effects) were related to a small and strong increase of errors, respectively. For Delboeuf, we believe that it was an artifact caused by illusion generation algorithm: the outline of the target circles was always created as slightly bigger, which made the difference between them more obvious at an illusion strength of 0. This was fixed in latest release of *Pyllusion* (v1.2), which now generate outlines of the same size as the target circle. For Zöllner, however, we did not find a good explanation of the pattern. **TODO: is there some explanation that we can find in the literature?** 
 
 Finally, this study provided evidence for both the existence of illusion-specific factors, as well as for a common latent factor (labelled Factor *i*) that explained about half of the total variance. These participant-level scores were related to the error rate and average reaction time, and can thus be interpreted as indices of illusion sensitivity.
 
@@ -191,9 +191,26 @@ Finally, this study provided evidence for both the existence of illusion-specifi
 
 ## Aim
 
+Study 3 aimed at investigating the links between the inter-individual scores of illusion sensitivity (obtained in study 2), and demographic and dispositional variables.
+
+
+
 ## Procedure
 
-This study was based on the data collected in study 2. However, the variables of interest here were taken from the questionnaires that were inserted in between the two series of illusion blocks. We used the *IPIP6* (24 items; [@sibley2011]) to measure 6 personality traits (namely, extraversion, openness, conscientiousness, agreeableness, neuroticism and honesty-humility). On the other hand, the PID-5 (25 items; [@hopwood2012]) was used to measure the degree to which participants inhibit psychopathological personality traits (disinhibition, antagonism, detachment, negative affect and psychoticism). The participants were the same as in study 2. However, due to a technical issue, no data on the personality questions are available for the first eight participants.
+This study was based on the data collected in study 2. The variables of interest here were taken from the questionnaires that were inserted in between the two series of illusion blocks. We used the *IPIP6* [24 items, @sibley2011] to measure 6 "normal" personality traits (Extraversion, Openness, Conscientiousness, Agreeableness, Neuroticism and Honesty-humility), and the PID-5 [25 items, @hopwood2012] to measure "pathological" personality traits (Disinhibition, Antagonism, Detachment, Negative Affect and Psychoticism). The participants were the same as in study 2 (see **Figure 3**). However, due to a technical issue, no personality data was recorded for the first eight participants.
+
+
+```{r message=FALSE, warning=FALSE, fig.cap="CAPTION."}
+knitr::include_graphics("figures/Figure2.png")
+```
+
+## Data Analysis
+
+## Results
+
+## Discussion
+
+
 
 # General Discussion
 
