@@ -595,7 +595,7 @@ load("models/gam_delboeuf_rt.RData")
 
 
 ```{r message=FALSE, warning=FALSE, cache=cache}
-plot_ppcheck(model_delboeuf_rt, gam_delboeuf_rt)
+# plot_ppcheck(model_delboeuf_rt, gam_delboeuf_rt)
 
 p_delboeuf_rt <- plot_model_rt(data, model_delboeuf_rt, gam_delboeuf_rt)
 ```
@@ -725,7 +725,7 @@ load("models/gam_ebbinghaus_rt.RData")
 
 
 ```{r message=FALSE, warning=FALSE, cache=cache, eval=TRUE}
-plot_ppcheck(model_ebbinghaus_rt, gam_ebbinghaus_rt)
+# # plot_ppcheck(model_ebbinghaus_rt, gam_ebbinghaus_rt)
 
 p_ebbinghaus_rt <- plot_model_rt(data, model_ebbinghaus_rt, gam_ebbinghaus_rt)
 ```
@@ -852,7 +852,7 @@ load("models/gam_rodframe_rt.RData")
 ```
 
 ```{r message=FALSE, warning=FALSE, cache=cache, eval=TRUE}
-plot_ppcheck(model_rodframe_rt, gam_rodframe_rt)
+# plot_ppcheck(model_rodframe_rt, gam_rodframe_rt)
 
 p_rodframe_rt <- plot_model_rt(data, model_rodframe_rt, gam_rodframe_rt)
 ```
@@ -966,7 +966,7 @@ save(model_verticalhorizontal_rt, file="models/model_verticalhorizontal_rt.Rdata
 load("models/model_verticalhorizontal_rt.RData")
 load("models/gam_verticalhorizontal_rt.RData")
 
-plot_ppcheck(model_verticalhorizontal_rt, gam_verticalhorizontal_rt)
+# plot_ppcheck(model_verticalhorizontal_rt, gam_verticalhorizontal_rt)
 # performance::check_model(model_verticalhorizontal_rt)
 # parameters::parameters(model)
 ```
@@ -1088,7 +1088,7 @@ save(model_zollner_rt, file="models/model_zollner_rt.Rdata")
 load("models/model_zollner_rt.RData")
 load("models/gam_zollner_rt.RData")
 
-plot_ppcheck(model_zollner_rt, gam_zollner_rt)
+# plot_ppcheck(model_zollner_rt, gam_zollner_rt)
 # performance::check_model(model_zollner_rt)
 # parameters::parameters(model)
 
@@ -1204,7 +1204,7 @@ save(model_white_rt, file="models/model_white_rt.Rdata")
 load("models/model_white_rt.RData")
 load("models/gam_white_rt.RData")
 
-plot_ppcheck(model_white_rt, gam_white_rt)
+# plot_ppcheck(model_white_rt, gam_white_rt)
 # performance::check_model(model_white_rt)
 # parameters::parameters(model)
 ```
@@ -1322,7 +1322,7 @@ save(model_mullerlyer_rt, file="models/model_mullerlyer_rt.Rdata")
 load("models/model_mullerlyer_rt.RData")
 load("models/gam_mullerlyer_rt.RData")
 
-plot_ppcheck(model_mullerlyer_rt, gam_mullerlyer_rt)
+# plot_ppcheck(model_mullerlyer_rt, gam_mullerlyer_rt)
 # performance::check_model(model_mullerlyer_rt)
 # parameters::parameters(model)
 ```
@@ -1439,7 +1439,7 @@ save(model_ponzo_rt, file="models/model_ponzo_rt.Rdata")
 load("models/model_ponzo_rt.RData")
 load("models/gam_ponzo_rt.RData")
 
-plot_ppcheck(model_ponzo_rt, gam_ponzo_rt)
+# plot_ppcheck(model_ponzo_rt, gam_ponzo_rt)
 # performance::check_model(model_ponzo_rt)
 # parameters::parameters(model)
 ```
@@ -1554,7 +1554,7 @@ save(model_poggendorff_rt, file="models/model_poggendorff_rt.Rdata")
 load("models/model_poggendorff_rt.RData")
 load("models/gam_poggendorff_rt.RData")
 
-plot_ppcheck(model_poggendorff_rt, gam_poggendorff_rt)
+# plot_ppcheck(model_poggendorff_rt, gam_poggendorff_rt)
 # performance::check_model(model_poggendorff_rt)
 # parameters::parameters(model)
 ```
@@ -1674,7 +1674,7 @@ save(model_contrast_rt, file="models/model_contrast_rt.Rdata")
 load("models/model_contrast_rt.RData")
 load("models/gam_contrast_rt.RData")
 
-plot_ppcheck(model_contrast_rt, gam_contrast_rt)
+# plot_ppcheck(model_contrast_rt, gam_contrast_rt)
 # performance::check_model(model_contrast_rt)
 # parameters::parameters(model)
 ```
@@ -1697,7 +1697,7 @@ p_contrast
 ### Extraction
 
 
-```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
+```{r message=FALSE, warning=FALSE, cache=cache, eval=TRUE}
 data <- rbind(
   extract_random(model_delboeuf_err, "Delboeuf"),
   # extract_random(model_delboeuf_rt, "Delboeuf"),
@@ -2190,6 +2190,18 @@ p_contrast <- plot_all(
   plot_model_err(filter(df, Illusion_Type == "Contrast"), model_contrast_err, gam_contrast_err), 
   plot_model_rt(filter(df, Illusion_Type == "Contrast", Error == 0), model_contrast_rt, gam_contrast_rt))
 
+# Vertical
+p_ill <- 
+  (p_delboeuf + p_ebbinghaus + 
+     p_rodframe + p_verticalhorizontal +
+     p_zollner + p_white +
+     p_mullerlyer + p_ponzo +
+     p_poggendorff + p_contrast) + 
+    patchwork::plot_layout(ncol= 2, nrow=5) 
+
+ggsave("figures/figure_ill2.png", p_ill, height = 30, width = 20, dpi=300)
+
+# Horizontal
 p_ill <- 
   (p_delboeuf + p_ebbinghaus + 
      p_rodframe + p_verticalhorizontal +
