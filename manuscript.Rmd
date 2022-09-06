@@ -8,10 +8,60 @@ author:
     address       : "HSS 04-18, 48 Nanyang Avenue, Singapore"
     email         : "dom.makowski@gmail.com"
     orcid         : 0000-0001-5375-9967
-
+    role:         # Contributorship roles (e.g., CRediT, https://casrai.org/credit/)
+      - "Conceptualization"
+      - "Data curation"
+      - "Formal Analysis"
+      - "Funding acquisition"
+      - "Investigation"
+      - "Methodology"
+      - "Project administration"
+      - "Resources"
+      - "Software"
+      - "Supervision"
+      - "Validation"
+      - "Visualization"
+      - "Writing – original draft"
+  - name          : "An Shu Te"
+    affiliation   : "1"
+    orcid         : 0000-0001-8008-2824
+    role:
+      - "Project administration"
+      - "Resources"
+      - "Investigation"
+      - "Writing – original draft"
+  - name          : "Stephanie Kirk"
+    affiliation   : "1"
+    orcid         : 0000-0001-8008-2824
+    role:
+      - "Project administration"
+      - "Resources"
+      - "Writing – original draft"
+  - name          : "Ngoi Zi Liang"
+    affiliation   : "1"
+    orcid         : 0000-0001-8008-2824
+    role:
+      - "Project administration"
+      - "Resources"
+      - "Writing – original draft"
+  - name          : "S.H. Annabel Chen"
+    affiliation   : "1, 2, 3, 4"
+    orcid         : 0000-0002-1540-5516
+    role:
+      - "Project administration"
+      - "Supervision"
+      - "Writing – review & editing"
+      
 affiliation:
   - id            : "1"
     institution   : "School of Social Sciences, Nanyang Technological University, Singapore"
+  - id            : "2"
+    institution   : "LKC Medicine, Nanyang Technological University, Singapore"
+  - id            : "3"
+    institution   : "National Institute of Education, Singapore"
+  - id            : "4"
+    institution   : "Centre for Research and Development in Learning, Nanyang Technological University, Singapore"
+    
 authornote: |
   Correspondence concerning this article should be addressed to Dominique Makowski, HSS 04-18, 48 Nanyang Avenue, Singapore (dom.makowski@gmail.com).
 abstract: |
@@ -61,21 +111,22 @@ cache <- TRUE
 
 Visual illusions are fascinating stimuli, capturing a key feature of our neurocognitive systems. They eloquently show that our brains did not evolve to be perfect perceptual devices providing veridical accounts of physical reality, but integrate prior knowledge and contextual information - blended together in our subjective conscious experience [@carbon2014]. Despite the historical and intensive interest within the fields of visual perception [@day1972; @eagleman2001; @gomez-villa2022], consciousness science [@caporuscio2022; @lamme2020], and psychiatry [@notredame2014; @gori2016; @razeghi2022; @teufel2015], several important issues remain open.
 
-Notably, the presence of a common mechanism underlying the effect of different illusions has been contested [@hamburger2016; @cretenoud2019a; @teufel2018a; @cretenoud2020]; and the nature of the underlying processes - whether related to low-level features of the visual processing system [@cretenoud2019; @gori2016] or to top-down influences of prior beliefs [@teufel2018; @caporuscio2022] are strongly debated. The existence of dispositional or demographic correlates of illusion sensitivity - for example, higher illusion resistance has been reported in schizophrenia and autism [@notredame2014; @park2022; @giaouri2011; @keane2014]; as well as in males as compared to females [@miller2001; @papageorgiou2020; @lo2011; @shaqiri2018] - is another area of controversy.
+Notably, the presence of a common mechanism underlying the effect of different illusions has been contested [@hamburger2016; @cretenoud2019a; @teufel2018a; @cretenoud2020]; and the nature of the underlying processes - whether related to low-level features of the visual processing system [@cretenoud2019; @gori2016] or to top-down influences of prior beliefs [@teufel2018; @caporuscio2022] are strongly debated. The existence of dispositional or demographic correlates of illusion sensitivity - for example, higher illusion resistance has been reported in schizophrenia and autism [@notredame2014; @park2022; @giaouri2011; @keane2014]; as well as in males as compared to females [@miller2001; @papageorgiou2020; @lo2011; @shaqiri2018] (**Is there something for personality that we could use here instead of sex?**) - is another area of controversy.
+
 
 <!-- Pyllusion -->
 
 One key challenge hindering the further development of illusion research is the relative difficulty in adapting visual illusions to an experimental setting, which typically requires the controlled modulation of the specific variables of interest. 
 To address this issue, we first developed a parametric framework to manipulate visual illusions, which we implemented and made accessible in the open-source software *Pyllusion* [@makowski2021]. This software allows us to generate different types of classic visual illusions (e.g., Müller-Lyer, Ponzo, Delboeuf, Ebbinghaus) with a continuous and independent modulation of two parameters: *illusion strength* and *task difficulty* (see **Figure 1**).
 
-```{r message=FALSE, warning=FALSE, fig.cap="The parametric framework for visual illusions (Makowski et al., 2021) applied to the Müller-Lyer illusion (above). Below are examples of stimuli showcasing the manipulation of two parameters, task difficulty and illusion strength."}
+```{r message=FALSE, warning=FALSE, fig.cap="The parametric framework for visual illusions (Makowski et al., 2021) applied to the Müller-Lyer illusion (above). Below are examples of stimuli showcasing the manipulation of two parameters, task difficulty and illusion strength.", out.width="100%"}
 knitr::include_graphics("figures/Figure1.png")
 ```
 
 <!-- Target, strength, difficulty -->
 
 Indeed, many visual illusions can be seen as being composed of *targets* (e.g., same-length lines), of which perception is biased by the *context* (e.g., in the Müller-Lyer illusion, the same-length line segments appear to have different lengths when they end with inwards or outwards pointing arrows). 
-Past illusion studies traditionally employed paradigms focusing on participants' subjective experience, by asking them to what extent they perceive two identical targets as different [@lányi], or having them adjust the targets to a reference stimulus relying only on their perception [@mylniec2016a; @grzeczkowski2018]. 
+Past illusion studies traditionally employed paradigms focusing on participants' subjective experience, by asking them to what extent they perceive two identical targets as different [@lanyi2022can], or having them adjust the targets to a reference stimulus relying only on their perception [@mylniec2016a; @grzeczkowski2018]. 
 Alternatively, *Pyllusion* allows the creation of illusions in which the targets are objectively different (e.g., one segment is truly more or less longer than the other), and in which the illusion varies in strength (the biasing angle of the arrows is more or less acute).
 
 <!-- Paradigm -->
@@ -84,7 +135,7 @@ This opens the door for an experimental task in which participants make perceptu
 
 <!-- Goals -->
 
-In the present set of preregistered studies, we will first test this novel paradigm by investigating if the effect of illusion and task difficulty can be manipulated continuously, and separated statistically. Then, we will further utilize the paradigm to assess whether 10 different classic illusions (Delboeuf, Ebbinghaus, Rod and Frame, Vertical-Horizontal, Zöllner, White, Müller-Lyer, Ponzo, Poggendorff, Contrast) share a common latent factor. Finally, we will investigate how the the inter-individual sensitivity to illusions relates to dispositional variables, such as demographic characteristics and personality.
+In the present set of preregistered studies, we will first test this novel paradigm by investigating if the effect of illusion and task difficulty can be manipulated continuously, and separately modeled statistically. Then, we will further utilize the paradigm to assess whether 10 different classic illusions (Delboeuf, Ebbinghaus, Rod and Frame, Vertical-Horizontal, Zöllner, White, Müller-Lyer, Ponzo, Poggendorff, Contrast) share a common latent factor. Finally, we will investigate how the the inter-individual sensitivity to illusions relates to dispositional variables, such as demographic characteristics and personality.
 
 In line with open-science standards, all the material (stimuli generation code, experiment code, raw data, analysis script with complementary figures and analyses, preregistration, etc.) is available at [**https://github.com/RealityBending/IllusionGameValidation**](https://github.com/RealityBending/IllusionGameValidation){.uri}.
 
@@ -144,7 +195,7 @@ Using the same recruitment procedure as in study 1, we recruited 256 participant
 
 The first part of the analysis focused on modelling the effect of illusion strength and task difficulty on errors and reaction time (RT), within each illusion. In order to achieve that, we started by fitting General Additive Models (GAMs), which can accommodate possible non-linear effects and interactions. Errors were analyzed using Bayesian logistic mixed models, and RTs of correct responses were analyzed using an ex-Gaussian family with the same fixed effects entered for the location $\mu$ (mean), scale $\sigma$ (spread) and tail-dominance $\tau$ of the RT distribution [@balota2011moving; @matzke2009psychological].
 
-Using the GAMs as a "ground-truth", we attempted at approximating them using general linear models, which have the advantage of estimating the participant-level variability of the effects (via random slopes). Following a comparison of models with a combination of transformations (raw, log, square root or cubic root) on the main predictors (task *difficulty* and illusion *strength*), we selected and fitted the best model (best on their indices of fit), and compared their output visually (see **Figure 2**).
+Using GAMs as the "ground-truth" models, we attempted at approximating them using general linear models, which have the advantage of estimating the participant-level variability of the effects (via random slopes). Following a comparison of models with a combination of transformations (raw, log, square root or cubic root) on the main predictors (task *difficulty* and illusion *strength*), we selected and fitted the best model (best on their indices of fit), and compared their output visually (see **Figure 2**).
 
 We then extracted the inter-individual variability in the effect of illusion strength and its interaction with task difficulty, and used it as participant-level scores. Finally, We explored the relationship of these indices across different illusions using exploratory factor analysis (EFA) and structural equation modelling (SEM).
 
@@ -172,21 +223,21 @@ We have to keep in mind that these individual scores are the result of several l
 
 This study confirmed that it was possible to continuously manipulate the effect of illusion strength for 10 classical illusions. Increasing the illusion strength increased the likelihood of errors, as well as the average and spread of RTs (but only up to a point, after which participants become faster at responding with the wrong answer). Future studies are needed to explore reaction times and try to identify the most appropriate models, and / or use models that integrate errors and reaction time (e.g., drift diffusion models).
 
-The effect on errors was monotonic for most illusions, with the exception of Delboeuf and Zöllner. For both of them, mildly congruent illusion strengths (which theoretically were supposed to be associated with less errors than incongruent effects) were related to small and strong increases of errors, respectively. For the Delboeuf illusion, we believe that this was due to an artifact caused by the illusion generation algorithm: the outline of the target circles was always created as slightly bigger, which made the difference between them more obvious at an illusion strength of 0. This was fixed in latest release of *Pyllusion* (v1.2), which now generate outlines of the same size as the target circle. For the Zöllner illusion, this observation is consistent with @kitaoka2000, in which they reported an acute angle contraction effect at very small as well as at sufficiently large angles (below 10 degrees for the former and between 50 to 90 degrees for the latter) between the target horizontal line and the biasing horizontal bars when the illusion strength is weak. This invoked underlying acute angle contraction mechanism could potentially explain the non-monotonic pattern found [@kitaoka2007; @kitaoka2000a].
+The effect on errors was monotonic for most illusions, with the exception of Delboeuf and Zöllner. For both of them, mildly congruent illusion strengths (which theoretically were supposed to be associated with less errors than incongruent effects) were related to small and strong increases of errors, respectively. For the Delboeuf illusion, we believe that this was due to an artifact caused by the illusion generation algorithm: the outline of the target circles was always created as slightly bigger, which made the difference between them more obvious at an illusion strength of 0. This was fixed in latest release of *Pyllusion* (v1.2), which now generate outlines of the same size as the target circle. For the Zöllner illusion, the observed non-monotonic pattern is actually consistent with previous reports [@kitaoka2000; @kitaoka2007], suggesting an acute angle contraction effect at very small as well as at sufficiently large angles (below 10 degrees for the former and between 50 to 90 degrees for the latter) between the target horizontal line and the biasing horizontal bars when the illusion strength is weak. 
 
-Finally, this study provided evidence for both the existence of illusion-specific factors, as well as for a common latent factor (labelled Factor *i*) that explained about half of the total variance. These participant-level scores were related to the error rate and average reaction time, and can thus be interpreted as indices of illusion sensitivity.
+Finally, this study provided evidence for both the existence of illusion-specific factors, as well as for a common latent factor (labelled Factor *i*) that explained about half of the total variance. These participant-level scores were positively related to the error rate and average reaction time, and can thus be interpreted as indices of illusion sensitivity.
 
 # Study 3
 
 ## Aim
 
-Study 3 aimed at investigating the links between the inter-individual scores of illusion sensitivity (obtained in study 2), and demographic and dispositional variables. **Insert a bit of litterature about why and some findings justifying what we did**.
+Study 3 aimed at investigating the links between the inter-individual scores of illusion sensitivity (obtained in study 2), and demographic and dispositional variables. **TODO: Insert a bit of literature about why and some findings justifying what we did**.
 
 ## Procedure
 
 This study was based on the data collected in study 2. The variables of interest here were taken from the questionnaires that were inserted in between the two series of illusion blocks. We used the *IPIP6* [24 items, @sibley2011] to measure 6 "normal" personality traits (Extraversion, Openness, Conscientiousness, Agreeableness, Neuroticism and Honesty-humility), and the PID-5 [25 items, @hopwood2012] to measure "pathological" personality traits (Disinhibition, Antagonism, Detachment, Negative Affect and Psychoticism). The participants were the same as in study 2 (see **Figure 3**). However, due to a technical issue, no personality data was recorded for the first eight participants.
 
-```{r message=FALSE, warning=FALSE, fig.cap="CAPTION."}
+```{r message=FALSE, warning=FALSE, fig.cap="The upper plots show the distribution of demographic and dispositional variables. The middle plots show the relationship between illusion sensitivty scores, sex, and age (solid lines indicate significant relationships). Bottom plots show the correlation between the general factor of illusion sensitivity (Factor \\textit{i}), and personality traits.", out.width="100%"}
 knitr::include_graphics("figures/Figure3.png")
 ```
 
