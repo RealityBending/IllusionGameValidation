@@ -32,18 +32,17 @@ author:
       - "Writing – original draft"
   - name          : "Stephanie Kirk"
     affiliation   : "1"
-    orcid         : 0000-0001-8008-2824
+    orcid         : 0000-0002-9312-5552
     role:
       - "Project administration"
       - "Resources"
       - "Writing – original draft"
   - name          : "Ngoi Zi Liang"
     affiliation   : "1"
-    orcid         : 0000-0001-8008-2824
     role:
       - "Project administration"
       - "Resources"
-      - "Writing – original draft"
+      - "Writing – review & editing"
   - name          : "S.H. Annabel Chen"
     affiliation   : "1, 2, 3, 4"
     orcid         : 0000-0002-1540-5516
@@ -262,19 +261,32 @@ Despite the widespread interest in finding associations between personality corr
 
 # General Discussion
 
-Using the parametric illusion generation framework developed with *Pyllusion* [@makowski2021], we have hence shown that illusions can be manipulated continuously across several different visual illusions. This opens the door for new illusions-based paradigms and tasks, therefore making it possible for future researchers to directly manipulate specific features and parameters of the illusion that are of interest. The validation of this novel framework also affords future illusion scientists a standardized measure of illusion susceptibility, instead of relying on conventional methods that depend upon participants' subjective perceptions. In our paradigm, in which we apply this approach to a reaction-time task, we were able to measure inter-individual scores of objective illusion sensitivity.
+<!-- Parametric framework -->
+The parametric illusion generation framework developed that we have developed in @makowski2021 proposes to conceptualize illusions as made of targets and distractors, both of which can be manipulated independently and continuously. In the present study, we have shown that such gradual modulation of illusion strength is effectively possible across 10 different types of classic visual illusions. This important methodological step opens the door for new illusions-based paradigms and tasks, to study the effect of illusions under different conditions and to quantify illusion sensitivity using objective behavioral outcomes, such as accuracy or speed. 
+
+<!-- Factor i -->
+Our findings suggested that the participants' sensitivities to 10 different types of visual illusions shared a common part of variance, suggesting the existence of a general factor of illusion sensitivity (Factor *i*). This result comes in a field of mixed findings. **TODO: discuss some papers investigating that**.
+
+Furthermore, although the illusions were fairly different in terms of the perceptual task (contrast-based, size-estimation, angle-perception), The possibility of our general factor being driven by inter-individual perceptual skills variability cannot be discarded. Future studies should investigate the relationship between perceptual abilities (in a similar task, but without illusions) and illusion sensitivity.
+
+
+<!-- Personality -->
 
 Notably, the general sensitivity to illusions Factor *i* was negatively associated with *Antagonism*, *Psychoticism*, *Disinhibition* and *Negative Affect*.
+
+<!-- Furthermore, results from studies that have been conducted to elucidate the mechanism underlying our susceptibility towards visual illusions remain relatively mixed. Whereas higher resistance towards such illusions have been reported for individuals with pathologically strong prior beliefs (such as schizophrenics) and atypical sensory perception (for example, those with autism spectrum disorder [ASD]) [@notredame2014; @park2022; @giaouri2011; @keane2014], other studies have found no significant differences between such individuals and healthy controls [@spencer2014; @yang2012; @tibber2013; @kaliuzhna2019] or only a weak correlation between the magnitude of visual illusions and such individuals' susceptibility to these illusory effects [@grzeczkowski2018; @manning2017]. -->
 
 
 
 <!-- Dump  -->
 
-Most notably, there is currently no universally agreed upon neurocognitive mechanism that explains individuals' susceptibility to visual illusions [@mylniec2016]. For instance, while some researchers have tried to explain our sensitivity to illusory effects as a result of deficits in the low-level visual processing system [@cretenoud2019; @gori2016], others have provided a compelling case using a top-down approach, suggesting that such visual phenomena occur as a result of a conflict between our visual input and our prior beliefs[@teufel2018; @caporuscio2022].
+<!-- Most notably, there is currently no universally agreed upon neurocognitive mechanism that explains individuals' susceptibility to visual illusions [@mylniec2016]. For instance, while some researchers have tried to explain our sensitivity to illusory effects as a result of deficits in the low-level visual processing system [@cretenoud2019; @gori2016], others have provided a compelling case using a top-down approach, suggesting that such visual phenomena occur as a result of a conflict between our visual input and our prior beliefs[@teufel2018; @caporuscio2022]. -->
 
-Furthermore, results from studies that have been conducted to elucidate the mechanism underlying our susceptibility towards visual illusions remain relatively mixed. Whereas higher resistance towards such illusions have been reported for individuals with pathologically strong prior beliefs (such as schizophrenics) and atypical sensory perception (for example, those with autism spectrum disorder [ASD]) [@notredame2014; @park2022; @giaouri2011; @keane2014], other studies have found no significant differences between such individuals and healthy controls [@spencer2014; @yang2012; @tibber2013; @kaliuzhna2019] or only a weak correlation between the magnitude of visual illusions and such individuals' susceptibility to these illusory effects [@grzeczkowski2018; @manning2017].
+
 
 # Future Directions
+
+Future study should investigate the psychometric properties of similar paradigms, including stability (e.g., test-retest reliability), consistency (in particular, the relationship with perceptual abilities), and validity.
 
 We strongly invite researchers to explore and re-analyze our dataset with other approaches and methods to push the understanding of visual illusions and illusion sensitivity further. The task, data and analysis script are available in open-access at [**https://github.com/RealityBending/IllusionGameValidation**](https://github.com/RealityBending/IllusionGameValidation){.uri}.
 
