@@ -22,6 +22,7 @@ From here you can access various components of the study.
 
 ## Other
 
+- IRB-2022-187 from NTU
 - [**Preregistration**](https://osf.io/5d6xp)
 - [**Pyllusion Software**](https://github.com/RealityBending/Pyllusion)
 
