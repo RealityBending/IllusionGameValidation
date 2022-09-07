@@ -1,6 +1,6 @@
 ---
 title             : "**The Illusion Game: A Novel Experimental Paradigm Provides Evidence in Favour of a General Factor of Visual Illusion Sensitivity and Personality Correlates**"
-shorttitle        : "Illusion Game"
+shorttitle        : "Illusion Game Validation"
 author:
   - name          : "Dominique Makowski"
     affiliation   : "1"
@@ -110,7 +110,7 @@ cache <- TRUE
 
 Visual illusions are fascinating stimuli capturing a key feature of our neurocognitive systems. They eloquently show that our brains did not evolve to be perfect perceptual devices providing veridical accounts of physical reality, but integrate prior knowledge and contextual information - blended together in our subjective conscious experience [@carbon2014]. Despite the historical and intensive interest within the fields of visual perception [@day1972; @eagleman2001; @gomez-villa2022], consciousness science [@caporuscio2022; @lamme2020], and psychiatry [@notredame2014; @gori2016; @razeghi2022; @teufel2015], several important issues remain open.
 
-Notably, the presence of a common mechanism underlying the effect of different illusions has been contested [@hamburger2016; @cretenoud2019a; @teufel2018a; @cretenoud2020]; and the nature of the underlying processes - whether related to low-level features of the visual processing system [@cretenoud2019; @gori2016] or to top-down influences of prior beliefs [@teufel2018; @caporuscio2022] are strongly debated. The existence of dispositional correlates of illusion sensitivity - for example, higher illusion resistance has been reported in schizophrenia and autism [@notredame2014; @park2022; @giaouri2011; @keane2014; @pessoa2008], as well as in individuals with stronger aggression and narcissism traits [@zhang2017; @konrath2009seeing] - is another area of controversy.
+Notably, the presence of a common mechanism underlying the effect of different illusions has been contested [@hamburger2016; @cretenoud2019a; @cretenoud2020]; and the nature of the underlying processes - whether related to low-level features of the visual processing system [@cretenoud2019; @gori2016] or to top-down influences of prior beliefs [@teufel2018; @caporuscio2022] are strongly debated. The existence of dispositional correlates of illusion sensitivity - for example, higher illusion resistance has been reported in schizophrenia and autism [@notredame2014; @park2022; @giaouri2011; @keane2014; @pessoa2008], as well as in individuals with stronger aggression and narcissism traits [@zhang2017; @konrath2009seeing] - is another area of controversy.
 
 <!-- Pyllusion -->
 
@@ -260,7 +260,7 @@ Our results suggested an inconsistent pattern of non-significant sex-differences
 
 
 <!-- Normal personality + Antagonism -->
-Our findings also suggested a positive relationship between illusion sensitivity and two "normal" personality traits, namely *Honesty-Humility* and *Agreeableness*, and a negative link with *Antagonism*. Although the past literature regarding the links between illusion sensitivity and personality traits remain scarce, convergent evidence can be found in studies reporting a negative relationship between illusion sensitivity and hostility, aggression and narcissism [@zhang2017; @konrath2009seeing]. While this result's interpretation is challenging, one possible explanation could be drawn from the literature on the cognitive style known as field dependence. Since narcissism and aggression tendencies are correlated with lower field dependence [i.e., a lesser reliance on external cues in ambiguous contexts, @witkin1976; @ohmann2016; @damour2021], opposite traits, such as *Honesty-Humility* and *Agreeableness*, could conversely be more biased by contextual cues and thus more sensitive to illusions.
+Our findings also suggested a positive relationship between illusion sensitivity and two "normal" personality traits, namely *Honesty-Humility* and *Agreeableness*, and a negative link with *Antagonism*. Although the past literature regarding the links between illusion sensitivity and personality traits remain scarce, convergent evidence can be found in studies reporting a negative relationship between illusion sensitivity and hostility, aggression and narcissism [@zhang2017; @konrath2009seeing; pessoa2008]. While this result's interpretation is challenging, one possible explanation could be drawn from the literature on the cognitive style known as field dependence. Since narcissism and aggression tendencies are correlated with lower field dependence [i.e., a lesser reliance on external cues in ambiguous contexts, @witkin1976; @ohmann2016; @damour2021], opposite traits, such as *Honesty-Humility* and *Agreeableness*, could conversely be more biased by contextual cues and thus more sensitive to illusions.
 
 
 <!-- Pathological personality -->
@@ -290,20 +290,10 @@ However, although the illusions were relatively different in terms of the percep
 
 <!-- Personality -->
 
-Finally, we found that the general sensitivity to illusions Factor *i* was negatively associated with *Antagonism*, *Psychoticism*, *Disinhibition* and *Negative Affect*.
+Finally, we found that the sensitivity to illusions was positively associated with "positive" personality traits, such as *Agreeableness* and *Honesty-Humility*, and negatively associated with maladaptive traits such as *Antagonism*, *Psychoticism*, *Disinhibition* and *Negative Affect*. Beyond highlighting the relevance of illusions beyond the field of visual perception, these results point towards an association with high-level general-domain mechanisms. While the search for the exact mechanism(s) underlying these links is an important goal of future research, our findings unlock the potential of illusion-based tasks as sensitive tools to capture specific inter-individual neuro-cognitive differences. 
 
 
-<!-- Furthermore, results from studies that have been conducted to elucidate the mechanism underlying our susceptibility towards visual illusions remain relatively mixed. Whereas higher resistance towards such illusions have been reported for individuals with pathologically strong prior beliefs (such as schizophrenics) and atypical sensory perception (for example, those with autism spectrum disorder [ASD]) [@notredame2014; @park2022; @giaouri2011; @keane2014], other studies have found no significant differences between such individuals and healthy controls [@spencer2014; @yang2012; @tibber2013; @kaliuzhna2019] or only a weak correlation between the magnitude of visual illusions and such individuals' susceptibility to these illusory effects [@grzeczkowski2018; @manning2017]. -->
-
-<!-- Despite the widespread interest in finding associations between personality correlates and a general sensitivity to visual illusions, the supporting literature remains relatively mixed. Whereas some researchers report no relationship between inter-individual traits and individuals' susceptibility to illusions [@cretenoud2020a; @grzeczkowski2017], others have found pathological traits such as higher Aggression-Hostility and Narcissism, and lower Impulsive Sensation-Seeking to be significantly correlated to a greater resistance against such illusory effects [@zhang2017; @konrath2009seeing]. Furthermore, research on patients with schizophrenia have also generally demonstrated lower illusion sensitivity to be linked to symptoms of the disorder, such as greater hostility as well as social and emotional withdrawal [@pessoa2008]. -->
-
-<!-- Dump  -->
-
-<!-- Most notably, there is currently no universally agreed upon neurocognitive mechanism that explains individuals' susceptibility to visual illusions [@mylniec2016]. For instance, while some researchers have tried to explain our sensitivity to illusory effects as a result of deficits in the low-level visual processing system [@cretenoud2019; @gori2016], others have provided a compelling case using a top-down approach, suggesting that such visual phenomena occur as a result of a conflict between our visual input and our prior beliefs[@teufel2018; @caporuscio2022]. -->
-
-
-
-In conclusion, we strongly invite researchers to explore and re-analyze our dataset with other approaches and methods to push the understanding of visual illusions and illusion sensitivity further. The task, data and analysis script are available in open-access at [**https://github.com/RealityBending/IllusionGameValidation**](https://github.com/RealityBending/IllusionGameValidation){.uri}.
+As a conclusion, we strongly invite researchers to explore and re-analyze our dataset with other approaches and methods to push the understanding of visual illusions and illusion sensitivity further. The task, data and analysis script are available in open-access at [**https://github.com/RealityBending/IllusionGameValidation**](https://github.com/RealityBending/IllusionGameValidation){.uri}.
 
 # Acknowledgments
 
