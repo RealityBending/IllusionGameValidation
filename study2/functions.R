@@ -692,7 +692,8 @@ prettify_itemName <- function(x) {
     str_replace("VerticalHorizontal", "Vertical-Horizontal") |>
     str_replace("Zollner", "Zöllner") |>
     str_replace("MullerLyer", "Müller-Lyer") |>
-    str_replace("HonestyHumility", "Honesty-Humility")
+    str_replace("HonestyHumility", "Honesty-Humility") |>
+    str_replace("NegativeAffect", "Negative Affect")
 }
 
 
