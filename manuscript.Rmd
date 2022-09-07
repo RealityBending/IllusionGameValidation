@@ -83,6 +83,7 @@ header-includes:
   - \usepackage[labelfont=bf, font={scriptsize, color=gray}]{caption}
 editor_options:
   chunk_output_type: console
+bibliography: references.bib
 ---
 
 ```{r, echo = FALSE, warning=FALSE, message=FALSE}
@@ -178,7 +179,7 @@ The aim of study 2 was two-fold. In the first part, we carefully modeled the err
 
 ## Procedure
 
-The paradigm of study 2 was similar to that of study 1, with the following changes. The illusory stimuli were re-generated within a refined space of parameters based on the results of study 1. Moreover, taking into account the findings of study 1, we used non-linearly spaced difficulty levels, depending on the best underlying model (i.e., with an exponential, square or cubic spacing depending on the relationship). For instance, a linear space of [0.1, 0.4, 0.7, 1.0] can be transformed to an exponential space of [0.1, 0.34, 0.64, 1.0].
+The paradigm of study 2 was similar to that of study 1, with the following changes made. The illusory stimuli were re-generated within a refined space of parameters based on the results of study 1. Moreover, taking into account the findings of study 1, we used non-linearly spaced difficulty levels, depending on the best underlying model (i.e., with an exponential, square or cubic spacing depending on the relationship). For instance, a linear space of [0.1, 0.4, 0.7, 1.0] can be transformed to an exponential space of [0.1, 0.34, 0.64, 1.0].
 
 Additionally, instead of repeating each stimulus two times, we generated illusions using more levels of difficulty and illusion strength. As such, for each illusion type, we generated a total of 134 stimuli that were split into two groups (67 stimuli per illusion block). Furthermore, instead of a simple break screen, we added two personality questionnaires between the two series of 10 illusion blocks (see study 3).
 
@@ -226,7 +227,7 @@ Finally, this study provided evidence for both the existence of illusion-specifi
 
 ## Aim
 
-Study 3 aimed at investigating the links between the inter-individual scores of illusion sensitivity (obtained in study 2), and demographic and dispositional variables. Despite the abundant literature on visual illusions, relatively few studies investigate the ties with participants' characteristics. **TODO: HERE mention studies on sex or age**. Furthermore, most works assessing the links with personality focused on traits associated with psychopathology [such as impulsivity or sensation-seeking, @hlavata2018; @zhang2017; @lanyi2022can; @pessoa2008]. In this study, we instead propose to explore the relationship between illusion sensitivity, demographic variables and stable "general" personality traits.
+Study 3 aimed at investigating the links between the inter-individual scores of illusion sensitivity (obtained in study 2), and demographic and dispositional variables. Despite the abundant literature on visual illusions, relatively few studies have investigated its ties with participants' characteristics. Moreover, research examining the influence of demographic variables tend to be centered on gender and age-related differences, and have generally found inconsistent results [@cretenoud2020a; @grzeczkowski2017; @lo2011; @papageorgiou2020]. Alternatively, among works assessing the links with personality, most focused on traits associated with psychopathology [such as impulsivity or sensation-seeking, @hlavata2018; @zhang2017; @lanyi2022can; @pessoa2008]. In this study, we instead propose to explore the relationship between illusion sensitivity, demographic variables and stable "general" personality traits.
 
 ## Procedure
 
@@ -253,43 +254,42 @@ Regarding "pathological" personality traits, the results yielded strong evidence
 ## Discussion
 
 <!-- Context -->
-We report significant links between inter-individual indices of illusion sensitivity and varialbes related to experimental context, demographic characteristics and personality. Firstly, screen size was found to have a significant negative relationship with the sensitivity to the two contrast-based illusions, namely the White and Contrast illusions. One possible explanation can be found in the mechanism by which visual systems filter through more low spatial frequencies when the size of the target object is small [@dixon2014]. As this filtering process excludes illumination information from visual processing, smaller screen sizes could yield artifactual changes in brightness perception, which in turn could attenuate the illusory effect of luminance-related illusions.
+
+We report significant links between inter-individual indices of illusion sensitivity and variables related to experimental context, demographic characteristics and personality. Firstly, screen size was found to have a significant negative relationship with the sensitivity to the two contrast-based illusions, namely the White and Contrast illusions. One possible explanation can be found in the mechanism by which visual systems filter through more low spatial frequencies when the size of the target object is small [@dixon2014]. As this filtering process excludes illumination information from visual processing, smaller screen sizes could yield artifactual changes in brightness perception, which in turn could attenuate the illusory effect of luminance-related illusions.
 
 <!-- Demographic -->
-**TODO: talk about absence of effect on sex + effect on age**
+
+Contrary to past studies in which females were found to exhibit greater illusion sensitivity [@lo2011; @miller2001; @papageorgiou2020], our study finds males to be more sensitive to the effects of the Zollner illusion. This inconsistency in findings could be due to past results conflating the objective illusory effect with the subjective perceptual skills needed to evaluate the visual illusions. Indeed, gender-related differences in visuospatial strategies have often been cited as the underlying mechanism explaining greater illusion sensitivity among females [@miller2001; @lo2011]. In this study, however, individuals' perceptual abilities and the objective illusory effect were independently modulated using our *Pyllusion* software. This thus allowed us to capture the variability related only to the latter, thereby mitigating the effects of subjective perceptual skills. As such, the greater illusion sensitivity among males observed (albeit only for the Zollner illusion) could be a more veridical reflection of the illusion effect.
 
 <!-- Normal personality -->
-Our findings also suggested a positive relationship between illusion sensitivity and two "normal" personality traits, namely *Honesty-Humility* and *Agreeableness*. Although the past literature regarding the links between illusion sensitivity and Big 5 or HEXACO personality traits remain scarce, convergent evidence can be found in studies reporting a negative relationship between illusion sensitivity and hostility, aggression and narcissism [@zhang2017; @konrath2009seeing]. **TODO: do we have any leads of explanations?**
 
+Our findings also suggested a positive relationship between illusion sensitivity and two "normal" personality traits, namely *Honesty-Humility* and *Agreeableness*. Although the past literature regarding the links between illusion sensitivity and personality traits remain scarce, convergent evidence can be found in studies reporting a negative relationship between illusion sensitivity and hostility, aggression and narcissism [@zhang2017; @konrath2009seeing]. One possible explanation for this association could be drawn from the literature on field dependence, which states that individuals with a field dependent cognitive style are more reliant on external cues when faced with ambiguity [@witkin1976]. Since personality traits such as narcissism and aggression have been correlated with relative field independence [@ohmann2016; @witkin1976a; @damour2021], this implies that individuals with high levels of such traits may be less reliant on biasing visual cues and thus display less illusion sensitivity.
 
 <!-- Pathological personality -->
-The positive relationship between illusion sensitivity and "positive" personality traits is mirrored by a negative relationship with several pathological traits, including *Antagonism*, *Psychoticism*, *Disinhibition*, and *Negative Affect*. These results are in general consistent with the past findings and theories, suggesting that ...**TODO: do we have a theory?**
 
+The positive relationship between illusion sensitivity and "positive" personality traits is mirrored by a negative relationship with several pathological traits, including *Antagonism*, *Psychoticism*, *Disinhibition*, and *Negative Affect*. These results are, in general, consistent with past findings and theories, suggesting a potential negative correlation between egocentric cognitions and context processing. Specifically, pathological egocentric beliefs, which is indexed by high levels of self-focus (and low levels of other-focus) and have been related to maladaptive personality traits like *Psychoticism,* could be associated with a reduced consideration for context integration, such as a tendency to disembed objects from their surroundings when processing visual stimuli [@ohmann2016; @konrath2009; @fox2006]. This could hence explain the positive relationship between illusion sensitivity and pathological traits observed in our study. Indeed, high levels of self-focus have been found to correlate with lower illusion sensitivity [@konrath2009], conferring support for the postulated links between egocentrism and decontextualized information processing.
 
-Our results, suggesting the existence of a link between illusion sensitivity and maladaptive personality traits in non-clinical populations, could be put in relation with clinical findings, which could be extreme cases where the relationship with illusion sensitivity is the most manifest. In line with our results on *Psychoticism* or *Disinhibition*, prior research has found greater illusion resistance in schizophrenia [**REF**], and in particular in association with schizotypal traits, such as cognitive disorganization [@cretenoud2019]. 
+Furthermore, our results, which suggests the existence of a link between illusion sensitivity and maladaptive personality traits in non-clinical populations, could be put in relation with clinical findings, which could be seen as extreme cases where the relationship with illusion sensitivity most manifests. In line with our results on *Psychoticism* or *Disinhibition*, prior research has found greater illusion resistance in schizophrenia [@notredame2014; @pessoa2008; @grzeczkowski2018], and in particular, in association with schizotypal traits, such as cognitive disorganization [@cretenoud2019; @lanyi2022can].
 
 <!-- The results reported by past studies on the relationship between illusion sensitivity and personality remain fairly mixed [@cretenoud2020a; @grzeczkowski2017].  -->
 
 <!-- Moreover, low aggression and high self-control have also been found to correlate strongly with greater resistance to illusions [@mcgurk]. -->
 
-
-
-
 # General Discussion
 
 <!-- Parametric framework -->
-The parametric illusion generation framework developed that we have developed in @makowski2021 proposes to conceptualize illusions as made of targets and distractors, both of which can be manipulated independently and continuously. In the present study, we have shown that such gradual modulation of illusion strength is effectively possible across 10 different types of classic visual illusions. This important methodological step opens the door for new illusions-based paradigms and tasks, to study the effect of illusions under different conditions and to quantify illusion sensitivity using objective behavioral outcomes, such as accuracy or speed. 
+
+The parametric illusion generation framework that we have developed in @makowski2021 proposes to conceptualize illusions as made of targets and distractors, both of which can be manipulated independently and continuously. In the present study, we have shown that such gradual modulation of illusion strength is effectively possible across 10 different types of classic visual illusions. This important methodological step opens the door for new illusions-based paradigms and tasks, to study the effect of illusions under different conditions and to quantify illusion sensitivity using objective behavioral outcomes, such as accuracy or speed.
 
 <!-- Factor i -->
-Our findings suggested that the participants' sensitivities to 10 different types of visual illusions shared a common part of variance, suggesting the existence of a general factor of illusion sensitivity (Factor *i*). This result comes in a field of mixed findings. **TODO: discuss some papers investigating that**.
 
-Furthermore, although the illusions were fairly different in terms of the perceptual task (contrast-based, size-estimation, angle-perception), The possibility of our general factor being driven by inter-individual perceptual skills variability cannot be discarded. Future studies should investigate the relationship between perceptual abilities (in a similar task, but without illusions) and illusion sensitivity.
+Our findings suggested that the participants' sensitivities to 10 different types of visual illusions shared a common part of variance, suggesting the existence of a general factor of illusion sensitivity (Factor *i*). This result comes in a field of mixed findings. In fact, contrary to early studies on visual illusions, recent research (over the past 10 years) have generally not found any significant evidence for a common stable factor across illusions within individuals [@grzeczkowski2017; @cretenoud2019; @cretenoud2020; @grzeczkowski2018; @yang2012]. Instead, past findings suggests illusory effects are highly specific to the features of different illusions, albeit some attempts at grouping certain illusions in hopes of extracting a common generalizable factor have been made [@grzeczkowski2017; @cretenoud2019]. However, the absence of significant results could have been due to the reliance of conventional paradigms, in which participants were instructed to adjust targets to be aligned with a reference stimulus. As such paradigms depend upon participants' subjective perceptual skills, our study hence provides a possible objective framework that could culminate in a renewed approach into the field of visual illusions.
 
+Furthermore, although the illusions we assessed were fairly different in terms of the perceptual task involved (contrast-based, size-estimation, angle-perception), the possibility of our general factor being driven by inter-individual perceptual skills variability cannot be discarded. Future studies should investigate the relationship between perceptual abilities (in a similar task, but without illusions) and illusion sensitivity.
 
 <!-- Personality -->
 
 Notably, the general sensitivity to illusions Factor *i* was negatively associated with *Antagonism*, *Psychoticism*, *Disinhibition* and *Negative Affect*.
-
 
 <!-- Furthermore, results from studies that have been conducted to elucidate the mechanism underlying our susceptibility towards visual illusions remain relatively mixed. Whereas higher resistance towards such illusions have been reported for individuals with pathologically strong prior beliefs (such as schizophrenics) and atypical sensory perception (for example, those with autism spectrum disorder [ASD]) [@notredame2014; @park2022; @giaouri2011; @keane2014], other studies have found no significant differences between such individuals and healthy controls [@spencer2014; @yang2012; @tibber2013; @kaliuzhna2019] or only a weak correlation between the magnitude of visual illusions and such individuals' susceptibility to these illusory effects [@grzeczkowski2018; @manning2017]. -->
 
@@ -298,8 +298,6 @@ Notably, the general sensitivity to illusions Factor *i* was negatively associat
 <!-- Dump  -->
 
 <!-- Most notably, there is currently no universally agreed upon neurocognitive mechanism that explains individuals' susceptibility to visual illusions [@mylniec2016]. For instance, while some researchers have tried to explain our sensitivity to illusory effects as a result of deficits in the low-level visual processing system [@cretenoud2019; @gori2016], others have provided a compelling case using a top-down approach, suggesting that such visual phenomena occur as a result of a conflict between our visual input and our prior beliefs[@teufel2018; @caporuscio2022]. -->
-
-
 
 # Future Directions
 
