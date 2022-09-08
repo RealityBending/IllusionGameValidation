@@ -1,5 +1,0 @@
-\begin{figure*}[hbt]
-\ifnextchar[{\eatarg}{}
-
-\includegraphics[width=4.2in]{figures/Figure1} \caption{ }\label{fig:unnamed-chunk-2}
-\end{figure*}
