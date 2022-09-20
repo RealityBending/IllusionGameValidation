@@ -194,7 +194,9 @@ data.frame(Participant = c("Total"), t(sapply(dfsub[2:ncol(dfsub)], mean, na.rm=
   knitr::kable() |>
   kableExtra::row_spec(1, italic = TRUE) |> 
   kableExtra::row_spec(which(dfsub$Participant %in% outliers) + 1, background = "#EF9A9A") |> 
-  kableExtra::row_spec(which(dfsub$Participant %in% partial_outliers) + 1, background = "#FFECB3")
+  kableExtra::row_spec(which(dfsub$Participant %in% partial_outliers) + 1, background = "#FFECB3") |> 
+  kableExtra::kable_styling(full_width = TRUE) |> 
+  kableExtra::scroll_box(width = "100%", height = "500px")
 ```
 
 
