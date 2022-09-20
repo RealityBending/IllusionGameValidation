@@ -2,9 +2,7 @@
 
 *Dominique Makowski, An Shu Te, Stephanie Kirk, Ngoi Zi Liang, & S.H. Annabel Chen*
 
-From here you can access various components of the study.
-
-## Try Experiments
+**Abstract.** Visual illusions highlight how the brain uses contextual and prior information to inform our perception of reality. Unfortunately, illusion research has been hampered by the difficulty of adapting these stimuli to experimental settings. In this study, we used the novel parametric framework for visual illusions to generate 10 different classic illusions (Delboeuf, Ebbinghaus, Rod and Frame, Vertical-Horizontal, Zöllner, White, Müller-Lyer, Ponzo, Poggendorff, Contrast) varying in strength, embedded in a perceptual discrimination task. We tested the objective effect of the illusions on errors and reaction times, and extracted participant-level performance scores (n=250). Our results provide evidence in favour of a general factor (labelled Factor *i*) underlying the sensitivity to different illusions. Moreover, we report a positive relationship between illusion sensitivity and personality traits such as Agreeableness, Honesty-Humility, and negative relationships with Psychoticism, Antagonism, Disinhibition, and Negative Affect.
 
 <!-- - [**Study 0**](https://realitybending.github.io/IllusionGameValidation/study0/index.html): Study 0 refers to an un-analyzed pilot of the perceptual task without the illusion (only the targets). -->
 - [**Pilot**](https://realitybending.github.io/IllusionGameValidation/study1/index.html): The pilot study of the illusions that let to the refinement of the parameters of the illusions and the fixing of bugs in the illusion-generating software.
@@ -31,5 +29,5 @@ From here you can access various components of the study.
 
 
 ![](figures/Figure1.png)
-![](figures/Figure2.png)
-![](figures/Figure3.png)
+![](figures/figure2.png)
+![](figures/figure3.png)
