@@ -1,9 +1,16 @@
 ---
-title: "Illusion Game Validation (Study 3)"
-output: html_document
+title: "Illusion Game Validation (part 2)"
+author: "Dominique Makowski et al."
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+    theme: paper
+    code_folding: hide
 date: "`r Sys.Date()`"
 editor_options: 
   chunk_output_type: console
+bibliography: "../submission/references.bib"
 ---
 
 ```{r, echo = FALSE, warning=FALSE, message=FALSE}
@@ -31,8 +38,7 @@ knitr::opts_chunk$set(
 # Introduction
 
 
-The goal of study 3 was to...
-
+Part 2 aimed at investigating the links between the inter-individual scores of illusion sensitivity (obtained in study 2), contextual variables (pertaining to the experiment setting), such as screen size, demographic features (such as sex and age), and stable dispositional variables such as "general" personality traits. Indeed, despite the abundant literature on visual illusions, relatively few studies have investigated its ties with participants' characteristics. Research examining the influence of demographic variables such as gender and age have generally found inconsistent results [@cretenoud2020individual; @grzeczkowski2017; @lo2011; @papageorgiou2020]. Regarding links with personality, most works focused on traits associated with psychopathology, such as impulsivity or sensation-seeking [@hlavata2018; @zhang2017; @lanyi2022can; @pessoa2008].
 
 
 # Methods
@@ -273,7 +279,7 @@ dflong |>
 
 ### Sex
 
-```{r message=FALSE, warning=FALSE, cache=cache}
+```{r sex_stats, message=FALSE, warning=FALSE, cache=cache}
 sig <- list()
 params <- data.frame()
 for (i in names(DVs)) {
@@ -324,7 +330,7 @@ p_gender
 
 ### Education
 
-```{r message=FALSE, warning=FALSE, cache=cache}
+```{r education_stats, message=FALSE, warning=FALSE, cache=cache}
 preds <- data.frame()
 for (i in names(DVs)) {
   model <- brms::brm(paste0(i, " ~ mo(as.numeric(Education))"), data = filter(dfsub, !Education %in% c("Other", "Prefer not to Say")), refresh = 0)
@@ -351,7 +357,7 @@ preds |>
 
 ### Age
 
-```{r message=FALSE, warning=FALSE, cache=cache}
+```{r age_stats, message=FALSE, warning=FALSE, cache=cache}
 preds <- data.frame()
 for (i in names(DVs)) {
   gam <- brms::brm(paste0(i, " ~ s(Age, k=3)"), data = dfsub, refresh = 0, seed = 1)
@@ -408,8 +414,9 @@ p_age <- preds |>
   )
 
 p_age
+```
 
-
+```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
 ggsave("figures/figure_agesex.png",
   (p_gender + p_age) + plot_layout(widths = c(2 / 3, 1 / 3)) +
     patchwork::plot_annotation(
@@ -424,7 +431,7 @@ ggsave("figures/figure_agesex.png",
 
 ### IPIP6
 
-```{r message=FALSE, warning=FALSE, cache=cache, eval=TRUE}
+```{r ipip_stats, message=FALSE, warning=FALSE, cache=cache, eval=TRUE}
 cor <- make_correlation(
   datawizard::data_select(dfsub, names(DVs)),
   select(dfsub, starts_with("IPIP") & !ends_with("_SD"))
@@ -464,7 +471,7 @@ p_ipip2 <- plot_correlation(dfsub, x = "i", y = "IPIP6_HonestyHumility", fill = 
 
 ### PID-5
 
-```{r message=FALSE, warning=FALSE, cache=cache, eval=TRUE}
+```{r pid_stats, message=FALSE, warning=FALSE, cache=cache, eval=TRUE}
 cor <- make_correlation(
   datawizard::data_select(dfsub, names(DVs)),
   select(dfsub, starts_with("PID") & !ends_with("_SD"))
@@ -571,3 +578,29 @@ p <- patchwork::wrap_elements(grid::rasterGrob(png::readPNG("figures/figure_dem.
 
 ggsave("../figures/figure3.png", p, height = 20200, width = 15166, units = "px", limitsize = FALSE)
 ```
+
+# Discussion
+
+
+Indeed, despite the abundant literature on visual illusions, relatively few studies have investigated its ties with participants' characteristics. Research examining the influence of demographic variables such as gender and age have generally found inconsistent results [@cretenoud2020individual; @grzeczkowski2017; @lo2011; @papageorgiou2020]. Regarding links with personality, most works focused on traits associated with psychopathology, such as impulsivity or sensation-seeking [@hlavata2018; @zhang2017; @lanyi2022can; @pessoa2008].
+
+
+<!-- Context -->
+
+We report significant links between inter-individual indices of illusion sensitivity and variables related to experimental context, demographic characteristics and personality. Firstly, screen size was found to have a significant negative relationship with the sensitivity to the two contrast-based illusions, namely the White and Contrast illusions. One possible explanation can be found in the mechanism by which visual systems filter through more low spatial frequencies when the size of the target object is small [@dixon2014]. As this filtering process excludes illumination information from visual processing, smaller screen sizes could yield artifactual changes in brightness perception, which in turn could attenuate the illusory effect of luminance-related illusions.
+
+<!-- Demographic -->
+
+Our results suggested an inconsistent pattern of non-significant sex-differences, with the exception of greater sensitivity of males as compared to females for the Zöllner illusion. Although we do not consider this result as significant given its specificity, we note that the existing literature reports, if any differences, that females exhibited greater illusion sensitivity [@lo2011; @miller2001; @papageorgiou2020]. This inconsistency could be due to past studies using a measure of illusion sensitivity that conflates the effect of illusions *per se* with the perceptual abilities involved in the task, for which gender-related differences can be found (in fact, the authors mention sex-differences in visuospatial strategies as the potential mechanism underlying their findings). On the contrary, the perceptual difficulty of the task and the illusion effect was independently modulated in our paradigm, and statistically dissociated. Our scores of illusion sensitivity might thus be less loaded with perceptual skills, thereby mitigating its effect.
+
+<!-- Normal personality + Antagonism -->
+
+Our findings also suggested a positive relationship between illusion sensitivity and two "normal" personality traits, namely *Honesty-Humility* and *Agreeableness*, and a negative link with *Antagonism*. Although the past literature regarding the links between illusion sensitivity and personality traits remain scarce, convergent evidence can be found in studies reporting a negative relationship between illusion sensitivity and hostility, aggression and narcissism [@zhang2017; @konrath2009seeing; @pessoa2008]. While this result's interpretation is challenging, one possible explanation could be drawn from the literature on the cognitive style known as field dependence. Since narcissism and aggression tendencies are correlated with lower field dependence [i.e., a lesser reliance on external cues in ambiguous contexts, @witkin1976; @ohmann2016; @damour2021], opposite traits, such as *Honesty-Humility* and *Agreeableness*, could conversely be more biased by contextual cues and thus more sensitive to illusions.
+
+<!-- Pathological personality -->
+
+The positive relationship between illusion sensitivity and "positive" personality traits is mirrored by a negative relationship with several other pathological traits, including *Psychoticism*, *Disinhibition*, and *Negative Affect*. These results are, in general, consistent with past findings and theories, suggesting a negative relationship between egocentric cognitive styles and context processing [including illusion sensitivity, @konrath2009seeing]. For instance, pathological egocentric beliefs [often observed alongside *Psychoticism*, @fox2006] have been related to reduced context integration [manifesting for instance in a tendency to separate objects from their surroundings when processing visual stimuli, @ohmann2016; @konrath2009seeing; @fox2006]. As such, it is possible to relate this higher resistance to illusions to a self-centered, decontextualized and disorganized information processing style, which can be found across the aforementioned maladaptive personality traits [@msetfi2009; @parkes1981field; @calamari2000field; @hoyle2006] .
+
+Furthermore, these results in favour of a link between illusion sensitivity and maladaptive personality traits in a non-clinical population could be put in relation with clinical findings, which could be seen as extreme cases where the relationship with illusion sensitivity is the most manifest. In line with our results (in particular on *Psychoticism* and *Disinhibition*), prior research has found greater illusion resistance in schizophrenia [@notredame2014; @pessoa2008; @grzeczkowski2018], and in particular, in association with schizotypal traits, such as cognitive disorganization [@cretenoud2019; @lanyi2022can].
+
+# References

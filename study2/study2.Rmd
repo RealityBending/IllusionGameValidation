@@ -1,9 +1,16 @@
 ---
-title: "Illusion Game Validation (Study 2)"
-output: html_document
+title: "Illusion Game Validation (part 1)"
+author: "Dominique Makowski et al."
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+    theme: paper
+    code_folding: hide
 date: "`r Sys.Date()`"
 editor_options: 
   chunk_output_type: console
+bibliography: "../submission/references.bib"
 ---
 
 ```{r, echo = FALSE, warning=FALSE, message=FALSE}
@@ -29,9 +36,13 @@ knitr::opts_chunk$set(
 )
 ```
 
+# Introduction
 
 
-# Preprocessing
+The aim of part 1 is two-fold. In the first part, we will carefully model the error rate and the reaction time of each illusion type in order to validate our novel paradigm and show that the effect of illusions can be manipulated continuously. In the second part, we will derive the participant-level scores from the models (i.e., the effect of illusion strength for each individual) and analyze their latent factors structure.
+
+
+# Methods
 
 
 ```{r eval=FALSE, message=FALSE, warning=FALSE, include=FALSE}
@@ -166,7 +177,7 @@ For each block, we computed the error rate and, if more than 50%, we discarded t
 
 
 
-### Summary
+### Descriptive Table
 
 ```{r message=FALSE, warning=FALSE}
 dfsub <- df |>
@@ -183,9 +194,6 @@ dfsub <- df |>
   arrange(desc(Error))
 ```
 
-See the next tab for the descriptive table.
-
-### Descriptive Table
 
 
 ```{r message=FALSE, warning=FALSE}
@@ -2215,3 +2223,13 @@ ggsave("figures/figure_ill.png", p_ill, height = 20, width = 30, dpi=300)
 ggsave("../figures/figure2.png", ((p_ill) / p_sem) + plot_layout(heights=c(2, 1.5)), height = 35, width = 30, dpi=300)
 ```
 
+# Discussion
+
+
+This study confirmed that it was possible to continuously manipulate the effect of illusion strength for 10 classic illusions. Increasing the illusion strength increased the likelihood of errors, as well as the average and spread of RTs (but only up to a point, after which participants become faster at responding with the wrong answer). Future studies are needed to explore reaction times and identify the most appropriate models, and/or use models that integrate both errors and reaction time (e.g., drift diffusion models).
+
+The effect on errors was monotonic for most illusions, with the exception of Delboeuf and Zöllner. For both of them, mildly congruent illusion strengths (which theoretically were supposed to be associated with fewer errors than incongruent effects) were related to small and strong increases of errors, respectively. For the Delboeuf illusion, we believe that this was due to an artifact caused by the illusion generation algorithm: the outline of the target circles was always created as slightly bigger, which made the difference between them more obvious at an illusion strength of 0. This was fixed in the latest release of *Pyllusion* (v1.2), which now generates outlines of the same size as the target circle. For the Zöllner illusion, the observed non-monotonic pattern is actually consistent with previous reports [@kitaoka2000; @kitaoka2007], suggesting an acute angle contraction effect at very small - as well as at sufficiently large angles (below 10 degrees for the former and between 50 to 90 degrees for the latter) between the target horizontal line and the biasing horizontal bars when the illusion strength is weak.
+
+Finally, this study provided evidence for both the existence of illusion-specific factors, as well as for a common latent factor (labelled Factor *i*) that explained about half of the total variance. These participant-level scores were positively related to the error rate and average reaction time, and can thus be interpreted as indices of illusion sensitivity.
+
+# References

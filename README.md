@@ -1,5 +1,7 @@
 # The Illusion Game Validation Study
 
+*Dominique Makowski, An Shu Te, Stephanie Kirk, Ngoi Zi Liang, & S.H. Annabel Chen*
+
 From here you can access various components of the study.
 
 ## Try Experiments
@@ -13,13 +15,13 @@ From here you can access various components of the study.
 
 - [**Pilot**](https://realitybending.github.io/IllusionGameValidation/study1/study1.html): In which we have a first look at the effects and refine the stimuli selection.
 - [**Study (part 1)**](https://realitybending.github.io/IllusionGameValidation/study2/study2.html): In which we analyze the effect of illusion strength and task difficulty on errors and RT.
-- [**Study (part 2)**](https://realitybending.github.io/IllusionGameValidation/study3/study3.html): In which we analyze the  links with personality.
+- [**Study (part 2)**](https://realitybending.github.io/IllusionGameValidation/study3/study3.html): In which we analyze the links with personality.
 
 ## Download Data
 
-- [**Study 2** (part 1)](data/study2_part1.csv): Can be assembled with `rbind(read.csv("study2_part1.csv"), read.csv("study2_part2.csv"))`
-- [**Study 2** (part 2)](data/study2_part2.csv)
-- [**Study 3**](data/study3.csv)
+- [**Raw data** (part 1)](data/study2_part1.csv): Can be assembled with `rbind(read.csv("study2_part1.csv"), read.csv("study2_part2.csv"))`
+- [**Raw data** (part 2)](data/study2_part2.csv)
+- [**Participant-level data**](data/study3.csv)
 
 ## Other
 
