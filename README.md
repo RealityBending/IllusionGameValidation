@@ -19,8 +19,7 @@
 
 ## Download Data
 
-- [**Raw data** (part 1)](data/study2_part1.csv): Can be assembled with `rbind(read.csv("study2_part1.csv"), read.csv("study2_part2.csv"))`
-- [**Raw data** (part 2)](data/study2_part2.csv)
+- **Raw data**: [Part 1](data/study2_part1.csv) and [Part 2](data/study2_part2.csv) (can be assembled with `rbind(read.csv("study2_part1.csv"), read.csv("study2_part2.csv"))`)
 - [**Participant-level data**](data/study3.csv)
 
 ## Other
@@ -29,7 +28,8 @@
 - [**Preregistration**](https://osf.io/5d6xp)
 - [**Pyllusion Software**](https://github.com/RealityBending/Pyllusion)
 
+# Figures
 
 ![](figures/Figure1.png)
 ![](figures/figure2.png)
-![](figures/figure3.png)
+![](figures/Figure3.png)
