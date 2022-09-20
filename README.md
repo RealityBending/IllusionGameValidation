@@ -13,13 +13,13 @@
 
 ## See Results
 
-- [**Pilot**](https://realitybending.github.io/IllusionGameValidation/study1/study1.html): In which we have a first look at the effects and refine the stimuli selection.
-- [**Study (part 1)**](https://realitybending.github.io/IllusionGameValidation/study2/study2.html): In which we analyze the effect of illusion strength and task difficulty on errors and RT.
-- [**Study (part 2)**](https://realitybending.github.io/IllusionGameValidation/study3/study3.html): In which we analyze the links with personality.
+- [**Pilot**](https://realitybending.github.io/IllusionGameValidation/study1/study1.html): In which we have a first look at the effects and refine the stimuli selection (`study1/`).
+- [**Study (part 1)**](https://realitybending.github.io/IllusionGameValidation/study2/study2.html): In which we analyze the effect of illusion strength and task difficulty on errors and RT (`study2/`).
+- [**Study (part 2)**](https://realitybending.github.io/IllusionGameValidation/study3/study3.html): In which we analyze the links with personality (`study3/`).
 
 ## Download Data
 
-- **Raw data**: [Part 1](data/study2_part1.csv) and [Part 2](data/study2_part2.csv) (can be assembled with `rbind(read.csv("study2_part1.csv"), read.csv("study2_part2.csv"))`)
+- **Raw data**: [**Part 1**](data/study2_part1.csv) and [**Part 2**](data/study2_part2.csv) (can be assembled with `rbind(read.csv("study2_part1.csv"), read.csv("study2_part2.csv"))`)
 - [**Participant-level data**](data/study3.csv)
 
 ## Other
