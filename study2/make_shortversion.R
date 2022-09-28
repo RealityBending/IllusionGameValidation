@@ -28,7 +28,7 @@ make_plot(gam_verticalhorizontal_err, gam_verticalhorizontal_rt,
           diff="Illusion_Difference=c(0.05, 0.225)",
           strength=c(-33, 33))
 
-# M??ller-Lyer
+# Muller-Lyer
 make_plot(gam_mullerlyer_err, gam_mullerlyer_rt,
           diff="Illusion_Difference=c(0.05, 0.35)",
           strength=c(-23, 23))
