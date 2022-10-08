@@ -32,4 +32,4 @@
 
 ![](figures/Figure1.png)
 ![](figures/figure2.png)
-![](figures/Figure3.png)
+![](figures/figure3.png)
