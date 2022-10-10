@@ -213,7 +213,7 @@ The Bayesian t-tests on the effect of sex suggested anecdotal to moderate eviden
 
 Regarding "normal" personality traits, Bayesian correlations suggested substantial evidence in favor of a positive relationship between *Honesty-Humility* and Zöllner ($BF_{10} > 100$), Vertical-Horizontal ($BF_{10} = 9.78$) and the Factor *i* ($BF_{10} = 4.00$); as well as between *Agreeableness* and Vertical-Horizontal ($BF_{10} = 25.06$), Ponzo ($BF_{10} = 4.88$) and the Factor *i* ($BF_{10} = 19.65$).
 
-```{r message=FALSE, warning=FALSE, fig.cap="The upper plots show the distribution of demographic and dispositional variables. The middle plots shows the illusion sensitivity scores as a function of sex and age (solid lines indicate significant relationships). Bottom plots show the correlation between the general factor of illusion sensitivity (Factor \\textit{i}) and personality traits.", out.width="100%"}
+```{r message=FALSE, warning=FALSE, fig.cap="The upper plots show the distribution of demographic and dispositional variables. The middle plots show the illusion sensitivity scores as a function of sex and age (solid lines indicate significant relationships). Bottom plots show the correlation between the general factor of illusion sensitivity (Factor \\textit{i}) and personality traits.", out.width="100%"}
 knitr::include_graphics("../figures/Figure3.png")
 ```
 
