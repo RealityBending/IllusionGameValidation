@@ -63,6 +63,8 @@ affiliation:
     institution   : "Centre for Research and Development in Learning, Nanyang Technological University, Singapore"
 authornote: |
   Correspondence concerning this article should be addressed to Dominique Makowski, HSS 04-18, 48 Nanyang Avenue, Singapore (dom.makowski@gmail.com).
+  
+  
 abstract: |
   Visual illusions highlight how the brain uses contextual and prior information to inform our perception of reality. Unfortunately, illusion research has been hampered by the difficulty of adapting these stimuli to experimental settings, leaving open the questions pertaining to a potential unique factor underlying the sensitivity to different types of illusions. In this study, we used a novel parametric framework for visual illusions to generate 10 different classic illusions (Delboeuf, Ebbinghaus, Rod and Frame, Vertical-Horizontal, Zöllner, White, Müller-Lyer, Ponzo, Poggendorff, Contrast) varying in strength, embedded in a perceptual discrimination task. We tested the objective effect of the illusions on errors and reaction times, and extracted participant-level performance scores (n=250). Our results provide evidence in favour of a general factor (labelled Factor *i*) underlying the sensitivity to different illusions. Moreover, we report a positive relationship between illusion sensitivity and personality traits such as Agreeableness, Honesty-Humility, and negative relationships with Psychoticism, Antagonism, Disinhibition, and Negative Affect.
 keywords          : "visual illusions, illusion game, Pyllusion, personality, general factor"
@@ -99,8 +101,7 @@ knitr::opts_chunk$set(
 cache <- TRUE
 ```
 
-<!-- Significance Statement (< 120 words) -->
-<!-- A novel paradigm to study the objective effect of visual illusions is presented, which yielded evidence in favor of a common factor to visual illusions (Factor *i*) and a relationship between a low illusion sensitivity and maladaptive personality traits, such as antagonism, psychoticism and disinhibition. -->
+**Significance Statement.** A novel paradigm to study the objective effect of visual illusions yielded evidence in favor of a common factor to visual illusions (Factor *i*) and a relationship between illusion resistance and maladaptive personality traits, such as antagonism, psychoticism and disinhibition.
 
 # Introduction
 
@@ -244,6 +245,10 @@ Future research is needed to address several limitations. One key question conce
 
 
 In conclusion, we strongly invite researchers to explore and re-analyze our dataset with other approaches and methods to push the understanding of visual illusions and illusion sensitivity further. The task, data and analysis script are available in open-access at [**https://github.com/RealityBending/IllusionGameValidation**](https://github.com/RealityBending/IllusionGameValidation){.uri}.
+
+# Funding
+
+This work was supported by the Presidential Postdoctoral Fellowship Grant (NTU-PPF-2020-10014) from Nanyang Technological University (awarded to DM).
 
 # Acknowledgments
 
