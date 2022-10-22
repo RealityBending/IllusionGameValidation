@@ -95,14 +95,6 @@ preprocess_raw <- function(file) {
   # Correct duration
   df$Duration <- df$Duration - df$Break_Duration
 
-  # Manual fixes for reported errors (using demographic info from prolific)
-  df[df$Participant == "5d3c6e745602310001bca8aa_6bdtb", "Sex"] <- "Female"
-  df[df$Participant == "60f5fa488f7b1381d175ecb5_qwvfs", "Sex"] <- "Male"
-  df[df$Participant == "5d558c262d8a6200172a8b7b_deegh", "Sex"] <- "Male"
-  df[df$Participant == "614a4c9d8172751921452626_mc4l4", "Sex"] <- "Female"
-  df[df$Participant == "61323c38f727b9f84e45a9ef_ls925", "Sex"] <- "Female"
-  df[df$Participant == "61568a59110d8f1cc99558af_8tqre", "Sex"] <- "Female"
-
 
   # Format names
   df$Illusion_Type <- ifelse(df$Illusion_Type == "MullerLyer", "Müller-Lyer", df$Illusion_Type)
