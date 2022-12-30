@@ -209,7 +209,7 @@ Finally, for each of the individual illusion sensitivity scores (10 illusion-spe
 The analysis was carried out using *R 4.2* [@RCoreTeam2022], *brms* [@Burkner2017], the *tidyverse* [@wickham2019], and the *easystats* collection of packages [@bayestestRArticle; @correlationArticle; @performanceArticle; @insightArticle]. As all the full results have been made available (see **Data Availability**), we will focus here on the significant results [based on the Bayes Factor *BF* or the Probability of Direction *pd*, see @makowski2019indices]. 
 
 ```{r message=FALSE, warning=FALSE, out.width="100%", fig.cap="Top: the effect of illusion strength and task difficulty on the error rate and reaction time (RT) for each individual illusion. The solid line represents the General Additive Model (GAM), and the dashed line corresponds to its approximation via linear models. Descriptive data is shown with stacked dots (for which errors start from the top) and distributions for RTs. Negative values for illusion strength correspond to congruent (i.e., facilitating) illusion effects. Task difficulty (the objective difference between the targets of perceptual decision) levels are shown as colors, with lower values corresponding to harder trials. The results for each illusion are surrounded by 4 extreme examples of stimuli, corresponding to the hardest difficulty (on top) and the strongest illusion (on the right for incongruent illusions). Bottom: We extracted the effect slope of the illusion strength and its interaction with task difficulty for each participant. We fitted a Structural Equation Model (SEM) suggesting that these manifest variables group to first-level illusion-specific latent factors, which then load on a general factor of illusion sensitivity (Factor \\textit{i})."}
-knitr::include_graphics("../figures/Figure2.png")
+knitr::include_graphics("../figures/Figure3.png")
 ```
 
 # Results
@@ -243,8 +243,8 @@ The Bayesian t-tests on the effect of sex suggested anecdotal to moderate eviden
 
 Regarding "normal" personality traits, Bayesian correlations suggested substantial evidence in favor of a positive relationship between *Honesty-Humility* and Zöllner ($BF_{10} > 100$), Vertical-Horizontal ($BF_{10} = 9.78$) and the Factor *i* ($BF_{10} = 4.00$); as well as between *Agreeableness* and Vertical-Horizontal ($BF_{10} = 25.06$), Ponzo ($BF_{10} = 4.88$) and the Factor *i* ($BF_{10} = 19.65$).
 
-```{r message=FALSE, warning=FALSE, fig.cap="The upper plots show the distribution of demographic and dispositional variables. The middle plots show the illusion sensitivity scores as a function of sex and age (solid lines indicate significant relationships). Bottom plots show the correlation between the general factor of illusion sensitivity (Factor \\textit{i}) and personality traits.", out.width="100%"}
-knitr::include_graphics("../figures/Figure3.png")
+```{r message=FALSE, warning=FALSE, fig.cap="The upper plots show the illusion sensitivity scores as a function of sex and age (solid lines indicate significant relationships). Bottom plots show the correlation between the general factor (Factor \\textit{i}) of illusion sensitivity (on the x-axes) and personality traits.", out.width="100%"}
+knitr::include_graphics("../figures/Figure4.png")
 ```
 
 
