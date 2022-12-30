@@ -10,7 +10,7 @@ output:
 date: "`r Sys.Date()`"
 editor_options: 
   chunk_output_type: console
-bibliography: "../submission/references.bib"
+bibliography: "../submission/R1/references.bib"
 ---
 
 ```{r, echo = FALSE, warning=FALSE, message=FALSE}
@@ -97,12 +97,12 @@ p_age <- estimate_density(dfsub$Age) |>
   geom_area(fill = "#607D8B") +
   scale_x_continuous(expand = c(0, 0)) +
   scale_y_continuous(expand = c(0, 0)) +
-  labs(title = "Age", color = NULL) +
-  theme_modern() +
+  labs(title = expression("Age"[" (in years)"]), color = NULL, y = "Distribution") +
+  theme_modern(axis.title.space = 5) +
   theme(
     plot.title = element_text(size = rel(1), face = "bold", hjust = 0.5),
     plot.subtitle = element_text(face = "italic", hjust = 0.5),
-    axis.title.y = element_blank(),
+    axis.title.y = element_text(size = rel(0.8)),
     axis.text.y = element_blank(),
     axis.text.x = element_text(size = rel(0.8)),
     axis.title.x = element_blank()
@@ -114,24 +114,24 @@ p_nat <- dfsub |>
   mutate(Nationality = fct_reorder(Nationality, desc(n))) |>
   ggplot(aes(x = Nationality, y = n, fill = Nationality)) +
   geom_bar(stat = "identity") +
-  labs(y = "Number", title = "Nationality") +
+  labs(y = "Number of participants", title = "Nationality") +
   scale_fill_material_d(guide = "none") +
   scale_x_discrete(expand = c(0, 0)) +
   scale_y_continuous(expand = c(0, 0)) +
-  theme_modern() +
+  theme_modern(axis.title.space = 5) +
   theme(
     plot.title = element_text(size = rel(1), face = "bold", hjust = 0.5),
     plot.subtitle = element_text(face = "italic", hjust = 0.5),
     axis.title.x = element_blank(),
-    axis.title.y = element_blank(),
+    axis.title.y = element_text(size = rel(0.8)),
     axis.text.y = element_text(size = rel(0.8)),
     axis.text.x = element_text(size = rel(0.6), angle = 50, hjust = 1)
   )
 
-# ggsave("figures/figure_dem1.png",
-#        patchwork::wrap_elements(p_age / p_nat),
-#        width=0.5*(fig.height),
-#        height=1*(fig.height), dpi=1000, bg="white")
+ggsave("figures/figure_dem1.png",
+       patchwork::wrap_elements(p_age / p_nat),
+       width=0.5*(fig.height),
+       height=1*(fig.height), dpi=1000, bg="white")
 
 
 p_sex <- plot_waffle(dfsub, what = "Sex", rows = 10, size = 5) +
@@ -144,8 +144,8 @@ p_race <- plot_waffle(dfsub, "Ethnicity", rows = 10, size = 5) +
   scale_color_manual(values = c("Hispanic" = "#FF5722", "Caucasian" = "#2196F3", "African" = "#4CAF50", "Other" = "#795548"))
 
 
-# ggsave("figures/figure_dem2.png",
-#        patchwork::wrap_elements(p_sex / p_edu / p_race), width=1*(fig.height), height=1*(fig.height), dpi=1000, bg="white")
+ggsave("figures/figure_dem2.png",
+       patchwork::wrap_elements(p_sex / p_edu / p_race), width=1*(fig.height), height=1*(fig.height), dpi=1000, bg="white")
 
 
 
@@ -161,12 +161,12 @@ p_ipip <- dfsub |>
   scale_x_continuous(expand = c(0, 0)) +
   scale_y_continuous(expand = c(0, 0)) +
   scale_color_manual(values = c("Agreeableness" = "#FFC107", "Honesty-Humility" = "#00BCD4", "Extraversion" = "#9C27B0", "Conscientiousness" = "#3F51B5", "Openness" = "#4CAF50", "Neuroticism" = "#E91E63")) +
-  labs(x = "Score", title = "Normal Personality", color = NULL) +
-  theme_modern() +
+  labs(x = "Score", title = "Normal Personality", y = "Distribution", color = NULL) +
+  theme_modern(axis.title.space = 5) +
   theme(
     plot.title = element_text(size = rel(1), face = "bold", hjust = 0.5),
-    axis.title.y = element_blank(),
     axis.text.y = element_blank(),
+    axis.title.y = element_text(size = rel(0.8)),
     axis.text.x = element_text(size = rel(0.8)),
     axis.title.x = element_blank(),
     legend.text = element_text(size = rel(0.8))
@@ -184,12 +184,12 @@ p_pid <- dfsub |>
   scale_x_continuous(expand = c(0, 0)) +
   scale_y_continuous(expand = c(0, 0)) +
   scale_color_manual(values = c("Antagonism" = "#FF9800", "Detachment" = "#03A9F4", "Disinhibition" = "#FF5722", "Negative Affect" = "#F44336", "Psychoticism" = "#673AB7")) +
-  labs(x = "Score", title = "Pathological Personality", color = NULL) +
-  theme_modern() +
+  labs(x = "Score", title = "Pathological Personality", y = "Distribution", color = NULL) +
+  theme_modern(axis.title.space = 5) +
   theme(
     plot.title = element_text(size = rel(1), face = "bold", hjust = 0.5),
-    axis.title.y = element_blank(),
     axis.text.y = element_blank(),
+    axis.title.y = element_text(size = rel(0.8)),
     axis.text.x = element_text(size = rel(0.8)),
     axis.title.x = element_blank(),
     legend.text = element_text(size = rel(0.8))
@@ -197,8 +197,8 @@ p_pid <- dfsub |>
   )
 
 
-# ggsave("figures/figure_dem3.png",
-#        patchwork::wrap_elements(p_ipip / p_pid), width=2/3*(fig.height), height=1*(fig.height), dpi=1000, bg="white")
+ggsave("figures/figure_dem3.png",
+       patchwork::wrap_elements(p_ipip / p_pid), width=2/3*(fig.height), height=1*(fig.height), dpi=1000, bg="white")
 
 
 
@@ -571,12 +571,14 @@ table1 |>
 
 
 ```{r message=FALSE, warning=FALSE, cache=cache, eval=FALSE}
-p <- patchwork::wrap_elements(grid::rasterGrob(png::readPNG("figures/figure_dem.png"), interpolate = TRUE)) /
+p <- 
+  # patchwork::wrap_elements(grid::rasterGrob(png::readPNG("figures/figure_dem.png"), interpolate = TRUE)) /
   patchwork::wrap_elements(grid::rasterGrob(png::readPNG("figures/figure_agesex.png"), interpolate = TRUE)) /
   patchwork::wrap_elements(grid::rasterGrob(png::readPNG("figures/figure_pers.png"), interpolate = TRUE)) +
-  plot_layout(heights = c(7200, 5000, 8000))
+  # plot_layout(heights = c(7200, 5000, 8000))
+  plot_layout(heights = c(5000, 8000))
 
-ggsave("../figures/figure3.png", p, height = 20200, width = 15166, units = "px", limitsize = FALSE)
+ggsave("../figures/figure4.png", p, height = 5000+8000, width = 15166, units = "px", limitsize = FALSE)
 ```
 
 # Discussion
