@@ -2159,43 +2159,53 @@ load("models/p_sem.RData")
 p_delboeuf <- plot_all(
   filter(df, Illusion_Type == "Delboeuf"), 
   plot_model_err(filter(df, Illusion_Type == "Delboeuf"), model_delboeuf_err, gam_delboeuf_err), 
-  plot_model_rt(filter(df, Illusion_Type == "Delboeuf", Error == 0), model_delboeuf_rt, gam_delboeuf_rt))
+  plot_model_rt(filter(df, Illusion_Type == "Delboeuf", Error == 0), model_delboeuf_rt, gam_delboeuf_rt), 
+  question="Which red circle is bigger?")
 p_ebbinghaus <- plot_all(
   filter(df, Illusion_Type == "Ebbinghaus"), 
   plot_model_err(filter(df, Illusion_Type == "Ebbinghaus"), model_ebbinghaus_err, gam_ebbinghaus_err), 
-  plot_model_rt(filter(df, Illusion_Type == "Ebbinghaus", Error == 0), model_ebbinghaus_rt, gam_ebbinghaus_rt))
+  plot_model_rt(filter(df, Illusion_Type == "Ebbinghaus", Error == 0), model_ebbinghaus_rt, gam_ebbinghaus_rt), 
+  question="Which red circle is bigger?")
 p_rodframe <- plot_all(
   filter(df, Illusion_Type == "Rod-Frame"), 
   plot_model_err(filter(df, Illusion_Type == "Rod-Frame"), model_rodframe_err, gam_rodframe_err), 
-  plot_model_rt(filter(df, Illusion_Type == "Rod-Frame", Error == 0), model_rodframe_rt, gam_rodframe_rt))
+  plot_model_rt(filter(df, Illusion_Type == "Rod-Frame", Error == 0), model_rodframe_rt, gam_rodframe_rt), 
+  question="Which side does the red line lean to?")
 p_verticalhorizontal <- plot_all(
   filter(df, Illusion_Type == "Vertical-Horizontal"), 
   plot_model_err(filter(df, Illusion_Type == "Vertical-Horizontal"), model_verticalhorizontal_err, gam_verticalhorizontal_err), 
-  plot_model_rt(filter(df, Illusion_Type == "Vertical-Horizontal", Error == 0), model_verticalhorizontal_rt, gam_verticalhorizontal_rt))
+  plot_model_rt(filter(df, Illusion_Type == "Vertical-Horizontal", Error == 0), model_verticalhorizontal_rt, gam_verticalhorizontal_rt), 
+  question="Which red segment is longer?")
 p_zollner <- plot_all(
   filter(df, Illusion_Type == "Zöllner"), 
   plot_model_err(filter(df, Illusion_Type == "Zöllner"), model_zollner_err, gam_zollner_err), 
-  plot_model_rt(filter(df, Illusion_Type == "Zöllner", Error == 0), model_zollner_rt, gam_zollner_rt))
+  plot_model_rt(filter(df, Illusion_Type == "Zöllner", Error == 0), model_zollner_rt, gam_zollner_rt), 
+  question="Which side do the red lines close on?")
 p_white <- plot_all(
   filter(df, Illusion_Type == "White"), 
   plot_model_err(filter(df, Illusion_Type == "White"), model_white_err, gam_white_err), 
-  plot_model_rt(filter(df, Illusion_Type == "White", Error == 0), model_white_rt, gam_white_rt) + coord_cartesian(ylim=c(0.125, 1.7), xlim = c(-17.5, 17.5)))
+  plot_model_rt(filter(df, Illusion_Type == "White", Error == 0), model_white_rt, gam_white_rt) + coord_cartesian(ylim=c(0.125, 1.7), xlim = c(-17.5, 17.5)), 
+  question="Which verticalcolumn\nis lighter?")
 p_mullerlyer <- plot_all(
   filter(df, Illusion_Type == "Müller-Lyer"), 
   plot_model_err(filter(df, Illusion_Type == "Müller-Lyer"), model_mullerlyer_err, gam_mullerlyer_err), 
-  plot_model_rt(filter(df, Illusion_Type == "Müller-Lyer", Error == 0), model_mullerlyer_rt, gam_mullerlyer_rt))
+  plot_model_rt(filter(df, Illusion_Type == "Müller-Lyer", Error == 0), model_mullerlyer_rt, gam_mullerlyer_rt), 
+  question="Which red line is longer?")
 p_ponzo <- plot_all(
   filter(df, Illusion_Type == "Ponzo"), 
   plot_model_err(filter(df, Illusion_Type == "Ponzo"), model_ponzo_err, gam_ponzo_err), 
-  plot_model_rt(filter(df, Illusion_Type == "Ponzo", Error == 0), model_ponzo_rt, gam_ponzo_rt))
+  plot_model_rt(filter(df, Illusion_Type == "Ponzo", Error == 0), model_ponzo_rt, gam_ponzo_rt), 
+  question="Which red line\nis longer?")
 p_poggendorff <- plot_all(
   filter(df, Illusion_Type == "Poggendorff"), 
   plot_model_err(filter(df, Illusion_Type == "Poggendorff"), model_poggendorff_err, gam_poggendorff_err), 
-  plot_model_rt(filter(df, Illusion_Type == "Poggendorff", Error == 0), model_poggendorff_rt, gam_poggendorff_rt))
+  plot_model_rt(filter(df, Illusion_Type == "Poggendorff", Error == 0), model_poggendorff_rt, gam_poggendorff_rt), 
+  question="Which side is the right\npart of the red segment\nmisplaced towards?")
 p_contrast <- plot_all(
   filter(df, Illusion_Type == "Contrast"), 
   plot_model_err(filter(df, Illusion_Type == "Contrast"), model_contrast_err, gam_contrast_err), 
-  plot_model_rt(filter(df, Illusion_Type == "Contrast", Error == 0), model_contrast_rt, gam_contrast_rt))
+  plot_model_rt(filter(df, Illusion_Type == "Contrast", Error == 0), model_contrast_rt, gam_contrast_rt), 
+  question="Which small rectangle\nis lighter?")
 
 # Vertical
 p_ill <- 
@@ -2220,7 +2230,7 @@ p_ill <-
 ggsave("figures/figure_ill.png", p_ill, height = 20, width = 30, dpi=300)
 
 
-ggsave("../figures/figure2.png", ((p_ill) / p_sem) + plot_layout(heights=c(2, 1.5)), height = 35, width = 30, dpi=300)
+ggsave("../figures/figure3.png", ((p_ill) / p_sem) + plot_layout(heights=c(2, 1.5)), height = 35, width = 30, dpi=300)
 ```
 
 # Discussion
