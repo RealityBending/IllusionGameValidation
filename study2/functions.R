@@ -482,7 +482,7 @@ plot_model_rt <- function(data, model, gam) {
 
   pred |>
     ggplot(aes_string(x = varstrength, y = "Predicted")) +
-    ggdist::stat_slab(data = data, aes_string(y = "RT", group = vardiff, fill = vardiff), alpha = 1/3) +
+    ggdist::stat_slab(data = data, aes_string(y = "RT", group = vardiff, fill = vardiff), alpha = 1 / 3) +
     geom_ribbon(data=gamdata, aes_string(ymin = "CI_low", ymax = "CI_high", fill = vardiff, group = vardiff), alpha = 0.2) +
     geom_vline(xintercept = 0, linetype = "dashed") +
     geom_line(data=gamdata, aes_string(color = vardiff, group = vardiff)) +
@@ -512,7 +512,7 @@ plot_model_rt <- function(data, model, gam) {
 
 
 
-plot_all <- function(data, p_err, p_rt) {
+plot_all <- function(data, p_err, p_rt, question="") {
   illname <- unique(data$Illusion_Type)
   # Get stimuli
   dat <- df |>
@@ -585,7 +585,9 @@ plot_all <- function(data, p_err, p_rt) {
   wrap_elements(((img_leftup | patchwork::plot_spacer() | img_rightup) / p / (img_leftdown | patchwork::plot_spacer() | img_rightdown) +
     patchwork::plot_layout(heights = c(0.5, 1.5, 0.5)) +
     patchwork::plot_annotation(title = paste(illname, "Illusion"),
-                               theme = theme(plot.title = element_text(size=rel(1.75), face="bold", hjust=0.5)))))
+                               subtitle = question,
+                               theme = theme(plot.title = element_text(size=rel(1.75), face="bold", hjust=0.5),
+                                             plot.subtitle = element_text(size=rel(1), face="italic", hjust=0.5, margin=margin(0,0,-30,0))))))
 }
 
 
