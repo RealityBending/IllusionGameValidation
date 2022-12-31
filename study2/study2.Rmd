@@ -2170,22 +2170,22 @@ p_rodframe <- plot_all(
   filter(df, Illusion_Type == "Rod-Frame"), 
   plot_model_err(filter(df, Illusion_Type == "Rod-Frame"), model_rodframe_err, gam_rodframe_err), 
   plot_model_rt(filter(df, Illusion_Type == "Rod-Frame", Error == 0), model_rodframe_rt, gam_rodframe_rt), 
-  question="Which side does the red line lean to?")
+  question="Which direction is the red line leaning towards?")
 p_verticalhorizontal <- plot_all(
   filter(df, Illusion_Type == "Vertical-Horizontal"), 
   plot_model_err(filter(df, Illusion_Type == "Vertical-Horizontal"), model_verticalhorizontal_err, gam_verticalhorizontal_err), 
   plot_model_rt(filter(df, Illusion_Type == "Vertical-Horizontal", Error == 0), model_verticalhorizontal_rt, gam_verticalhorizontal_rt), 
-  question="Which red segment is longer?")
+  question="Which red line is longer?")
 p_zollner <- plot_all(
   filter(df, Illusion_Type == "Zöllner"), 
   plot_model_err(filter(df, Illusion_Type == "Zöllner"), model_zollner_err, gam_zollner_err), 
   plot_model_rt(filter(df, Illusion_Type == "Zöllner", Error == 0), model_zollner_rt, gam_zollner_rt), 
-  question="Which side do the red lines close on?")
+  question="Which direction are the red\nlines converging towards?")
 p_white <- plot_all(
   filter(df, Illusion_Type == "White"), 
   plot_model_err(filter(df, Illusion_Type == "White"), model_white_err, gam_white_err), 
   plot_model_rt(filter(df, Illusion_Type == "White", Error == 0), model_white_rt, gam_white_rt) + coord_cartesian(ylim=c(0.125, 1.7), xlim = c(-17.5, 17.5)), 
-  question="Which verticalcolumn\nis lighter?")
+  question="Which vertical rectangle\nis lighter?")
 p_mullerlyer <- plot_all(
   filter(df, Illusion_Type == "Müller-Lyer"), 
   plot_model_err(filter(df, Illusion_Type == "Müller-Lyer"), model_mullerlyer_err, gam_mullerlyer_err), 

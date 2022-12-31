@@ -153,30 +153,11 @@ This study was approved by the NTU Institutional Review Board (NTU IRB-2022-187)
 
 ## Stimuli
 
-We investigated the effect of 10 different classic illusions [**inseert figure**]:
+```{r message=FALSE, warning=FALSE, out.width="100%", fig.cap="Ten different illusions were used as stimuli in a perceptual task, where participants had to answer as fast as possibly, without making errors, according to specific instructions. For each illusion type, two parameters were experimentally manipulated, 1) the task difficulty (e.g., how large was the difference between the bigger and the smaller red circles in the Delboeuf illusion), and 2) the illusion strength (e.g., the size of the black circles in the Ebbinghaus illusion)."}
+knitr::include_graphics("../figures/Figure2.png")
+```
 
-<!-- Geometrical Illusions -->
-The Müller-Lyer illusion is represented by two equal-length line segments that end with arrow-like fins, either pointing inwards or outwards. The line with inward-pointing fins is typically perceived to be longer.
-
-The Ebbinghaus illusion is comprised of two circles of identical size placed near each other. While one circle is surrounded by smaller circles, the other is surrounded by larger circles. The latter circle usually appears smaller than the former. 
-
-The Ponzo illusion is composed of two parallel horizontal lines embedded between a pair of converging lines. The upper line is perceived to be longer despite the two lines having the same objective length.
-
-The Poggendorff illusion is characterized by an oblique collinear line that appears as two misaligned line segments as a result of an intervening rectangular structure separating them. The upper line usually appears to be positioned higher than the point that would be collinear with the lower line.  
-
-The Zollner illusion is represented by two parallel horizontal lines that are crossed with short, repeated lines. Notably, the direction in which the short repeated lines cross over the target parallel lines oppose one another, causing the target lines to appear not parallel.
-
-The Vertical-Horizontal illusion involves two equal-length line segments; one presented vertically and the other horizontally. The length of the vertical line is usually perceived as being longer, relative to that of the horizontal line.
-
-The Rod and Frame illusion consists of a vertical line segment ('rod') that is enclosed in a laterally tilted square ('frame'). The orientation of the line segment typically looks congruent with the orientation of the frame. 
-
-The Delboeuf illusion comprises two circles of identical size placed near each other; each surrounded by an outer ring. The central circle with the closer surrounding ring appears smaller than that with the distant surrounding ring in this visual illusion.
-
-<!-- Brightness illusions -->
-The Simultaneous Brightness Contrast illusion, henceforth referred to as the Contrast illusion, consists of two rectangles with identical shades of grey that are embedded in backgrounds of different color intensities. The rectangle situated on the dark background usually appears to be of a lighter shade than the rectangle on the light background.
-
-The White illusion is composed of a series of black and white horizontal bars that have been superimposed with rectangles that have an identical shade of grey. Rectangles that have been superimposed onto white bars appear to have a darker shade than those superimposed onto black bars.    
-
+We investigated the effect of 10 different classic illusions (**Figure 2**).
 A pilot study (*n = 46*), of which a full description is available at [**https://github.com/RealityBending/IllusionGameValidation**](https://github.com/RealityBending/IllusionGameValidation){.uri}, was first conducted to determine a sensitive range of stimuli parameters. Then, for each of the 10 illusion types, we generated a total of 134 stimuli. These stimuli resulted from the combination of 15 equally-spaced levels of illusion *strength* (7 negative, i.e., congruent effects; 7 positive, i.e., incongruent effects; and 0) overlapped with 16 non-linearly spaced task *difficulty* levels (i.e., with an exponential, square or cubic spacing depending on the pilot results). For instance, a linear space of [0.1, 0.4, 0.7, 1.0] can be transformed to an exponential space of [0.1, 0.34, 0.64, 1.0], where 0.1 corresponds to the highest difficulty - i.e., the smallest objective difference between targets). For each illusion type, the stimuli were split into two series (56 and 72 stimuli per series) with alternating parameter values to maintain their homogeneity. Additionally, 6 stimuli per illusion type were generated for a practice series using parameters with more extreme variations (i.e., containing very easy trials to help cement the task instructions). 
 
 
@@ -200,7 +181,7 @@ The final sample included 250 participants (Mean age = 26.5, SD = 7.6, range: [1
 
 The first part of the analysis focused on modelling the effect of illusion strength and task difficulty on errors and response time (RT) **separately for each illusion**. We started by fitting General Additive Models (GAMs), which can parsimoniously accommodate possible non-linear effects and interactions. Errors were analyzed using Bayesian logistic mixed models, and RTs of correct responses were analyzed using an ex-Gaussian family with the same fixed effects entered for the location $\mu$ (mean), scale $\sigma$ (spread) and tail-dominance $\tau$ of the RT distribution [@balota2011moving; @matzke2009psychological].
 
-Using GAMs as the "ground-truth" models, we attempted at approximating them using general linear mixed models, which can be used to estimate the effects' participant-level variability (via random slopes). Following a comparison of models with a combination of transformations (raw, log, square root or cubic root) on the main predictors (task *difficulty* and illusion *strength*), we fitted the best model (based on their indices of fit), and compared their output visually (**Figure 2**).
+Using GAMs as the "ground-truth" models, we attempted at approximating them using general linear mixed models, which can be used to estimate the effects' participant-level variability (via random slopes). Following a comparison of models with a combination of transformations (raw, log, square root or cubic root) on the main predictors (task *difficulty* and illusion *strength*), we fitted the best model (based on their indices of fit), and compared their output visually (**Figure 3**).
 
 The inter-individual variability in the effect of illusion strength and its interaction with task difficulty (**diff**) was extracted from the models and used as participant-level scores. We then explored the relationship of these indices across different illusions using exploratory factor analysis (EFA) and structural equation modelling (SEM), and tested the existence of a general factor of illusion sensitivity (Factor *i*).
 
@@ -239,7 +220,7 @@ It is important to note that these individual scores are the result of several l
 The Bayesian correlation analysis (with narrow priors centered around a null effect) between the illusion scores and contextual variables (screen size and refresh rate) provided weak evidence in favor of an absence of effect, with the exception of the two contrast-based illusions. Anecdotal ($BF_{10} = 2.05$) and moderate evidence ($BF_{10} = 4.11$) was found for a negative correlation between screen size and the sensitivity to the White and the Contrast illusion, respectively. To test whether this result could be an artifact related to the highly skewed screen size distribution (caused by very few participants with extreme screen sizes), we re-ran a robust correlation (with rank-transformed values), which provided even stronger evidence in favor of the effect existence ($BF_{10} = 28.19$, $BF_{10} = 4.31$ for White and Contrast, respectively).
 
 
-The Bayesian t-tests on the effect of sex suggested anecdotal to moderate evidence in favour of the null effect for all scores, with the exception of the sensitivity to the Zöllner illusion, which was higher in males as compared to females ($\Delta=-0.37$, 95% CI [-0.62, -0.13], $BF_{10} = 12.74$). We fitted Bayesian linear models with the education level entered as a monotonic predictor [appropriate for ordinal variables, @burkner2020modelling], which yielded no significant effects. For age, we fitted two types of models for each score, one general additive models (GAM) and a 2nd order polynomial model. These consistently suggested a significant positive linear relationship between age and Factor *i* ($pd=100\%$), as well as the sensitivity to Müller-Lyer ($pd=100\%$), Vertical-Horizontal ($pd=100\%$), Zöllner ($pd=100\%$) and Ebbinghaus ($pd=99\%$) illusions (**Figure 3**).
+The Bayesian t-tests on the effect of sex suggested anecdotal to moderate evidence in favour of the null effect for all scores, with the exception of the sensitivity to the Zöllner illusion, which was higher in males as compared to females ($\Delta=-0.37$, 95% CI [-0.62, -0.13], $BF_{10} = 12.74$). We fitted Bayesian linear models with the education level entered as a monotonic predictor [appropriate for ordinal variables, @burkner2020modelling], which yielded no significant effects. For age, we fitted two types of models for each score, one general additive models (GAM) and a 2nd order polynomial model. These consistently suggested a significant positive linear relationship between age and Factor *i* ($pd=100\%$), as well as the sensitivity to Müller-Lyer ($pd=100\%$), Vertical-Horizontal ($pd=100\%$), Zöllner ($pd=100\%$) and Ebbinghaus ($pd=99\%$) illusions (**Figure 4**).
 
 Regarding "normal" personality traits, Bayesian correlations suggested substantial evidence in favor of a positive relationship between *Honesty-Humility* and Zöllner ($BF_{10} > 100$), Vertical-Horizontal ($BF_{10} = 9.78$) and the Factor *i* ($BF_{10} = 4.00$); as well as between *Agreeableness* and Vertical-Horizontal ($BF_{10} = 25.06$), Ponzo ($BF_{10} = 4.88$) and the Factor *i* ($BF_{10} = 19.65$).
 
