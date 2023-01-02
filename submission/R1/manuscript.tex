@@ -1,0 +1,578 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+  man,floatsintext]{apa6}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+% Make \paragraph and \subparagraph free-standing
+\ifx\paragraph\undefined\else
+  \let\oldparagraph\paragraph
+  \renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+  \let\oldsubparagraph\subparagraph
+  \renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+\newlength{\cslhangindent}
+\setlength{\cslhangindent}{1.5em}
+\newlength{\csllabelwidth}
+\setlength{\csllabelwidth}{3em}
+\newlength{\cslentryspacingunit} % times entry-spacing
+\setlength{\cslentryspacingunit}{\parskip}
+\newenvironment{CSLReferences}[2] % #1 hanging-ident, #2 entry spacing
+ {% don't indent paragraphs
+  \setlength{\parindent}{0pt}
+  % turn on hanging indent if param 1 is 1
+  \ifodd #1
+  \let\oldpar\par
+  \def\par{\hangindent=\cslhangindent\oldpar}
+  \fi
+  % set entry spacing
+  \setlength{\parskip}{#2\cslentryspacingunit}
+ }%
+ {}
+\usepackage{calc}
+\newcommand{\CSLBlock}[1]{#1\hfill\break}
+\newcommand{\CSLLeftMargin}[1]{\parbox[t]{\csllabelwidth}{#1}}
+\newcommand{\CSLRightInline}[1]{\parbox[t]{\linewidth - \csllabelwidth}{#1}\break}
+\newcommand{\CSLIndent}[1]{\hspace{\cslhangindent}#1}
+\ifLuaTeX
+\usepackage[bidi=basic]{babel}
+\else
+\usepackage[bidi=default]{babel}
+\fi
+\babelprovide[main,import]{english}
+% get rid of language-specific shorthands (see #6817):
+\let\LanguageShortHands\languageshorthands
+\def\languageshorthands#1{}
+% Manuscript styling
+\usepackage{upgreek}
+\captionsetup{font=singlespacing,justification=justified}
+
+% Table formatting
+\usepackage{longtable}
+\usepackage{lscape}
+% \usepackage[counterclockwise]{rotating}   % Landscape page setup for large tables
+\usepackage{multirow}		% Table styling
+\usepackage{tabularx}		% Control Column width
+\usepackage[flushleft]{threeparttable}	% Allows for three part tables with a specified notes section
+\usepackage{threeparttablex}            % Lets threeparttable work with longtable
+
+% Create new environments so endfloat can handle them
+% \newenvironment{ltable}
+%   {\begin{landscape}\centering\begin{threeparttable}}
+%   {\end{threeparttable}\end{landscape}}
+\newenvironment{lltable}{\begin{landscape}\centering\begin{ThreePartTable}}{\end{ThreePartTable}\end{landscape}}
+
+% Enables adjusting longtable caption width to table width
+% Solution found at http://golatex.de/longtable-mit-caption-so-breit-wie-die-tabelle-t15767.html
+\makeatletter
+\newcommand\LastLTentrywidth{1em}
+\newlength\longtablewidth
+\setlength{\longtablewidth}{1in}
+\newcommand{\getlongtablewidth}{\begingroup \ifcsname LT@\roman{LT@tables}\endcsname \global\longtablewidth=0pt \renewcommand{\LT@entry}[2]{\global\advance\longtablewidth by ##2\relax\gdef\LastLTentrywidth{##2}}\@nameuse{LT@\roman{LT@tables}} \fi \endgroup}
+
+% \setlength{\parindent}{0.5in}
+% \setlength{\parskip}{0pt plus 0pt minus 0pt}
+
+% Overwrite redefinition of paragraph and subparagraph by the default LaTeX template
+% See https://github.com/crsh/papaja/issues/292
+\makeatletter
+\renewcommand{\paragraph}{\@startsection{paragraph}{4}{\parindent}%
+  {0\baselineskip \@plus 0.2ex \@minus 0.2ex}%
+  {-1em}%
+  {\normalfont\normalsize\bfseries\itshape\typesectitle}}
+
+\renewcommand{\subparagraph}[1]{\@startsection{subparagraph}{5}{1em}%
+  {0\baselineskip \@plus 0.2ex \@minus 0.2ex}%
+  {-\z@\relax}%
+  {\normalfont\normalsize\itshape\hspace{\parindent}{#1}\textit{\addperi}}{\relax}}
+\makeatother
+
+% \usepackage{etoolbox}
+\makeatletter
+\patchcmd{\HyOrg@maketitle}
+  {\section{\normalfont\normalsize\abstractname}}
+  {\section*{\normalfont\normalsize\abstractname}}
+  {}{\typeout{Failed to patch abstract.}}
+\patchcmd{\HyOrg@maketitle}
+  {\section{\protect\normalfont{\@title}}}
+  {\section*{\protect\normalfont{\@title}}}
+  {}{\typeout{Failed to patch title.}}
+\makeatother
+
+\usepackage{xpatch}
+\makeatletter
+\xapptocmd\appendix
+  {\xapptocmd\section
+    {\addcontentsline{toc}{section}{\appendixname\ifoneappendix\else~\theappendix\fi\\: #1}}
+    {}{\InnerPatchFailed}%
+  }
+{}{\PatchFailed}
+\keywords{visual illusions, illusion game, Pyllusion, personality, general factor\newline\indent Word count: 4084}
+\usepackage{lineno}
+
+\linenumbers
+\usepackage{csquotes}
+\usepackage[titles]{tocloft}
+\cftpagenumbersoff{figure}
+\renewcommand{\cftfigpresnum}{\itshape\figurename\enspace}
+\renewcommand{\cftfigaftersnum}{.\space}
+\setlength{\cftfigindent}{0pt}
+\setlength{\cftafterloftitleskip}{0pt}
+\settowidth{\cftfignumwidth}{Figure 10.\qquad}
+\usepackage[labelfont=bf, font={scriptsize, color=gray}]{caption}
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same} % disable monospaced font for URLs
+\hypersetup{
+  pdftitle={The Illusion Game: A Novel Experimental Paradigm Provides Evidence for a General Factor of Visual Illusion Sensitivity and Personality Correlates},
+  pdfauthor={Dominique Makowski1, An Shu Te1, Stephanie Kirk1, Ngoi Zi Liang1, \& S.H. Annabel Chen1, 2, 3, 4},
+  pdflang={en-EN},
+  pdfkeywords={visual illusions, illusion game, Pyllusion, personality, general factor},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{\textbf{The Illusion Game: A Novel Experimental Paradigm Provides Evidence for a General Factor of Visual Illusion Sensitivity and Personality Correlates}}
+\author{Dominique Makowski\textsuperscript{1}, An Shu Te\textsuperscript{1}, Stephanie Kirk\textsuperscript{1}, Ngoi Zi Liang\textsuperscript{1}, \& S.H. Annabel Chen\textsuperscript{1, 2, 3, 4}}
+\date{}
+
+
+\shorttitle{Illusion Game Validation}
+
+\authornote{
+
+Correspondence concerning this article should be addressed to Dominique Makowski, HSS 04-18, 48 Nanyang Avenue, Singapore (\href{mailto:dom.makowski@gmail.com}{\nolinkurl{dom.makowski@gmail.com}}).
+
+The authors made the following contributions. Dominique Makowski: Conceptualization, Data curation, Formal Analysis, Funding acquisition, Investigation, Methodology, Project administration, Resources, Software, Supervision, Validation, Visualization, Writing -- original draft; An Shu Te: Project administration, Resources, Investigation, Writing -- original draft; Stephanie Kirk: Project administration, Resources, Writing -- original draft; Ngoi Zi Liang: Project administration, Resources, Writing -- review \& editing; S.H. Annabel Chen: Project administration, Supervision, Writing -- review \& editing.
+
+Correspondence concerning this article should be addressed to Dominique Makowski, HSS 04-18, 48 Nanyang Avenue, Singapore. E-mail: \href{mailto:dom.makowski@gmail.com}{\nolinkurl{dom.makowski@gmail.com}}
+
+}
+
+\affiliation{\vspace{0.5cm}\textsuperscript{1} School of Social Sciences, Nanyang Technological University, Singapore\\\textsuperscript{2} LKC Medicine, Nanyang Technological University, Singapore\\\textsuperscript{3} National Institute of Education, Singapore\\\textsuperscript{4} Centre for Research and Development in Learning, Nanyang Technological University, Singapore}
+
+\abstract{%
+Visual illusions are a gateway to understand how we construct our experience of reality. Unfortunately, important questions remain open, such as the hypothesis of a common factor underlying the sensitivity to different types of illusions, as well as of personality correlates of illusion sensitivity. In this study, we used a novel parametric framework for visual illusions to generate 10 different classic illusions (Delboeuf, Ebbinghaus, Rod and Frame, Vertical-Horizontal, Zöllner, White, Müller-Lyer, Ponzo, Poggendorff, Contrast) varying in strength, embedded in a perceptual discrimination task. We tested the objective effect of the illusions on errors and response times, and extracted participant-level performance scores (n=250) for each illusion. Our results provide evidence in favour of a general factor underlying the sensitivity to different illusions (labelled Factor \emph{i}). Moreover, we report a positive link between illusion sensitivity and personality traits such as Agreeableness, Honesty-Humility, and negative relationships with Psychoticism, Antagonism, Disinhibition, and Negative Affect.
+}
+
+
+
+\begin{document}
+\maketitle
+
+\textbf{Significance Statement.} A novel paradigm to study the objective effect of visual illusions yielded evidence in favor of a common factor to visual illusions (Factor \emph{i}) and a relationship between illusion resistance and maladaptive personality traits, such as antagonism, psychoticism and disinhibition.
+
+\hypertarget{introduction}{%
+\section{Introduction}\label{introduction}}
+
+Visual illusions are fascinating stimuli capturing a key feature of our neurocognitive systems. They eloquently show that our brains did not evolve to be perfect perceptual devices providing veridical accounts of physical reality, but integrate prior knowledge and contextual information - blended together in our subjective conscious experience\textsuperscript{1}. Despite the long-standing interest within the fields of visual perception\textsuperscript{2--4}, consciousness science\textsuperscript{5,6}, and psychiatry\textsuperscript{7--10}, several important issues remain open.
+
+One area of contention concerns the presence of a common mechanism underlying the effect of different illusions\textsuperscript{11,12}. While early research has suggested a common factor of illusion sensitivity indexed by overall vision proficiency\textsuperscript{13,14}, recent empirical studies observed at most weak correlations between inter-individual resistance to distinct illusions\textsuperscript{15,16}. The existence of dispositional correlates of illusion sensitivity has also been controversial, with evidence suggesting a lower illusion sensitivity in patients with schizophrenia and autism\textsuperscript{7--9,16,17}, as well as individuals with stronger aggression and narcissism traits\textsuperscript{18,19}.
+
+Although the nature of the processes underlying illusion perception - whether related to low-level features of the visual processing system\textsuperscript{8,20} or to top-down influences\textsuperscript{5,21} - remains debated, a growing body of literature proposes to conceptualize illusions under the Bayesian brain hypothesis\textsuperscript{22}. In this context,illusions are conceptualized as \textbf{non-veridical perceptual experiences that result from giving ample weight to prior knowledge to minimize prediction error in the face of biasing sensory evidence.} The predictive coding account further provides an explanation regarding the observations from clinical populations. Certain dispositional traits or characteristics (e.g., psychoticism) are seen as driven by alterations in the system's metacognitive components\textsuperscript{23}, resulting in an underweighting of priors during perceptual inferences, and manifesting as a decreased sensitivity to illusions\textsuperscript{24}.
+
+Despite strong theoretical foundations and hypotheses, the empirical evidence remains scarce, clouded by methodological hurdles. For instance, one key challenge can be found in the difficulty of adapting visual illusions to an experimental setting, which typically requires the controlled modulation of the specific variables of interest. Instead, existing studies typically use only one or a small subset of illusion types, with few contrasting conditions, restricting the findings' generalizability\textsuperscript{12,20,25}. Moreover, conventional paradigms often focus on the participants' subjective experience, by asking them the extent to which they perceive two identical targets as different\textsuperscript{26}, having them estimate the targets' physical properties\textsuperscript{27}, \textbf{or through the method of adjustment, which involves having them adjust the targets to perceptually match a reference stimulus\textsuperscript{16,28--30}.} This reliance on meta-cognitive judgements about one's subjective experience likely distorts the measurand, limiting the ability to reliably obtain more direct and objective measures of illusion sensitivity\textsuperscript{31}.
+\textbf{While some recent efforts have some made to implement more empirically rigorous paradigms\textsuperscript{32}, most of the applied manipulations only focus on varying the physical dimensions of the illusion's target features without modulating its contextual elements, hence limiting the variability in the illusory effects of the stimuli presented. Furthermore, such prior studies have typically generated stimuli whose targets' physical attributes vary over a relatively narrow range, thus further constraining the reliability of their findings. As such, it is possible that the recent evidence reported against a common factor of illusions could be due to the low stimulus variance instead of a true reflection of a lack of common mechanism.}
+
+To address these issues, we first developed a parametric framework to manipulate visual illusions that we implemented and made accessible in the open-source software \emph{Pyllusion}\textsuperscript{33}. This software allows us to generate different types of classic visual illusions with a continuous and independent modulation of two parameters: \emph{illusion strength} and \emph{task difficulty} (\textbf{Figure 1}). Indeed, many visual illusions can be seen as being composed of \emph{targets} (e.g., same-length lines), of which perception is biased by the \emph{context} (e.g., in the Müller-Lyer illusion, the same-length line segments appear to have different lengths if they end with inwards vs.~outwards pointing arrows). Past illusion studies traditionally employed paradigms focusing on participants' subjective experience, by asking them the extent to which they perceive two identical targets as different\textsuperscript{26}, or having them adjust the targets to match a reference stimulus relying only on their perception\textsuperscript{16,28}. Alternatively, \emph{Pyllusion} allows the creation of illusions in which the targets are objectively different (e.g., one segment is truly more or less longer than the other), and in which the illusion varies in strength (the biasing angle of the arrows is more or less acute).
+
+\begin{figure}
+\includegraphics[width=1\linewidth]{../../figures/Figure1} \caption{The parametric framework for visual illusions (Makowski et al., 2021) applied to the Müller-Lyer illusion (above). Below are examples of stimuli showcasing the manipulation of two parameters, task difficulty and illusion strength.}\label{fig:unnamed-chunk-2}
+\end{figure}
+
+This systematic calibration of the stimuli enables the creation of experimental tasks in which participants make perceptual judgments about the targets (e.g., which segment is the longest) under different conditions of objective difficulty and illusion strength. Moreover, the illusion effect can be specified as either ``incongruent'' (making the task more difficult by biasing the perception in the opposite way) or ``congruent'' (making the task easier). Although visual illusions are inherently tied to subjective perception, this framework allows a reversal of the traditional paradigm to potentially quantify the ``objective'' effect of illusions by measuring its behavioral effect (error rate and reaction times) on the performance in a perceptual task.
+
+The aim of the present preregistered (\url{https://osf.io/5d6xp}) study is three-fold. First, we will test this novel paradigm by investigating if the effect of illusion strength and task difficulty can be manipulated continuously for 10 different classic illusions (Delboeuf, Ebbinghaus, Rod and Frame, Vertical-Horizontal, Zöllner, White, Müller-Lyer, Ponzo, Poggendorff, Simultaneous Brighness Contrast). Next, we will investigate the factor structure of illusion-specific performance scores and test the existence of a common latent factor of illusion sensitivity. Finally, we will explore how illusion sensitivity relates to demographic characteristics, contextual variables, and personality traits.
+
+\hypertarget{methods}{%
+\section{Methods}\label{methods}}
+
+\hypertarget{ethics-statement}{%
+\subsection{Ethics Statement}\label{ethics-statement}}
+
+This study was approved by the NTU Institutional Review Board (NTU IRB-2022-187) and all procedures performed were in accordance with the ethical standards of the institutional board and with the 1964 Helsinki Declaration. All participants provided their informed consent prior to participation and were incentivized after completing the study.
+
+\hypertarget{stimuli}{%
+\subsection{Stimuli}\label{stimuli}}
+
+\begin{figure}
+\includegraphics[width=1\linewidth]{../../figures/Figure2} \caption{Ten different illusions were used as stimuli in a perceptual task, where participants had to answer as fast as possibly, without making errors, according to specific instructions. For each illusion type, two parameters were experimentally manipulated, 1) the task difficulty (e.g., how large was the difference between the bigger and the smaller red circles in the Delboeuf illusion), and 2) the illusion strength (e.g., the size of the black circles in the Ebbinghaus illusion).}\label{fig:unnamed-chunk-3}
+\end{figure}
+
+We investigated the effect of 10 different classic illusions (\textbf{Figure 2}).
+A pilot study (\emph{n = 46}), of which a full description is available at \href{https://github.com/RealityBending/IllusionGameValidation}{\textbf{https://github.com/RealityBending/IllusionGameValidation}}, was first conducted to determine a sensitive range of stimuli parameters. Then, for each of the 10 illusion types, we generated a total of 134 stimuli. These stimuli resulted from the combination of 15 equally-spaced levels of illusion \emph{strength} (7 negative, i.e., congruent effects; 7 positive, i.e., incongruent effects; and 0) overlapped with 16 non-linearly spaced task \emph{difficulty} levels (i.e., with an exponential, square or cubic spacing depending on the pilot results). For instance, a linear space of {[}0.1, 0.4, 0.7, 1.0{]} can be transformed to an exponential space of {[}0.1, 0.34, 0.64, 1.0{]}, where 0.1 corresponds to the highest difficulty - i.e., the smallest objective difference between targets). For each illusion type, the stimuli were split into two series (56 and 72 stimuli per series) with alternating parameter values to maintain their homogeneity. Additionally, 6 stimuli per illusion type were generated for a practice series using parameters with more extreme variations (i.e., containing very easy trials to help cement the task instructions).
+
+\hypertarget{procedure}{%
+\subsection{Procedure}\label{procedure}}
+
+Participants were first given a brief demographic survey, which collected information regarding their \textbf{age, gender, country of birth, ethnicity and highest attained education level}. This was followed by a practice series of illusions, after which the first series of 10 illusion blocks was presented in a randomized order, with a further randomization of the stimuli order within each block. Following this first series of blocks, two personality questionnaires were administered, the \emph{IPIP6}\textsuperscript{24 items, 34} - measuring 6 ``normal'' personality traits (Extraversion, Openness, Conscientiousness, Agreeableness, Neuroticism and Honesty-Humility), and the \emph{PID-5}\textsuperscript{25 items, 35} - measuring 5 ``pathological'' personality traits (Disinhibition, Antagonism, Detachment, Negative Affect and Psychoticism). Next, the second series of 10 illusion blocks was presented (with new randomized orders of blocks and trials). In total, each participant underwent 1340 trials of which they had to respond ``as fast as possible without making errors'' (i.e., an explicit double constraint to mitigate the inter-individual variability in the speed-accuracy trade off) by pressing the correct arrow key (left/right, or up/down depending on the illusion type). For instance, in the Müller-Lyer block, participants had to answer which one of the upper or bottom target line was the longest. \textbf{All trials were required to be completed within a single-session (total experiment duration: \textasciitilde55 minutes)}. The task was implemented using \emph{jsPsych}\textsuperscript{36} and was \textbf{hosted on \emph{Pavlovia} } \href{https://pavlovia.org/}{(\textbf{https://pavlovia.org/})}. The set of instructions for each illusion type is available in the experiment code.
+
+\hypertarget{participants}{%
+\subsection{Participants}\label{participants}}
+
+Participants were recruited via \emph{Prolific}, a crowd-sourcing platform recognized for providing high quality data\textsuperscript{37}. The only inclusion criterion was a fluent proficiency in English to ensure that the task instructions would be well-understood. Participants were incentivised with a reward of about \textsterling 7.50 for completing the task, which took approximately 50 minutes to finish. Demographic variables (age, gender, and ethnicity) were self-reported on a voluntary basis.
+
+We excluded 6 participants upon inspection of the average error rate (when close to 50\%, suggesting random answers), and reaction time distribution (when implausibly fast relative to the average RT distribution). For the remaining participants, we discarded blocks with more than 50\% of errors (2.16\% of trials), possibly indicating that instructions were misunderstood (e.g., participants focused on the shorter line instead of the longer one), and 0.76\% trials with extreme response times (\textless{} 125 ms or \textgreater{} 4 SD above mean RT). Additionally, due to a technical issue, no personality data was recorded for the first eight participants.
+
+The final sample included 250 participants (Mean age = 26.5, SD = 7.6, range: {[}18 - 69{]}; Sex: 48\% females, 52\% males).
+
+\hypertarget{data-analysis}{%
+\subsection{Data Analysis}\label{data-analysis}}
+
+The first part of the analysis focused on modelling the effect of illusion strength and task difficulty on errors and response time (RT) \textbf{separately for each illusion} under a Bayesian framework. We started by fitting General Additive Models (GAMs), which can parsimoniously accommodate possible non-linear effects and interactions. Errors were analyzed using logistic mixed models \textbf{(suited to estimate the error rate)}, and RTs of correct responses were analyzed using an ex-Gaussian family with the same fixed effects entered for the location \(\mu\) (mean), scale \(\sigma\) (spread) and tail-dominance \(\tau\) of the RT distribution\textsuperscript{38,39}.
+
+Using GAMs as the ``ground-truth'' models, we attempted at approximating them using general linear mixed models, which can be used to estimate the effects' participant-level variability (via random slopes). Following a comparison of models with a combination of transformations (raw, log, square root or cubic root; \textbf{which are types of relationship commonly found in perceptual tasks}) on the main predictors (task \emph{difficulty} and illusion \emph{strength}), we fitted the best model (\textbf{based on their BIC and R2}), and compared their output visually (\textbf{Figure 3}). \textbf{Note that the model comparison and the parameters used in the resulting models were not pre-registered.}
+
+The inter-individual variability in the effect of illusion strength and its interaction with task difficulty (\textbf{diff}) was extracted from the models and used as participant-level scores. We then explored the relationship of these indices across different illusions using exploratory factor analysis (EFA, \textbf{to gain insights into the structure}), and structural equation modelling (SEM, \textbf{to model and test different hierarchical models}), and tested the existence of a general factor of illusion sensitivity (Factor \emph{i}).
+
+Finally, for each of the individual illusion sensitivity scores (10 illusion-specific factors and the general Factor \emph{i}), we tested the effect of contextual variables (screen size, screen refresh rate), demographic variables (sex, education, age), and personality traits. It should be noted that the measure of screen size used (measured using the number of pixels) is \textbf{only a proxy of the true physical screen size}.
+
+The analysis was carried out using \emph{R 4.2}\textsuperscript{40}, \emph{brms}\textsuperscript{41}, the \emph{tidyverse}\textsuperscript{42}, and the \emph{easystats} collection of packages\textsuperscript{43--46}. As all the full results have been made available (see \textbf{Data Availability}), we will focus here on the significant results\textsuperscript{based on the Bayes Factor \emph{BF} or the Probability of Direction \emph{pd}, see 47}.
+
+\begin{figure}
+\includegraphics[width=1\linewidth]{../../figures/Figure3} \caption{Top: the effect of illusion strength and task difficulty on the error rate and reaction time (RT) for each individual illusion. The solid line represents the General Additive Model (GAM), and the dashed line corresponds to its approximation via linear models. Descriptive data is shown with stacked dots (for which errors start from the top) and distributions for RTs. Negative values for illusion strength correspond to congruent (i.e., facilitating) illusion effects. Task difficulty (the objective difference between the targets of perceptual decision) levels are shown as colors, with lower values corresponding to harder trials. The results for each illusion are surrounded by 4 extreme examples of stimuli, corresponding to the hardest difficulty (on top) and the strongest illusion (on the right for incongruent illusions). Bottom: We extracted the effect slope of the illusion strength and its interaction with task difficulty for each participant. We fitted a Structural Equation Model (SEM) suggesting that these manifest variables group to first-level illusion-specific latent factors, which then load on a general factor of illusion sensitivity (Factor \textit{i}).}\label{fig:unnamed-chunk-4}
+\end{figure}
+
+\hypertarget{results}{%
+\section{Results}\label{results}}
+
+\hypertarget{effects-of-illusion-strength-and-task-difficulty}{%
+\subsection{Effects of Illusion Strength and Task Difficulty}\label{effects-of-illusion-strength-and-task-difficulty}}
+
+The best model specifications were \(log(diff)*strength\) for Delboeuf; \(sqrt(diff)*strength\) for Ebbinghaus; \(log(diff)*log(strength)\) for Rod and Frame; \(sqrt(diff)*sqrt(strength)\) for Vertical-Horizontal; \(cbrt(diff)*strength\) for Zöllner; \(diff*sqrt(strength)\) and \(log(diff)*strength\) respectively for errors and RT in White; \(sqrt(diff)*sqrt(strength)\) and \(sqrt(diff)*strength\) respectively for errors and RT in Müller-Lyer; \(cbrt(diff)*strength\) for Ponzo; \(cbrt(diff)*sqrt(strength)\) and \(cbrt(diff)*strength\) respectively for errors and RT in Poggendorff; and \(sqrt(diff)*sqrt(strength)\) for Contrast. For all of these models, the effects of illusion strength, task difficulty and their interaction were significant.
+
+For error rates, most of the models closely matched their GAMs counterpart, with the exception of Delboeuf (for which the GAM suggested a non-monotonic effect of illusion strength with a local minimum at 0) and Zöllner (for which theoretically congruent illusion effects were related to increased error rate). A specific discussion regarding these 2 illusions is available in the study documentation (part 1) at \href{https://github.com/RealityBending/IllusionGameValidation}{\textbf{https://github.com/RealityBending/IllusionGameValidation}}.
+
+For RTs, the GAMs suggested a consistent non-linear relationship between RT and illusion strength: as the illusion strength increases beyond a certain threshold, the participants responded faster. While this is not surprising (strong illusions are likely so effective in biasing perception that it is ``easier'', i.e., faster, to make the wrong decision), the linear models were not designed to capture this - likely quadratic - pattern and hence are not good representatives of the underlying dynamics. As such, we decided not to use them for the individual scores analysis.
+
+\hypertarget{factor-structure}{%
+\subsection{Factor Structure}\label{factor-structure}}
+
+Though imperfect, we believe that the random-slope models capture inter-individual differences with more accuracy (and also provide more conservative estimates due to shrinkage) than basic empirical scores, such as the total number of errors, or the average RT. Thus, for each illusion and within each participant, we extracted the effect of illusion strength and its interaction with task difficulty when the illusion effect was incongruent. These twenty participant-level scores were subjected to exploratory factor analysis (EFA). The Method Agreement Procedure\textsuperscript{48} suggested the presence of 7 latent factors. An oblique (\emph{oblimin} rotation) factor solution explaining 66.69\% of variance suggested separate dimensions for the effect of Zöllner, White, Poggendorff, Contrast, Ebbinghaus, Delboeuf, and a common factor for the parameters related to Müller-Lyer, Vertical-Horizontal, Ponzo and Rod and Frame. We submitted these factors to a second-level analysis and extracted two orthogonal (\emph{varimax} rotation) factors. The first factor was loaded by all the previous dimensions with the exception of Delboeuf, which formed its own separate factor.
+
+Finally, we tested this data-driven model (\emph{m0}) against four other structural models using structural equation modelling (SEM): one in which the two parameters of each of the 10 illusions (illusion strength and interaction with task difficulty) loaded on separate factors, which then all loaded on a common factor (\emph{m1}); one in which the parameters were grouped by illusion type (lines, circles, contrast and angle) before loading on a common factor (\emph{m2}); one in which all the parameters related to strength, and all the parameters related to the interaction loaded onto two respective factors, which then loaded on a common factor (\emph{m3}); and one in which there was no intermediate level: all 20 parameters loaded directly on a common factor (\emph{m4}).
+
+The model \emph{m1}, in which the parameters loaded on a first level of 10 illusion-specific factors, which then all loaded on a common factor, significantly outperformed the other models. Its indices of fit ranged from acceptable to satisfactory (CFI = .92; SRMR = .08; NNFI = .91; PNFI = .74; RMSEA = .08), and all the specified effects were significant. The illusion-specific latent factors were loaded positively by the sensitivity to illusion strength, as well as by the interaction effect with task difficulty (with the exception of Delboeuf, Ebbinghaus, Vertical-Horizontal, Müller-Lyer and Contrast, for which the loading was negative). The general factor of illusion sensitivity, labelled Factor \emph{i} (i- for illusion), explained 48.02\% of the total variance of the initial dataset, and was strongly related to Vertical-Horizontal (\(\beta_{std.}=0.83\)), Müller-Lyer (\(\beta_{std.}=0.76\)), Ponzo (\(\beta_{std.}=0.65\)), Ebbinghaus (\(\beta_{std.}=0.64\)); moderately to Zöllner (\(\beta_{std.}=0.53\)), Poggendorff (\(\beta_{std.}=0.44\)), Rod and Frame (\(\beta_{std.}=0.42\)), Contrast (\(\beta_{std.}=0.40\)) and White (\(\beta_{std.}=0.35\)); and weakly to Delboeuf (\(\beta_{std.}=0.19\)). We then computed, for each participant, the score for the 10 illusion-specific factors and for the general Factor \emph{i}.
+
+It is important to note that these individual scores are the result of several layers of simplification: 1) the individual coefficient is that of simpler models that sometimes do not perfectly capture the underlying dynamics (especially in the case of Delboeuf and Zöllner); 2) we only used the models on error rate, which could be biased by the speed-accuracy decision criterion used by participants; 3) the structural equation model used to compute the scores also incorporated multiple levels of abstractions. Thus, in order to validate the individual scores, we computed the correlation between them and simple empirical scores, such as the average error rate and the mean RT in the task. This analysis revealed strong and significant correlations between each illusion-specific factor and the average amount of errors in its corresponding task. Moreover, each individual score was strongly associated with the average RT across multiple illusion types. This suggests that the individual scores obtained from the structural equation model do capture the sensitivity of each participant to visual illusions, manifesting in both the number of errors and long reaction times.
+
+\hypertarget{correlations-with-inter-individual-characteristics}{%
+\subsection{Correlations with Inter-individual Characteristics}\label{correlations-with-inter-individual-characteristics}}
+
+The Bayesian correlation analysis (with narrow priors centered around a null effect) between the illusion scores and contextual variables (screen size and refresh rate) provided weak evidence in favor of an absence of effect, with the exception of the two contrast-based illusions. Anecdotal (\(BF_{10} = 2.05\)) and moderate evidence (\(BF_{10} = 4.11\)) was found for a negative correlation between screen size and the sensitivity to the White and the Contrast illusion, respectively. To test whether this result could be an artifact related to the highly skewed screen size distribution (caused by very few participants with extreme screen sizes), we re-ran a robust correlation (with rank-transformed values), which provided even stronger evidence in favor of the effect existence (\(BF_{10} = 28.19\), \(BF_{10} = 4.31\) for White and Contrast, respectively).
+
+The Bayesian t-tests on the effect of sex suggested anecdotal to moderate evidence in favour of the null effect for all scores, with the exception of the sensitivity to the Zöllner illusion, which was higher in males as compared to females (\(\Delta=-0.37\), 95\% CI {[}-0.62, -0.13{]}, \(BF_{10} = 12.74\)). We fitted Bayesian linear models with the education level entered as a monotonic predictor\textsuperscript{appropriate for ordinal variables, 49}, which yielded no significant effects. For age, we fitted two types of models for each score, one general additive models (GAM) and a 2nd order polynomial model. These consistently suggested a significant positive linear relationship between age and Factor \emph{i} (\(pd=100\%\)), as well as the sensitivity to Müller-Lyer (\(pd=100\%\)), Vertical-Horizontal (\(pd=100\%\)), Zöllner (\(pd=100\%\)) and Ebbinghaus (\(pd=99\%\)) illusions (\textbf{Figure 4}).
+
+Regarding ``normal'' personality traits, Bayesian correlations suggested substantial evidence in favor of a positive relationship between \emph{Honesty-Humility} and Zöllner (\(BF_{10} > 100\)), Vertical-Horizontal (\(BF_{10} = 9.78\)) and the Factor \emph{i} (\(BF_{10} = 4.00\)); as well as between \emph{Agreeableness} and Vertical-Horizontal (\(BF_{10} = 25.06\)), Ponzo (\(BF_{10} = 4.88\)) and the Factor \emph{i} (\(BF_{10} = 19.65\)).
+
+\begin{figure}
+\includegraphics[width=1\linewidth]{../../figures/Figure4} \caption{The upper plots show the illusion sensitivity scores as a function of sex and age (solid lines indicate significant relationships). Bottom plots show the correlation between the general factor (Factor \textit{i}) of illusion sensitivity (on the x-axes) and personality traits.}\label{fig:unnamed-chunk-5}
+\end{figure}
+
+Regarding ``pathological'' personality traits, the results yielded strong evidence in favor of a negative relationship between illusion scores and multiple traits. \emph{Antagonism} was associated with the sensitivity to Vertical-Horizontal (\(BF_{10} > 100\)), Müller-Lyer (\(BF_{10} = 21.57\)), Ponzo (\(BF_{10} = 17.97\)) illusions, and the Factor \emph{i} (\(BF_{10} = 55.45\)); \emph{Psychoticism} was associated with the sensitivity to Vertical-Horizontal (\(BF_{10} = 66.63\)) and Müller-Lyer (\(BF_{10} = 35.59\)) illusions, and the Factor \emph{i} (\(BF_{10} = 35.02\)); \emph{Disinhibition} was associated with the sensitivity to Vertical-Horizontal (\(BF_{10} = 25.38\)), Zöllner (\(BF_{10} = 7.59\)), Müller-Lyer (\(BF_{10} = 5.89\)) illusions, and the Factor \emph{i} (\(BF_{10} = 31.42\)); and \emph{Negative Affect} was associated with Zöllner (\(BF_{10} = 62.04\)), Vertical-Horizontal (\(BF_{10} = 12.65\)), Müller-Lyer (\(BF_{10} = 3.17\)), and the Factor \emph{i} (\(BF_{10} = 6.39\)). The last remaining trait, \emph{Detachment}, did not share any significant relationship with illusion sensitivity.
+
+\hypertarget{discussion}{%
+\section{Discussion}\label{discussion}}
+
+This study tested a novel illusion sensitivity task paradigm based on the parametric illusion generation framework\textsuperscript{33}. Using the carefully generated stimuli in a perceptual decision task, we have shown that a gradual modulation of illusion strength is effectively possible across 10 different types of classic visual illusions. Increasing the illusion strength led to an increase in error likelihood, as well as the average and spread of RTs (but only up to a point, after which participants become faster at responding with the wrong answer). Using mixed models, we were able to statistically quantify the effect of illusions for each illusion and each participant separately. This important methodological step opens the door for new illusions-based paradigms and tasks to study the effect of illusions under different conditions and to measure illusion sensitivity using objective behavioral outcomes - such as accuracy or speed - instead of subjective meta-cognitive reports. This new and complementary approach will hopefully help address some of the longstanding literature gaps, as well as cement illusions as valuable stimuli for the study of cognition.
+
+Our findings suggest that the sensitivity to 10 different types of visual illusions share a common part of variance, supporting the existence of a general factor of illusion sensitivity (Factor \emph{i}). This result comes in a field of mixed findings. In fact, contrary to early studies on visual illusions, more recent research have generally not found any significant evidence for a common stable factor across illusions within individuals\textsuperscript{12,15,16,20,50}. Instead, past findings suggest illusory effects are highly specific to the perceptual features of the illusions at stake\textsuperscript{15,20}. It should be noted, however, that most of these studies were low-powered and/or relied on conventional paradigms, such as the adjustment procedure to measure the participants' subjective perception. We believe that our study presents several methodological improvements, including statistical power (high number of trials per participant), homogeneous stimuli (with minimal and highly controlled features) and tasks (decision-making reaction-time task), and a more reliable participant-level score extraction method (based on random-factors models), which in our opinion contributed to the emergence of the common factor.
+
+Finally, we found illusion sensitivity to be positively associated with ``positive'' personality traits, such as agreeableness and honesty-humility, and negatively associated with maladaptive traits such as antagonism, psychoticism, disinhibition, and negative affect. Although the existing evidence investigating links between illusion sensitivity and personality traits is scarce, these results are consistent with past findings relating pathological egocentric beliefs\textsuperscript{often associated with psychoticism, 51} to reduced context integration, manifesting in a tendency to separate objects from their surroundings when processing visual stimuli\textsuperscript{19,51,52}. As such, the association between maladaptive traits and lower illusion sensitivity could be linked to a self-centered, decontextualized and disorganized information processing style. Conversely, the relationship between illusion sensitivity and adaptive personality traits is in line with the decreased field dependence (the tendency to rely on external cues in ambiguous contexts) associated with traits negatively correlated with agreeableness and honesty-humility, such as hostility, aggression and narcissism\textsuperscript{18,19,53}.
+
+Importantly, these findings highlight the relevance of illusions beyond the field of visual perception, pointing towards an association with high-level domain-general mechanisms. In particular, the evidence in favor of a relationship between maladaptive personality traits and illusion sensitivity is in line with clinical observations, in which a greater resistance to illusions have been reported among patients with schizophrenia\textsuperscript{7,16,53}, especially in association with schizotypal traits such as cognitive disorganization\textsuperscript{20,26}. While the search for the exact mechanism(s) underlying these links is an important goal of future research, our findings unlock the potential of illusion-based tasks as sensitive tools to capture specific inter-individual neuro-cognitive differences.
+
+Future research is needed to address several limitations. One key question concerns the relationship of illusion sensitivity with perceptual abilities (e.g., using similar tasks, but without illusions). Although the illusions used in the present study did differ in terms of the perceptual task (contrast-based, size-estimation, angle-perception), the possibility of our general factor being driven by inter-individual perceptual skills variability (or other cognitive skills) cannot be discarded. Moreover, using only the error rate models to extract individual-level scores might fail in capturing the whole range of behavioral dynamics. Future work should attempt at integrating the reaction times data (e.g., by jointly analyzing them using drift diffusion models), and assess the psychometric properties - such as stability (e.g., test-retest reliability) and validity - of similar illusion-based paradigms. Finally, while the personality measures used in this study highlight illusion sensitivity as an interesting measure rather than a mere perceptual artifact, further studies should test its relationship with more specific dispositional characteristics (e.g., autistic or schizotypal traits), cognitive styles and abilities, to help understand the potential underlying mechanisms of these associations.
+
+\hypertarget{data-availability}{%
+\section{Data Availability}\label{data-availability}}
+
+The datasets generated and/or analysed during the current study are available in the GitHub repository \url{https://github.com/RealityBending/IllusionGameValidation}
+
+\hypertarget{funding}{%
+\section{Funding}\label{funding}}
+
+This work was supported by the Presidential Postdoctoral Fellowship Grant (NTU-PPF-2020-10014) from Nanyang Technological University (awarded to DM).
+
+\hypertarget{acknowledgments}{%
+\section{Acknowledgments}\label{acknowledgments}}
+
+We would like to thank Zen J. Lau, Tam Pham, and W. Paul Boyce for their contribution to \emph{Pyllusion}, as well as Prof Dólos for the inspiration.
+
+\newpage
+
+\hypertarget{references}{%
+\section{References}\label{references}}
+
+\hypertarget{refs}{}
+\begin{CSLReferences}{0}{0}
+\leavevmode\vadjust pre{\hypertarget{ref-carbon2014}{}}%
+\CSLLeftMargin{1. }%
+\CSLRightInline{Carbon, C.-C. \href{https://www.frontiersin.org/articles/10.3389/fnhum.2014.00566}{Understanding human perception by human-made illusions}. \emph{Frontiers in Human Neuroscience} \textbf{8}, (2014).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-day1972}{}}%
+\CSLLeftMargin{2. }%
+\CSLRightInline{Day, R. H. \href{https://doi.org/10.1126/science.175.4028.1335}{Visual Spatial Illusions: A General Explanation: A wide range of visual illusions, including geometrical distortions, can be explained by a single principle.} \emph{Science} \textbf{175}, 1335--1340 (1972).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-eagleman2001}{}}%
+\CSLLeftMargin{3. }%
+\CSLRightInline{Eagleman, D. M. \href{https://doi.org/10.1038/35104092}{Visual illusions and neurobiology}. \emph{Nature Reviews Neuroscience} \textbf{2}, 920--926 (2001).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-gomez-villa2022}{}}%
+\CSLLeftMargin{4. }%
+\CSLRightInline{Gomez-Villa, A., Martín, A., Vazquez-Corral, J., Bertalmío, M. \& Malo, J. \href{https://doi.org/10.1167/jov.22.8.2}{On the synthesis of visual illusions using deep generative models}. \emph{Journal of Vision} \textbf{22}, 2 (2022).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-caporuscio2022}{}}%
+\CSLLeftMargin{5. }%
+\CSLRightInline{Caporuscio, C., Fink, S. B., Sterzer, P. \& Martin, J. M. \href{https://doi.org/10.1016/j.concog.2022.103334}{When seeing is not believing: A mechanistic basis for predictive divergence}. \emph{Consciousness and Cognition} \textbf{102}, 103334 (2022).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-lamme2020}{}}%
+\CSLLeftMargin{6. }%
+\CSLRightInline{Lamme, V. A. F. \href{https://www.frontiersin.org/articles/10.3389/fpsyg.2020.00083}{Visual functions generating conscious seeing}. \emph{Frontiers in Psychology} \textbf{11}, (2020).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-notredame2014}{}}%
+\CSLLeftMargin{7. }%
+\CSLRightInline{Notredame, C.-E., Pins, D., Deneve, S. \& Jardri, R. \href{https://doi.org/10.3389/fnint.2014.00063}{What visual illusions teach us about schizophrenia}. \emph{Frontiers in Integrative Neuroscience} \textbf{8}, 63 (2014).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-gori2016}{}}%
+\CSLLeftMargin{8. }%
+\CSLRightInline{Gori, S., Molteni, M. \& Facoetti, A. \href{https://doi.org/10.3389/fnhum.2016.00175}{Visual illusions: An interesting tool to investigate developmental dyslexia and autism spectrum disorder}. \emph{Frontiers in Human Neuroscience} \textbf{10}, 175 (2016).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-razeghi2022}{}}%
+\CSLLeftMargin{9. }%
+\CSLRightInline{Razeghi, R., Arsham, S., Movahedi, A. \& Sammaknejad, N. \href{https://doi.org/10.1080/03004430.2020.1802260}{The effect of visual illusion on performance and quiet eye in autistic children}. \emph{Early Child Development and Care} \textbf{192}, 807--815 (2022).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-teufel2015}{}}%
+\CSLLeftMargin{10. }%
+\CSLRightInline{Teufel, C. \emph{et al.} \href{https://doi.org/10.1073/pnas.1503916112}{Shift toward prior knowledge confers a perceptual advantage in early psychosis and psychosis-prone healthy individuals}. \emph{Proceedings of the National Academy of Sciences} \textbf{112}, 13401--13406 (2015).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-hamburger2016}{}}%
+\CSLLeftMargin{11. }%
+\CSLRightInline{Hamburger, K. Visual Illusions Based on Processes: New Classification System Needed: \emph{Perception} (2016) doi:\href{https://doi.org/10.1177/0301006616629038}{10.1177/0301006616629038}.}
+
+\leavevmode\vadjust pre{\hypertarget{ref-cretenoud2020illusions}{}}%
+\CSLLeftMargin{12. }%
+\CSLRightInline{Cretenoud, A. F., Francis, G. \& Herzog, M. H. When illusions merge. \emph{Journal of vision} \textbf{20}, 12--12 (2020).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-halpern1999interindividual}{}}%
+\CSLLeftMargin{13. }%
+\CSLRightInline{Halpern, S. D., Andrews, T. J. \& Purves, D. Interindividual variation in human visual performance. \emph{Journal of cognitive neuroscience} \textbf{11}, 521--534 (1999).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-thurstone1944factorial}{}}%
+\CSLLeftMargin{14. }%
+\CSLRightInline{Thurstone, L. L. A factorial study of perception. (1944).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-grzeczkowski2017}{}}%
+\CSLLeftMargin{15. }%
+\CSLRightInline{Grzeczkowski, L., Clarke, A. M., Francis, G., Mast, F. W. \& Herzog, M. H. \href{https://doi.org/10.1016/j.visres.2016.10.006}{About individual differences in vision}. \emph{Vision Research} \textbf{141}, 282--292 (2017).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-grzeczkowski2018}{}}%
+\CSLLeftMargin{16. }%
+\CSLRightInline{Grzeczkowski, L. \emph{et al.} \href{https://doi.org/10.1016/j.psychres.2018.10.063}{Is the perception of illusions abnormal in schizophrenia?} \emph{Psychiatry Research} \textbf{270}, 929--939 (2018).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-park2022}{}}%
+\CSLLeftMargin{17. }%
+\CSLRightInline{Park, S., Zikopoulos, B. \& Yazdanbakhsh, A. \href{https://doi.org/10.1111/ejn.15739}{Visual illusion susceptibility in autism: A neural model}. \emph{European Journal of Neuroscience} \textbf{56}, (2022).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-zhang2017}{}}%
+\CSLLeftMargin{18. }%
+\CSLRightInline{Zhang, Y. \emph{et al.} \href{https://doi.org/10.1515/tnsci-2017-0004}{Personality traits and perception of Müller-Lyer illusion in male Chinese military soldiers and university students}. \emph{Translational Neuroscience} \textbf{8}, 15--20 (2017).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-konrath2009seeing}{}}%
+\CSLLeftMargin{19. }%
+\CSLRightInline{Konrath, S., Bushman, B. J. \& Grove, T. Seeing my world in a million little pieces: Narcissism, self-construal, and cognitive--perceptual style. \emph{Journal of Personality} \textbf{77}, 1197--1228 (2009).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-cretenoud2019}{}}%
+\CSLLeftMargin{20. }%
+\CSLRightInline{Cretenoud, A. F. \emph{et al.} \href{https://doi.org/10.1167/19.14.12}{Factors underlying visual illusions are illusion-specific but not feature-specific}. \emph{Journal of Vision} \textbf{19}, 12 (2019).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-teufel2018}{}}%
+\CSLLeftMargin{21. }%
+\CSLRightInline{Teufel, C., Dakin, S. C. \& Fletcher, P. C. \href{https://doi.org/10.1038/s41598-018-28845-5}{Prior object-knowledge sharpens properties of early visual feature-detectors}. \emph{Scientific Reports} \textbf{8}, 10853 (2018).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-friston2010free}{}}%
+\CSLLeftMargin{22. }%
+\CSLRightInline{Friston, K. The free-energy principle: A unified brain theory? \emph{Nature reviews neuroscience} \textbf{11}, 127--138 (2010).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-adams2013computational}{}}%
+\CSLLeftMargin{23. }%
+\CSLRightInline{Adams, R. A., Stephan, K. E., Brown, H. R., Frith, C. D. \& Friston, K. J. The computational anatomy of psychosis. \emph{Frontiers in psychiatry} \textbf{4}, 47 (2013).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-koethe2009binocular}{}}%
+\CSLLeftMargin{24. }%
+\CSLRightInline{Koethe, D. \emph{et al.} Binocular depth inversion as a paradigm of reduced visual information processing in prodromal state, antipsychotic-naive and treated schizophrenia. \emph{European Archives of Psychiatry and Clinical Neuroscience} \textbf{259}, 195--202 (2009).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-bressan2021most}{}}%
+\CSLLeftMargin{25. }%
+\CSLRightInline{Bressan, P. \& Kramer, P. Most findings obtained with untimed visual illusions are confounded. \emph{Psychological Science} \textbf{32}, 1238--1246 (2021).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-lanyi2022can}{}}%
+\CSLLeftMargin{26. }%
+\CSLRightInline{Lányi, O., Keri, S., Pálffy, Z. \& Polner, B. Can you believe your eyes? Positive schizotypy is associated with increased susceptibility to the m{ü}ller-lyer illusion. (2022).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-coren1976empirical}{}}%
+\CSLLeftMargin{27. }%
+\CSLRightInline{Coren, S., Girgus, J. S., Erlichman, H. \& Hakstian, A. R. An empirical taxonomy of visual illusions. \emph{Perception \& psychophysics} \textbf{20}, 129--137 (1976).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-mylniec2016}{}}%
+\CSLLeftMargin{28. }%
+\CSLRightInline{Mylniec, A. \& Bednarek, H. \href{https://doi.org/10.1515/ppb-2016-0012}{Field dependence, efficiency of information processing in working memory and susceptibility to orientation illusions among architects}. \emph{Polish Psychological Bulletin} \textbf{47}, 112--122 (2016).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-cretenoud2020individual}{}}%
+\CSLLeftMargin{29. }%
+\CSLRightInline{Cretenoud, A. F., Grzeczkowski, L., Bertamini, M. \& Herzog, M. H. Individual differences in the m{ü}ller-lyer and ponzo illusions are stable across different contexts. \emph{Journal of Vision} \textbf{20}, 4--4 (2020).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-cretenoud2021visual}{}}%
+\CSLLeftMargin{30. }%
+\CSLRightInline{Cretenoud, A. F. \emph{et al.} How do visual skills relate to action video game performance? \emph{Journal of vision} \textbf{21}, 10--10 (2021).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-skottun2014subjective}{}}%
+\CSLLeftMargin{31. }%
+\CSLRightInline{Skottun, B. C. \& Skoyles, J. R. Subjective criteria and illusions in visual testing: Some methodological limitations. \emph{Psychological research} \textbf{78}, 136--140 (2014).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-cretenoud2021individual}{}}%
+\CSLLeftMargin{32. }%
+\CSLRightInline{Cretenoud, A. F., Grzeczkowski, L., Kunchulia, M. \& Herzog, M. H. Individual differences in the perception of visual illusions are stable across eyes, time, and measurement methods. \emph{Journal of vision} \textbf{21}, 26--26 (2021).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-makowski2021}{}}%
+\CSLLeftMargin{33. }%
+\CSLRightInline{Makowski, D., Lau, Z. J., Pham, T., Paul Boyce, W. \& Annabel Chen, S. H. \href{https://doi.org/10.1177/03010066211057347}{A Parametric Framework to Generate Visual Illusions Using Python}. \emph{Perception} \textbf{50}, 950--965 (2021).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-sibley2011}{}}%
+\CSLLeftMargin{34. }%
+\CSLRightInline{Sibley, C. \emph{et al.} The mini-IPIP6: Validation and extension of a short measure of the big-six factors of personality in new zealand. \emph{New Zealand Journal of Psychology} \textbf{40}, 142--159 (2011).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-hopwood2012}{}}%
+\CSLLeftMargin{35. }%
+\CSLRightInline{Hopwood, C. J., Thomas, K. M., Markon, K. E., Wright, A. G. C. \& Krueger, R. F. \href{https://doi.org/10.1037/a0026656}{DSM-5 personality traits and DSM{\textendash}IV personality disorders.} \emph{Journal of Abnormal Psychology} \textbf{121}, 424--432 (2012).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-de2015jspsych}{}}%
+\CSLLeftMargin{36. }%
+\CSLRightInline{De Leeuw, J. R. jsPsych: A JavaScript library for creating behavioral experiments in a web browser. \emph{Behavior research methods} \textbf{47}, 1--12 (2015).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-peer2022}{}}%
+\CSLLeftMargin{37. }%
+\CSLRightInline{Peer, E., Rothschild, D., Gordon, A., Evernden, Z. \& Damer, E. \href{https://doi.org/10.3758/s13428-021-01694-3}{Data quality of platforms and panels for online behavioral research}. \emph{Behavior Research Methods} \textbf{54}, 1643--1662 (2022).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-balota2011moving}{}}%
+\CSLLeftMargin{38. }%
+\CSLRightInline{Balota, D. A. \& Yap, M. J. Moving beyond the mean in studies of mental chronometry: The power of response time distributional analyses. \emph{Current Directions in Psychological Science} \textbf{20}, 160--166 (2011).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-matzke2009psychological}{}}%
+\CSLLeftMargin{39. }%
+\CSLRightInline{Matzke, D. \& Wagenmakers, E.-J. Psychological interpretation of the ex-gaussian and shifted wald parameters: A diffusion model analysis. \emph{Psychonomic bulletin \& review} \textbf{16}, 798--817 (2009).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-RCoreTeam2022}{}}%
+\CSLLeftMargin{40. }%
+\CSLRightInline{R Core Team. \emph{\href{https://www.R-project.org/}{R: A language and environment for statistical computing}}. (R Foundation for Statistical Computing, 2022).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-Burkner2017}{}}%
+\CSLLeftMargin{41. }%
+\CSLRightInline{Bürkner, P.-C. \href{https://doi.org/10.18637/jss.v080.i01}{{brms}: An {R} package for {Bayesian} multilevel models using {Stan}}. \emph{Journal of Statistical Software} \textbf{80}, 1--28 (2017).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-wickham2019}{}}%
+\CSLLeftMargin{42. }%
+\CSLRightInline{Wickham, H. \emph{et al.} \href{https://doi.org/10.21105/joss.01686}{Welcome to the tidyverse}. \emph{Journal of Open Source Software} \textbf{4}, 1686 (2019).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-bayestestRArticle}{}}%
+\CSLLeftMargin{43. }%
+\CSLRightInline{Makowski, D., Ben-Shachar, M. \& Lüdecke, D. \href{https://doi.org/10.21105/joss.01541}{{bayestestR}: Describing effects and their uncertainty, existence and significance within the {Bayesian} framework}. \emph{JOSS} \textbf{4}, 1541 (2019).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-correlationArticle}{}}%
+\CSLLeftMargin{44. }%
+\CSLRightInline{Makowski, D., Ben-Shachar, M., Patil, I. \& Lüdecke, D. \href{https://doi.org/10.21105/joss.02306}{Methods and algorithms for correlation analysis in {R}}. \emph{JOSS} \textbf{5}, 2306 (2020).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-performanceArticle}{}}%
+\CSLLeftMargin{45. }%
+\CSLRightInline{Lüdecke, D., Ben-Shachar, M., Patil, I., Waggoner, P. \& Makowski, D. \href{https://doi.org/10.21105/joss.03139}{{performance}: An {R} package for assessment, comparison and testing of statistical models}. \emph{JOSS} \textbf{6}, 3139 (2021).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-insightArticle}{}}%
+\CSLLeftMargin{46. }%
+\CSLRightInline{Lüdecke, D., Waggoner, P. \& Makowski, D. \href{https://doi.org/10.21105/joss.01412}{Insight: A unified interface to access information from model objects in {R}}. \emph{JOSS} \textbf{4}, 1412 (2019).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-makowski2019indices}{}}%
+\CSLLeftMargin{47. }%
+\CSLRightInline{Makowski, D., Ben-Shachar, M. S., Chen, S. A. \& Lüdecke, D. Indices of effect existence and significance in the bayesian framework. \emph{Frontiers in psychology} \textbf{10}, 2767 (2019).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-parametersArticle}{}}%
+\CSLLeftMargin{48. }%
+\CSLRightInline{Lüdecke, D., Ben-Shachar, M., Patil, I. \& Makowski, D. \href{https://doi.org/10.21105/joss.02445}{Extracting, computing and exploring the parameters of statistical models using {R}}. \emph{JOSS} \textbf{5}, 2445 (2020).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-burkner2020modelling}{}}%
+\CSLLeftMargin{49. }%
+\CSLRightInline{Bürkner, P.-C. \& Charpentier, E. Modelling monotonic effects of ordinal predictors in bayesian regression models. \emph{British Journal of Mathematical and Statistical Psychology} \textbf{73}, 420--451 (2020).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-yang2012}{}}%
+\CSLLeftMargin{50. }%
+\CSLRightInline{Yang, E. \emph{et al.} Visual Context Processing in Schizophrenia: \emph{Clinical Psychological Science} (2012) doi:\href{https://doi.org/10.1177/2167702612464618}{10.1177/2167702612464618}.}
+
+\leavevmode\vadjust pre{\hypertarget{ref-fox2006}{}}%
+\CSLLeftMargin{51. }%
+\CSLRightInline{Fox, A. Adolescent self-development and psychopathology: Anorexia nervosa and psychosis. (2006).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-ohmann2016}{}}%
+\CSLLeftMargin{52. }%
+\CSLRightInline{Ohmann, K. \& Burgmer, P. \href{https://doi.org/10.1016/j.paid.2016.03.069}{Nothing compares to me: How narcissism shapes comparative thinking}. \emph{Personality and Individual Differences} \textbf{98}, 162--170 (2016).}
+
+\leavevmode\vadjust pre{\hypertarget{ref-pessoa2008}{}}%
+\CSLLeftMargin{53. }%
+\CSLRightInline{Pessoa, V. F., Monge-Fuentes, V., Simon, C. Y., Suganuma, E. \& Tavares, M. C. H. \href{https://doi.org/10.1515/REVNEURO.2008.19.2-3.91}{The müller-lyer illusion as a tool for schizophrenia screening}. \emph{Reviews in the Neurosciences} \textbf{19}, (2008).}
+
+\end{CSLReferences}
+
+
+\clearpage
+\renewcommand{\listfigurename}{Figure captions}
+
+
+\end{document}
