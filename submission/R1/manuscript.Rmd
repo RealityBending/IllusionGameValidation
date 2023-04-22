@@ -4,7 +4,7 @@ shorttitle        : "Illusion Game Validation"
 author:
       
   - name          : "Dominique Makowski"
-    affiliation   : "1"
+    affiliation   : "1, 2"
     corresponding : yes    # Define only one corresponding author
     address       : "HSS 04-18, 48 Nanyang Avenue, Singapore"
     email         : "dom.makowski@gmail.com"
@@ -24,7 +24,7 @@ author:
       - "Visualization"
       - "Writing – original draft"
   - name          : "An Shu Te"
-    affiliation   : "1"
+    affiliation   : "2"
     orcid         : 0000-0001-8008-2824
     role:
       - "Project administration"
@@ -32,34 +32,35 @@ author:
       - "Investigation"
       - "Writing – original draft"
   - name          : "Stephanie Kirk"
-    affiliation   : "1"
+    affiliation   : "2"
     orcid         : 0000-0002-9312-5552
     role:
       - "Project administration"
       - "Resources"
       - "Writing – original draft"
   - name          : "Ngoi Zi Liang"
-    affiliation   : "1"
+    affiliation   : "2"
     role:
       - "Project administration"
       - "Resources"
       - "Writing – review & editing"
   - name          : "S.H. Annabel Chen"
-    affiliation   : "1, 2, 3, 4"
+    affiliation   : "2, 3, 4, 5"
     orcid         : 0000-0002-1540-5516
     role:
       - "Project administration"
       - "Supervision"
       - "Writing – review & editing"
 affiliation:
-    
   - id            : "1"
-    institution   : "School of Social Sciences, Nanyang Technological University, Singapore"
+    institution   : "School of Psychology, University of Sussex, UK"
   - id            : "2"
-    institution   : "LKC Medicine, Nanyang Technological University, Singapore"
+    institution   : "School of Social Sciences, Nanyang Technological University, Singapore"
   - id            : "3"
-    institution   : "National Institute of Education, Singapore"
+    institution   : "LKC Medicine, Nanyang Technological University, Singapore"
   - id            : "4"
+    institution   : "National Institute of Education, Singapore"
+  - id            : "5"
     institution   : "Centre for Research and Development in Learning, Nanyang Technological University, Singapore"
 # authornote: |
 #   Correspondence concerning this article should be addressed to Dominique Makowski, HSS 04-18, 48 Nanyang Avenue, Singapore (dom.makowski@gmail.com).
